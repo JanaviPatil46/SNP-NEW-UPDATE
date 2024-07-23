@@ -1,0 +1,11 @@
+.base-Input-input.focused,
+.base-Input-input:focus {
+  border-color: #0072e5;
+}
+.base-Input-input{
+    padding: 8px;
+    border-radius: 10px;
+    border: 2px solid #cbd5e1;
+    margin: 8px 0;
+    width: 100%;
+}
