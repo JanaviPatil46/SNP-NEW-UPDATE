@@ -17,7 +17,7 @@ height: 100vh;
 
 .sidebar {
   height: 100%;
-
+  background-color: var(--sidebar-bg-color);
   grid-area: side;
   transition: 0.3s all;
   position: relative;
@@ -27,7 +27,8 @@ height: 100vh;
 .main {
   padding: 20px;
   grid-area: main;
-  /* border: 2px solid blue; */
+  background-color: var(--main-bg-color);
+  /* background-color: #f0f0f0; */
   overflow-y: auto;
   
 }
@@ -118,6 +119,7 @@ height: 100vh;
 @media (max-width: 768px) {
   .sidebar {
     display: none;
+    
   }
 
   .sidebar.show {
@@ -125,7 +127,7 @@ height: 100vh;
     position: absolute;
     width: 250px;
     height: 100%;
-    background: #fff;
+    background-color: var(--sidebar-bg-color);
     z-index: 10;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
   }
@@ -146,3 +148,35 @@ height: 100vh;
     }
   }
 }
+/* Define CSS variables for light mode */
+:root {
+  --sidebar-bg-color: #fff;
+  --sidebar-text-color: #000;
+  /* --main-bg-color: #f0f0f0; */
+  --main-text-color: #000;
+  --newsidebar-bg-color: #f0f0f0
+}
+
+/* Define CSS variables for dark mode */
+[data-theme='dark'] {
+  --sidebar-bg-color: #333;
+  --sidebar-text-color: #fff;
+  --main-bg-color: #222;
+  --main-text-color: #ddd;
+  --newsidebar-bg-color:pink
+}
+
+/* Apply styles using CSS variables */
+/* .sidebar {
+  background-color: var(--sidebar-bg-color);
+  color: var(--sidebar-text-color);
+}
+
+.main {
+  background-color: var(--main-bg-color);
+  color: var(--main-text-color);
+}
+.new-sidebar{
+  background-color: var(--newsidebar-bg-color);
+} */
+/* Add any additional styles here */

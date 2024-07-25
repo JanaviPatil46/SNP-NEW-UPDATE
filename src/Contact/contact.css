@@ -1,3 +1,14 @@
 .contact-form::-webkit-scrollbar{
     display: none;
 }
+.account-form::-webkit-scrollbar{
+    display: none;
+}
+.create_new_contactform::-webkit-scrollbar{
+    display: none;
+}
+.account-contact-info{
+    margin-top: 15px;
+    text-align: start;
+    /* border-bottom: 1px solid gray; */
+}

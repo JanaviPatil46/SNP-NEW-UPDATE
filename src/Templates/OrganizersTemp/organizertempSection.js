@@ -14,7 +14,6 @@ import {
 
 const Section = ({ section, onDelete, onUpdate }) => {
   const [text, setText] = useState(section.text);
-  const [dropdownVisible, setDropdownVisible] = useState(false);
   const [formElements, setFormElements] = useState(section.formElements || []);
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -38,7 +37,8 @@ const Section = ({ section, onDelete, onUpdate }) => {
     const updatedFormElements = [...formElements, newElement];
     setFormElements(updatedFormElements);
     onUpdate(section.id, text, updatedFormElements);
-    setDropdownVisible(false);
+    // setDropdownVisible(false);
+    setAnchorEl(null);
   };
 
   const handleDeleteFormElement = (id) => {
@@ -119,8 +119,11 @@ const Section = ({ section, onDelete, onUpdate }) => {
               variant="outlined"
               placeholder="Option"
               value={option.text}
+              size='small'
+              margin='normal'
+              fullWidth
               onChange={(e) => handleOptionChange(element.id, option.id, e.target.value)}
-              sx={{ marginRight: '8px' }}
+              
             />
             <IconButton onClick={() => handleDeleteOption(element.id, option.id)}>
               <RiDeleteBinLine />
@@ -143,8 +146,11 @@ const Section = ({ section, onDelete, onUpdate }) => {
               variant="outlined"
               placeholder="Free Entry"
               value={element.text}
+              size='small'
+              margin='normal'
+              fullWidth
               onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-              sx={{ marginRight: '8px' }}
+              
             />
             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
               <RiDeleteBinLine />
@@ -158,8 +164,11 @@ const Section = ({ section, onDelete, onUpdate }) => {
               variant="outlined"
               placeholder="Email"
               value={element.text}
+              size='small'
+              margin='normal'
+              fullWidth
               onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-              sx={{ marginRight: '8px' }}
+              
             />
             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
               <RiDeleteBinLine />
@@ -173,8 +182,11 @@ const Section = ({ section, onDelete, onUpdate }) => {
               variant="outlined"
               placeholder="Number"
               value={element.text}
+              size='small'
+              margin='normal'
+              fullWidth
               onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-              sx={{ marginRight: '8px' }}
+              
             />
             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
               <RiDeleteBinLine />
@@ -205,8 +217,11 @@ const Section = ({ section, onDelete, onUpdate }) => {
                 variant="outlined"
                 placeholder="Radio Buttons"
                 value={element.text}
+                size='small'
+                margin='normal'
+                fullWidth
                 onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-                sx={{ marginRight: '8px' }}
+                
               />
               <IconButton onClick={() => handleDeleteFormElement(element.id)}>
                 <RiDeleteBinLine />
@@ -225,8 +240,11 @@ const Section = ({ section, onDelete, onUpdate }) => {
                 variant="outlined"
                 placeholder="Checkboxes"
                 value={element.text}
+                size='small'
+                margin='normal'
+                fullWidth
                 onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
-                sx={{ marginRight: '8px' }}
+                
               />
               <IconButton onClick={() => handleDeleteFormElement(element.id)}>
                 <RiDeleteBinLine />
@@ -244,8 +262,11 @@ const Section = ({ section, onDelete, onUpdate }) => {
                 variant="outlined"
                 placeholder="Dropdown"
                 value={element.text}
+                size='small'
+                margin='normal'
+                fullWidth
                 onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
-                sx={{ marginRight: '8px' }}
+                
               />
               <IconButton onClick={() => handleDeleteFormElement(element.id)}>
                 <RiDeleteBinLine />
@@ -263,13 +284,17 @@ const Section = ({ section, onDelete, onUpdate }) => {
                 variant="outlined"
                 placeholder="Yes/No"
                 value={element.text}
+                size='small'
+                margin='normal'
+                fullWidth
                 onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-                sx={{ marginRight: '8px' }}
+                
               />
               <IconButton onClick={() => handleDeleteFormElement(element.id)}>
                 <RiDeleteBinLine />
               </IconButton>
             </Box>
+            {renderOptions(element)}
           </Box>
         );
       default:
@@ -292,6 +317,9 @@ const Section = ({ section, onDelete, onUpdate }) => {
           variant="outlined"
           fullWidth
           value={text}
+          size='small'
+          margin='normal'
+         
           onChange={handleTextChange}
           placeholder="Section text"
         />
@@ -299,7 +327,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
           <IconButton onClick={handleDelete}>
             <RiDeleteBinLine />
           </IconButton>
-          <IconButton onClick={(event) => setAnchorEl(event.currentTarget)}>
+          <IconButton >
             <HiOutlineDuplicate />
           </IconButton>
           <Menu
@@ -314,7 +342,9 @@ const Section = ({ section, onDelete, onUpdate }) => {
             ))}
           </Menu>
         </Box>
+        
       </Box>
+      <Button variant="contained" onClick={(event) => setAnchorEl(event.currentTarget)}>Questions</Button>
       {formElements.map(element => (
         <Box key={element.id} sx={{ marginTop: '16px' }}>
           {renderFormElement(element)}

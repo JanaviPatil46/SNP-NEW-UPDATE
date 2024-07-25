@@ -1,128 +1,182 @@
-
-import { Box } from "@mui/material";
-import { useCallback, useRef, useState } from "react";
+import React from 'react';
+import { Box } from '@mui/material';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Table from '@tiptap/extension-table';
+import TableRow from '@tiptap/extension-table-row';
+import TableCell from '@tiptap/extension-table-cell';
+import TextStyle from '@tiptap/extension-text-style';
+import Underline from '@tiptap/extension-underline';
+import Subscript from '@tiptap/extension-subscript';
+import Superscript from '@tiptap/extension-superscript';
+import Color from '@tiptap/extension-color';
+import Highlight from '@tiptap/extension-highlight';
+import TaskList from '@tiptap/extension-task-list';
+import TaskItem from '@tiptap/extension-task-item';
+import TableHeader from '@tiptap/extension-table-header';
+import Image from '@tiptap/extension-image'; // Import the Image extension
+import FontFamily from './FontFamily';
+import FontSize from './FontSize';
+import './editor.css';
 import {
-  LinkBubbleMenu,
-  RichTextEditor,
-  TableBubbleMenu,
-  insertImages,
-} from "mui-tiptap";
-import EditorMenuControls from "./EditorMenuControls";
-import useExtensions from "./useExtensions";
-
-const exampleContent = "";
-
-function fileListToImageFiles(fileList) {
-  return Array.from(fileList).filter((file) => {
-    const mimeType = (file.type || "").toLowerCase();
-    return mimeType.startsWith("image/");
-  });
-}
+  MenuButtonAddTable,
+  MenuButtonBlockquote,
+  MenuButtonBold,
+  MenuButtonBulletedList,
+  MenuButtonCode,
+  MenuButtonCodeBlock,
+  MenuButtonEditLink,
+  MenuButtonHighlightColor,
+  MenuButtonHorizontalRule,
+  MenuButtonImageUpload,
+  MenuButtonIndent,
+  MenuButtonItalic,
+  MenuButtonOrderedList,
+  MenuButtonRedo,
+  MenuButtonRemoveFormatting,
+  MenuButtonStrikethrough,
+  MenuButtonSubscript,
+  MenuButtonSuperscript,
+  MenuButtonTaskList,
+  MenuButtonTextColor,
+  MenuButtonUnderline,
+  MenuButtonUndo,
+  MenuButtonUnindent,
+  MenuControlsContainer,
+  MenuDivider,
+  MenuSelectFontFamily,
+  MenuSelectFontSize,
+  MenuSelectHeading,
+  MenuSelectTextAlign,
+  RichTextEditorProvider,
+  isTouchDevice,
+} from 'mui-tiptap';
+import { useTheme } from '@mui/material';
 
 export default function Editor() {
-  const extensions = useExtensions({
-    placeholder: "Add your own content here...",
+  const theme = useTheme();
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Table,
+      TableRow,
+      TableCell,
+      TableHeader,
+      TextStyle,
+      Underline,
+      Subscript,
+      Superscript,
+      Color,
+      Highlight,
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
+      Image,
+      FontFamily,
+      FontSize,
+      // Add other extensions as needed
+    ],
+    content: '',
   });
-  const rteRef = useRef(null);
-  const [isEditable] = useState(true);
-  const [showMenuBar] = useState(true);
 
-  const handleNewImageFiles = useCallback(
-    (files, insertPosition) => {
-      if (!rteRef.current?.editor) {
-        return;
-      }
+  if (!editor) {
+    return null;
+  }
 
-      const attributesForImageFiles = files.map((file) => ({
-        src: URL.createObjectURL(file),
-        alt: file.name,
-      }));
-
-      insertImages({
-        images: attributesForImageFiles,
-        editor: rteRef.current.editor,
-        insertPosition,
-      });
-    },
-    [],
-  );
-
-  const handleDrop = useCallback(
-    (view, event, _slice, _moved) => {
-      if (!(event instanceof DragEvent) || !event.dataTransfer) {
-        return false;
-      }
-
-      const imageFiles = fileListToImageFiles(event.dataTransfer.files);
-      if (imageFiles.length > 0) {
-        const insertPosition = view.posAtCoords({
-          left: event.clientX,
-          top: event.clientY,
-        })?.pos;
-
-        handleNewImageFiles(imageFiles, insertPosition);
-
-        event.preventDefault();
-        return true;
-      }
-
-      return false;
-    },
-    [handleNewImageFiles],
-  );
-
-  const handlePaste = useCallback(
-    (_view, event, _slice) => {
-      if (!event.clipboardData) {
-        return false;
-      }
-
-      const pastedImageFiles = fileListToImageFiles(event.clipboardData.files);
-      if (pastedImageFiles.length > 0) {
-        handleNewImageFiles(pastedImageFiles);
-        return true;
-      }
-
-      return false;
-    },
-    [handleNewImageFiles],
-  );
+  const handleUploadFiles = (files) => {
+    return files.map((file) => ({
+      src: URL.createObjectURL(file),
+      alt: file.name,
+    }));
+  };
 
   return (
-    <Box
-      sx={{
-        "& .ProseMirror": {
-          "& h1, & h2, & h3, & h4, & h5, & h6": {
-            scrollMarginTop: showMenuBar ? 50 : 0,
-          },
-        },
-      }}
-    >
-      <RichTextEditor
-        ref={rteRef}
-        extensions={extensions}
-        content={exampleContent}
-        editable={isEditable}
-        editorProps={{
-          handleDrop: handleDrop,
-          handlePaste: handlePaste,
-        }}
-        renderControls={() => <EditorMenuControls />}
-        RichTextFieldProps={{
-          variant: "outlined",
-          MenuBarProps: {
-            hide: !showMenuBar,
-          }
-        }}
-      >
-        {() => (
-          <>
-            <LinkBubbleMenu />
-            <TableBubbleMenu />
-          </>
-        )}
-      </RichTextEditor>
+    <Box sx={{ border: '1px solid grey' }}>
+      <RichTextEditorProvider editor={editor} >
+        <Box sx={{padding:'10px'}}>
+          <MenuControlsContainer >
+            <MenuSelectFontFamily
+              options={[
+                { label: 'Comic Sans', value: 'Comic Sans MS, Comic Sans' },
+                { label: 'Cursive', value: 'cursive' },
+                { label: 'Monospace', value: 'monospace' },
+                { label: 'Serif', value: 'serif' },
+              ]}
+            />
+            <MenuDivider />
+            <MenuSelectHeading />
+            <MenuDivider />
+            <MenuSelectFontSize />
+            <MenuDivider />
+            <MenuButtonBold />
+            <MenuButtonItalic />
+            <MenuButtonUnderline />
+            <MenuButtonStrikethrough />
+            <MenuButtonSubscript />
+            <MenuButtonSuperscript />
+            <MenuDivider />
+            <MenuButtonTextColor
+              defaultTextColor={theme.palette.text.primary}
+              swatchColors={[
+                { value: '#000000', label: 'Black' },
+                { value: '#ffffff', label: 'White' },
+                { value: '#888888', label: 'Grey' },
+                { value: '#ff0000', label: 'Red' },
+                { value: '#ff9900', label: 'Orange' },
+                { value: '#ffff00', label: 'Yellow' },
+                { value: '#00d000', label: 'Green' },
+                { value: '#0000ff', label: 'Blue' },
+              ]}
+            />
+            <MenuButtonHighlightColor
+              swatchColors={[
+                { value: '#595959', label: 'Dark grey' },
+                { value: '#dddddd', label: 'Light grey' },
+                { value: '#ffa6a6', label: 'Light red' },
+                { value: '#ffd699', label: 'Light orange' },
+                { value: '#ffff00', label: 'Yellow' },
+                { value: '#99cc99', label: 'Light green' },
+                { value: '#90c6ff', label: 'Light blue' },
+                { value: '#8085e9', label: 'Light purple' },
+              ]}
+            />
+            <MenuDivider />
+            <MenuButtonEditLink />
+            <MenuDivider />
+            <MenuSelectTextAlign />
+            <MenuDivider />
+            <MenuButtonOrderedList />
+            <MenuButtonBulletedList />
+            <MenuButtonTaskList />
+            {isTouchDevice() && (
+              <>
+                <MenuButtonIndent />
+                <MenuButtonUnindent />
+              </>
+            )}
+            <MenuDivider />
+            <MenuButtonBlockquote />
+            <MenuDivider />
+            <MenuButtonCode />
+            <MenuButtonCodeBlock />
+            <MenuDivider />
+            <MenuButtonImageUpload onUploadFiles={handleUploadFiles} />
+            <MenuDivider />
+            <MenuButtonHorizontalRule />
+            <MenuButtonAddTable />
+            <MenuDivider />
+            <MenuButtonRemoveFormatting />
+            <MenuDivider />
+            <MenuButtonUndo />
+            <MenuButtonRedo />
+          </MenuControlsContainer>
+        </Box>
+
+        <div className="editor-container" >
+          <EditorContent editor={editor} className="editor-content" style={{ borderTop: '1px solid grey',padding:'10px' }} />
+        </div>
+      </RichTextEditorProvider>
     </Box>
   );
 }
-

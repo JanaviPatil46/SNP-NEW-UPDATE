@@ -4,14 +4,12 @@ import SidebarComponent from './Sidebar/Sidebar';
 import Insights from './Pages/Insights';
 import Account from './Pages/Account';
 import Contact from './Pages/Contact';
-
 import ErrorPage from './Pages/ErrorPage';
 import Tasks from './Templates/Task/Tasks'
-import Accounts from './Pages/Accounts';
 import Tags from './Templates/Tags/Tags';
 import EmailTemp from './Templates/EmailTemp/EmailTemp';
 import Templates from './Pages/Templates';
-import JobTemp from './Templates/JobsTemp/JobTemp';
+import JobTemp from './Templates/JobsTemp/Jobtemp';
 import PipelineTemp from './Templates/PipelineTemp/PipelineTemp';
 import FolderTemp from './Templates/FoldersTemp/FolderTemp';
 import ChatTemp from './Templates/ChatsTemp/ChatTemp';
@@ -24,7 +22,10 @@ import ProposalTemp from './Templates/ProposalsTemp/ProposalTemp';
 import CreateJob from './Jobs/CreateJob';
 import Docs from './Pages/Docs'
 import Login from './Login&Signup/Login'
-
+import Invoices from './Billing/Invoices';
+import MyAccount from './Settings/MyAccount'
+import Pipeline from './Workflow/Pipeline';
+import WorkflowTask from './Workflow/Tasks'
 const App = () => {
   return (
 
@@ -37,8 +38,11 @@ const App = () => {
           <Route path='/docs' element={<Docs/>}/>
           <Route path='clients/accounts' element={<Account />} />
           <Route path='clients/contacts' element={<Contact />} />
-          <Route path='accounts' element={<Accounts />} />
+         
           <Route path='addJobs' element={<CreateJob />} />
+          <Route path='billing/Invoices' element={<Invoices/>}/>
+          <Route path='workflow/tasks' element={<WorkflowTask/>}/>
+          <Route path='workflow/pipelines' element={<Pipeline/>}/>
           <Route path='firmtemp/templates' element={<Templates />}>
             <Route path="tasks" element={<Tasks />} />
             <Route path='tags' element={<Tags />} />
@@ -54,6 +58,7 @@ const App = () => {
             <Route path='signatures' element={<SignatureTemp />} />
             <Route path='proposals' element={<ProposalTemp />} />
           </Route>
+          <Route path='/settings/myaccount' element={<MyAccount/>}/>
 
           <Route path='*' element={<ErrorPage />} />
         </Route>

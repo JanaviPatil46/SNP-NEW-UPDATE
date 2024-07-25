@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Box, IconButton, List, ListItem, ListItemIcon, ListItemText, Collapse, Typography, Drawer } from "@mui/material";
-import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+import { ChevronLeft, ChevronRight,Brightness4, Brightness7 } from "@mui/icons-material";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Outlet, Link } from "react-router-dom";
@@ -24,7 +24,12 @@ function Sidebar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isRightDrawerOpen, setIsRightDrawerOpen] = useState(false);
   const [rightDrawerContent, setRightDrawerContent] = useState(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
+  useEffect(() => {
+    // Apply dark mode based on the state
+    document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
   useEffect(() => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth <= 768);
@@ -104,6 +109,11 @@ function Sidebar() {
           </Box>
           <Box>
             <AiOutlinePlusCircle className="add-icon" onClick={handleDrawerOpen} />
+          </Box>
+          <Box>
+            <IconButton onClick={() => setIsDarkMode(!isDarkMode)}>
+              {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+            </IconButton>
           </Box>
         </Box>
       </header>
@@ -199,7 +209,7 @@ function Sidebar() {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 
           </Box>
-          {rightDrawerContent === 'Account' && <AccountForm handleDrawerClose={handleDrawerClose}/>}
+          {rightDrawerContent === 'Account' && <AccountForm handleNewDrawerClose={handleNewDrawerClose}/>}
           {rightDrawerContent === 'Contact' && <ContactForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />}
         </Box>
       </Drawer>
@@ -208,3 +218,5 @@ function Sidebar() {
 }
 
 export default Sidebar;
+
+

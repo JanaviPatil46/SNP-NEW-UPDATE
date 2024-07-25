@@ -12,20 +12,24 @@ import {
   TableRow,
   TableCell,
   Paper,
-  Grid,
+
   TextField,
   InputLabel,
   Select,
   MenuItem,
   Chip,
   Switch, FormControlLabel,
-  Divider, IconButton
+  Divider, IconButton,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
+import Grid from '@mui/material/Unstable_Grid2';
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { LuPlusCircle,LuPenLine  } from "react-icons/lu";
+import { LuPlusCircle, LuPenLine } from "react-icons/lu";
 import { RxDragHandleDots2 } from "react-icons/rx";
 const PipelineTemp = () => {
-
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [showForm, setShowForm] = useState(false);
   const [pipelineName, setPipelineName] = useState('');
   const [userData, setUserData] = useState([]);
@@ -131,12 +135,7 @@ const PipelineTemp = () => {
     setStages(updatedStages);
   };
 
-  // const toggleDropdown = (index) => {
-  //   const updatedStages = stages.map((stage, idx) => (
-  //     idx === index ? { ...stage, showDropdown: !stage.showDropdown } : stage
-  //   ));
-  //   setStages(updatedStages);
-  // };
+
   return (
     <Container>
       {!showForm ? (
@@ -169,14 +168,14 @@ const PipelineTemp = () => {
 
           }}
         >
-          
+
           <Box>
             <form>
               <Box>
                 <Typography variant='h5' gutterBottom>  Create Pipelines</Typography>
                 <Box mt={2} mb={2}><hr /></Box>
                 <Grid container spacing={2} >
-                  <Grid item xs={12} sm={5} className='left-side-container' >
+                  <Grid xs={12} sm={5.8}>
                     <Box >
                       <InputLabel>Pipeline Name</InputLabel>
                       <TextField
@@ -247,7 +246,7 @@ const PipelineTemp = () => {
 
                     <Box mt={3}>
                       <Typography variant='h6'>Job card fields</Typography>
-                      <Grid container spacing={5}>
+                      <Grid container spacing={5} mt={2} >
                         <Grid item xs={4}>
                           <Box mt={2}>
                             <FormControlLabel
@@ -368,16 +367,16 @@ const PipelineTemp = () => {
                       </Grid>
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={1} sx={{ display: { xs: 'none', sm: 'block' } }}>
+                  <Grid item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
                     <Box
                       sx={{
                         borderLeft: '1px solid black',
                         height: '100%',
-                        margin: '0 20px'
+                        ml: 1.5
                       }}
                     ></Box>
                   </Grid>
-                  <Grid item xs={12} sm={5} ml={{ xs: 0, sm: 3 }} className='right-side-container'>
+                  <Grid xs={12} sm={5.8}>
                     <Typography>Default recurrence setting</Typography>
                   </Grid>
 
@@ -385,25 +384,37 @@ const PipelineTemp = () => {
                 <Box mt={5} display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
                   <Typography variant='h6'>Stages</Typography>
                   <Button
-                      variant="contained"
-                      startIcon={<LuPlusCircle />}
-                      onClick={handleAddStage}
-                      sx={{ border: 'none', backgroundColor: '#e4e9f7', color: 'blue', fontSize: '15px' }}
-                    >
-                      Add stage
-                    </Button>
+                    variant="contained"
+                    startIcon={<LuPlusCircle />}
+                    onClick={handleAddStage}
+
+                  >
+                    Add stage
+                  </Button>
                 </Box>
-                {/* <Box ><hr /></Box> */}
-                <Divider mt={2} />
+                <Box mt={2}><hr /></Box>
                 <Box sx={{ margin: '20px 0 10px 10px' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    
-                    
-                  </Box>
-                  
-                  <Box sx={{ display: 'flex', gap: '10px', overflowX: 'auto', marginBottom: '10%' }}>
+                  <Box sx={{
+                    display: 'flex',
+                    gap: '10px',
+                    overflowX: 'auto',
+                    marginBottom: '10%',
+                    flexDirection: isSmallScreen ? 'column' : 'row'
+                  }}>
                     {stages.map((stage, index) => (
-                      <Paper key={index} sx={{ height: 'auto', marginTop: '20px', borderRadius: '10px', boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)", width: '25%' }}>
+                      <Paper
+                        key={index}
+                        sx={{
+                          height: 'auto',
+                          marginTop: '20px',
+                          borderRadius: '10px',
+                          boxShadow: "0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)",
+                          width: isSmallScreen ? '90%' : '20%',
+                          marginBottom: '20px',
+                          marginLeft: isSmallScreen ? '0' : '5px',
+                          alignSelf: isSmallScreen ? 'center' : 'flex-start'
+                        }}
+                      >
                         <Box sx={{ margin: '10px' }}>
                           <Box sx={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                             <RxDragHandleDots2 />
@@ -414,6 +425,7 @@ const PipelineTemp = () => {
                                 placeholder="Stage Name"
                                 sx={{ flexGrow: 1 }}
                                 size='small'
+                                margin='normal'
                               />
                             </Box>
                             <IconButton onClick={() => handleDeleteStage(index)}>
@@ -421,8 +433,8 @@ const PipelineTemp = () => {
                             </IconButton>
                           </Box>
                           <Divider />
-                          <Box>
-                            <Typography variant="h6" sx={{ fontSize: '15px', margin: '5px 0' }}>Stage conditions</Typography>
+                          <Box m={2}>
+                            <Typography variant="h6" sx={{ fontSize: '15px', fontWeight: 'bold' }}>Stage conditions</Typography>
                             {index === 0 ? (
                               <Typography variant="body2">First stage can't have conditions</Typography>
                             ) : index === stages.length - 1 ? (
@@ -435,29 +447,16 @@ const PipelineTemp = () => {
                                 <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold' }}>Add conditions</Typography>
                               </Box>
                             )}
-                            <Divider />
-                            <Typography variant="h6" sx={{ fontSize: '15px', margin: '5px 0' }}>Automations</Typography>
+                            <Typography variant="h6" sx={{ fontSize: '15px', fontWeight: 'bold', mt: 2 }}>Automations</Typography>
                             <Typography variant="body2">Triggered when job enters stage</Typography>
-                            <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold' }} >Added automation</Typography>
-                            {/* onClick={() => toggleDropdown(index)} */}
-                            {/* {stage.showDropdown && (
-                              <Box className="dropdown-content">
-                                <ul>
-                                  {automoveActions.map((action, actionIndex) => (
-                                    <li key={actionIndex} onClick={() => handleActionSelect(index, action)}>{action}</li>
-                                  ))}
-                                </ul>
-                              </Box>
-                            )} */}
-                            <Divider />
-                            <Typography variant="h6" sx={{ fontSize: '15px', margin: '5px 0' }}>Automove</Typography>
+                            <Typography variant="body2" sx={{ cursor: 'pointer', color: 'blue', fontWeight: 'bold', mt: 2 }}>Added automation</Typography>
+                            <Typography variant="h6" sx={{ fontSize: '15px', mt: 2, fontWeight: 'bold' }}>Automove</Typography>
                             <Typography variant="body2">Move jobs automatically when linked actions are completed</Typography>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
                               <Switch
                                 onChange={() => handleAutoMoveChange(index)}
                                 checked={stage.autoMove}
                                 color="primary"
-                                sx={{ width: 45, height: 25 }}
                               />
                               <Typography sx={{ cursor: "pointer" }}>Automove jobs</Typography>
                             </Box>

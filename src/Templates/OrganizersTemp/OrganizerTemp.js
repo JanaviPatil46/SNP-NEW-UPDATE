@@ -6,24 +6,25 @@ import Section from './organizertempSection';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-import { 
-  Box, 
-  Button, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  TextField, 
- 
+import {
+  Box,
+  Button,
+  InputLabel,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+
   Typography
 } from '@mui/material';
 
 
 const OrganizersTemp = () => {
 
-  
+
   const [templateName, setTemplateName] = useState('');
   const [organizerName, setOrganizerName] = useState('');
   const [sections, setSections] = useState([]);
@@ -53,8 +54,8 @@ const OrganizersTemp = () => {
     ));
   };
 
-  
-  
+
+
 
   const [showOrganizerTemplateForm, setShowOrganizerTemplateForm] = useState(false);
 
@@ -62,11 +63,11 @@ const OrganizersTemp = () => {
     setShowOrganizerTemplateForm(true);
   };
 
-  
+
 
   const handleCancel = () => {
     setShowOrganizerTemplateForm(false);
-    
+
   };
 
   function truncateText(text, maxWords) {
@@ -81,7 +82,7 @@ const OrganizersTemp = () => {
     <Box>
       {!showOrganizerTemplateForm && (
         <Box>
-          <Typography variant="h4">Organizer Template</Typography>
+          <Box sx={{ mb: 5 }}><Typography variant="h5">Organizer Template</Typography></Box>
           <Button variant="contained" onClick={handleCreateInvoiceClick} className='btn1'>Create Template</Button>
           <TableContainer>
             <Table>
@@ -92,29 +93,39 @@ const OrganizersTemp = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                
+
               </TableBody>
             </Table>
           </TableContainer>
-          
+
         </Box>
       )}
       {showOrganizerTemplateForm && (
         <>
           <Box>
-            <TextField
-              label="Template name"
-              value={templateName}
-              onChange={(e) => setTemplateName(e.target.value)}
-              fullWidth
-            />
-            <TextField
-              label="Organizer name"
-              value={organizerName}
-              onChange={(e) => setOrganizerName(e.target.value)}
-              fullWidth
-              style={{ marginTop: '20px' }}
-            />
+            <Box>
+              <InputLabel sx={{ color: 'black' }}>Template Name</InputLabel>
+              <TextField
+                label="Template name"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                fullWidth
+                size='small'
+                margin='normal'
+              />
+            </Box>
+            <Box mt={2}>
+              <InputLabel sx={{ color: 'black' }}>Organizer name</InputLabel>
+              <TextField
+                label="Organizer name"
+                value={organizerName}
+                onChange={(e) => setOrganizerName(e.target.value)}
+                fullWidth
+                size='small'
+                margin='normal'
+              />
+            </Box>
+
           </Box>
           <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%" }}>
             <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "315px" }}>
@@ -124,6 +135,8 @@ const OrganizersTemp = () => {
                     <TextField
                       placeholder={`Section Name`}
                       className='section-name'
+                      size='small'
+                      margin='normal'
                       value={truncateText(section.text, 5)}
                       InputProps={{
                         readOnly: true
@@ -154,16 +167,17 @@ const OrganizersTemp = () => {
             </Box>
           </Box>
           <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px" }}>
-            <Button 
-              variant="contained" 
-              color="primary" 
-              
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
             >
               Save
             </Button>
-            <Button 
-              variant="contained" 
-              color="secondary" 
+            <Button
+               type="button"
+               variant="outlined"
+               color="primary"
               onClick={handleCancel}
             >
               Cancel
@@ -171,7 +185,7 @@ const OrganizersTemp = () => {
           </Box>
         </>
       )}
-      
+
     </Box>
   );
 };

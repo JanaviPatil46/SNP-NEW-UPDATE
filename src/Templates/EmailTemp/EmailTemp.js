@@ -268,13 +268,13 @@ const EmailTemp = () => {
 
 
                             <InputLabel sx={{ color: 'black' }}>From</InputLabel>
-                            
+
                             <Select
                                 sx={{ width: '100%', mt: 2, mb: 2 }}
                                 value={selectedUser}
                                 size="small"
                                 onChange={handleUserChange}
-                                input={<OutlinedInput  />}
+                                input={<OutlinedInput />}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         <Chip key={selected} label={options.find(option => option.value === selected)?.label} />

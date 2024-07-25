@@ -114,10 +114,10 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
             state: state,
             postalCode: postalCode,
             phoneNumbers: phoneNumbers.map((phone) => phone.phone),
-            
-                
-            
-           
+
+
+
+
 
 
         })
@@ -228,7 +228,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
     return (
         <Box
-       
+
         >
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderBottom: '1px solid grey' }}>
                 <Typography variant='h6'>New Contact</Typography>
@@ -244,7 +244,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                         flexDirection: isSmallScreen ? 'column' : 'row',
                         gap: isSmallScreen ? 2 : 5,
                         padding: '1px 5px 0 5px',
-                       
+
                     }}
                 >
                     <Box>
@@ -285,7 +285,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                         <InputLabel sx={{ color: 'black' }}>Last Name</InputLabel>
 
                         <TextField
-                         fullWidth
+                            fullWidth
                             name="lastName"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
@@ -462,7 +462,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                     }}
                     onClick={handleAddPhoneNumber}
                 >
-                    <AiOutlinePlusCircle style={{marginTop:'20px'}}/>
+                    <AiOutlinePlusCircle style={{ marginTop: '20px' }} />
                     <p>Add phone number</p>
                 </Box>
                 <Typography variant="h6" gutterBottom sx={{ ml: 1, fontWeight: 'bold', mt: 3 }}>
@@ -490,7 +490,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                 </Box>
                 <Box>
 
-                    <InputLabel sx={{ color: 'black',mt:2 }}>Street address</InputLabel>
+                    <InputLabel sx={{ color: 'black', mt: 2 }}>Street address</InputLabel>
 
                     <TextField
                         fullWidth
@@ -511,7 +511,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                             ? 'column'
                             : 'row',
                         gap: isSmallScreen ? 2 : 5,
-                        mt:2
+                        mt: 2
                     }}
                 >
                     <Box>
@@ -519,7 +519,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                         <InputLabel sx={{ color: 'black' }}>City</InputLabel>
 
                         <TextField
-                         fullWidth
+                            fullWidth
                             margin="normal"
                             name="city"
                             value={city}
@@ -543,7 +543,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                         />
                     </Box>
                     <Box>
-                        
+
                         <InputLabel sx={{ color: 'black' }}>ZIP/Postal Code</InputLabel>
 
                         <TextField
