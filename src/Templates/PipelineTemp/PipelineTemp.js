@@ -12,12 +12,9 @@ import {
   TableRow,
   TableCell,
   Paper,
-
+  Autocomplete,
   TextField,
   InputLabel,
-  Select,
-  MenuItem,
-  Chip,
   Switch, FormControlLabel,
   Divider, IconButton,
   useMediaQuery,
@@ -27,32 +24,33 @@ import Grid from '@mui/material/Unstable_Grid2';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LuPlusCircle, LuPenLine } from "react-icons/lu";
 import { RxDragHandleDots2 } from "react-icons/rx";
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const PipelineTemp = () => {
   const theme = useTheme();
+  const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [showForm, setShowForm] = useState(false);
   const [pipelineName, setPipelineName] = useState('');
-  const [userData, setUserData] = useState([]);
+
   const handleCreatePipeline = () => {
     setShowForm(true); // Show the form when button is clicked
   };
   const handleClosePipelineTemp = () => {
     setShowForm(false);
   }
-  const handlePipelineNameChange = (event) => {
-    setPipelineName(event.target.value);
-  };
-  const handleUserChange = (event) => {
-    setUserData(event.target.value);
-  };
+
+
 
   // sort jobs
   const [sortbyjobs, setSortbyJobs] = useState([]);
   const [selectedSortByJob, setSelectedSortByJob] = useState('');
 
-  const handleSortingByJobs = (event) => {
-    setSelectedSortByJob(event.target.value);
-  };
+  const handleSortingByJobs = (selectedOptions) => {
+    setSelectedSortByJob(selectedOptions);
+    console.log(selectedOptions)
+  }
 
   useEffect(() => {
     fetchSortByJob();
@@ -73,10 +71,7 @@ const PipelineTemp = () => {
     value: sort._id,
     label: sort.description
   }));
-  const [selectedtemp, setselectedTemp] = useState();
-  const handletemp = (event) => {
-    setselectedTemp(event.target.value);
-  };
+
   const [Account_id, setAccount_id] = useState(false);
   const handleAccount_idChange = (event) => {
     setAccount_id(event.target.checked);
@@ -121,6 +116,11 @@ const PipelineTemp = () => {
     const newStage = { name: '', conditions: [], automations: [], autoMove: false, showDropdown: false, activeAction: null };
     setStages([...stages, newStage]);
   };
+  const handleStageNameChange = (e, index) => {
+    const newStages = [...stages]; // Create a copy of the stages array
+    newStages[index].name = e.target.value; // Update the name of the specific stage
+    setStages(newStages); // Update the state with the modified stages array
+  };
 
   const handleDeleteStage = (index) => {
     const updatedStages = [...stages];
@@ -135,6 +135,195 @@ const PipelineTemp = () => {
     setStages(updatedStages);
   };
 
+  const [selectedUser, setSelectedUser] = useState([]);
+  const [combinedValues, setCombinedValues] = useState([]);
+  const [userData, setUserData] = useState([]);
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const response = await fetch(url);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleUserChange = (event, selectedOptions) => {
+    setSelectedUser(selectedOptions);
+    const selectedValues = selectedOptions.map((option) => option.value);
+    setCombinedValues(selectedValues);
+  };
+  const options = userData.map((user) => ({
+    value: user._id,
+    label: user.username,
+  }));
+
+  //Default Jobt template get 
+  const [Defaulttemp, setDefaultTemp] = useState([]);
+  const [selectedtemp, setselectedTemp] = useState();
+  const handletemp = (selectedOptions) => {
+    setselectedTemp(selectedOptions);
+    console.log(selectedOptions)
+  }
+  useEffect(() => {
+    fetchtemp();
+  }, []);
+
+  const fetchtemp = async () => {
+    try {
+      const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate';
+      const response = await fetch(url);
+      const data = await response.json();
+      setDefaultTemp(data.JobTemplates);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const optiontemp = Defaulttemp.map((temp) => ({
+    value: temp._id,
+    label: temp.templatename
+
+  }));
+
+
+  const createPipe = () => {
+    const data = {
+      pipelineName: pipelineName,
+      availableto: combinedValues,
+      sortjobsby: selectedSortByJob.value,
+      defaultjobtemplate: selectedtemp.value,
+      accountId: Account_id,
+      description: Description,
+      duedate: Due_date,
+      accounttags: Account_tags,
+      priority: Priority,
+      days_on_Stage: Days_on_stage,
+      assignees: Assignees,
+      name: Name,
+      startdate: startDate,
+      stages: stages,
+    };
+
+    const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'http://127.0.0.1:7500/workflow/pipeline/createpipeline',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: data,
+    };
+
+    axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+        // Display success toast
+        fetchPipelineData();
+        toast.success("Pipeline created successfully");
+        setShowForm(false);
+        clearForm();
+        // Additional success handling here
+      })
+      .catch((error) => {
+        console.log(error);
+        // Display error toast
+        toast.error("Failed to create pipeline");
+        // Additional error handling here
+      });
+  };
+  const clearForm = () => {
+    setPipelineName('');
+    setSelectedUser([]);
+    setCombinedValues([]);
+    setSelectedSortByJob('');
+    setselectedTemp(null);
+
+    setAccount_id(false);
+    setDays_on_stage(false);
+    setAccount_tags(false);
+    setStartDate(false);
+    setName(false);
+    setDue_date(false);
+    setPriority(false);
+    setDescription(false);
+    setAssignees(false);
+
+    setStages([]);
+
+
+  };
+
+  // const fetchPipelineData = async () => {
+  //   // try {
+  //   //   const response = await axios.get('http://127.0.0.1:7500/workflow/pipeline/pipelines');
+  //   //   setPipelineData(response.data);
+  //   // } catch (error) {
+  //   //   console.error('API Error:', error);
+  //   //   toast.error('Failed to fetch pipeline');
+  //   // }
+
+  // };
+
+  // useEffect(() => {
+  //   fetchPipelineData();
+  // }, []);
+  //get all templateName Record 
+  const [pipelineData, setPipelineData] = useState([]);
+
+  useEffect(() => {
+    fetchPipelineData();
+  }, []);
+
+  const fetchPipelineData = async () => {
+    try {
+
+      const url = 'http://127.0.0.1:7500/workflow/pipeline/pipelines';
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch pipeline data');
+      }
+      const data = await response.json();
+      setPipelineData(data.pipeline);
+    } catch (error) {
+      console.error('Error fetching pipeline data:', error);
+    }
+  };
+  const handleEdit = (_id) => {
+    // Implement logic for editing here
+    // console.log("Edit action triggered for template id: ", templateId);
+    navigate('PipelineTemplateUpdate/' + _id)
+};
+
+const [openMenuId, setOpenMenuId] = useState(null);
+const toggleMenu = (_id) => {
+    setOpenMenuId(openMenuId === _id ? null : _id);
+};
+
+
+//delete template
+const handleDelete = async (_id) => {
+  const config = {
+    method: 'delete',
+    maxBodyLength: Infinity,
+    url: `http://127.0.0.1:7500/workflow/pipeline/pipeline/${_id}`,
+    headers: {}
+  };
+
+  try {
+    const response = await axios.request(config);
+    console.log('Delete response:', response.data);
+    toast.success('Item deleted successfully');
+    fetchPipelineData();
+    // Optionally, you can refresh the data or update the state to reflect the deletion
+  } catch (error) {
+    console.error('Error deleting pipeline:', error);
+  }
+};
 
   return (
     <Container>
@@ -152,11 +341,38 @@ const PipelineTemp = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
+                {pipelineData.map((pipeline) => (
+                  <TableRow key={pipeline._id}>
 
-                </TableRow>
+                    <TableCell>{pipeline.pipelineName}</TableCell>
+                    <TableCell>
+            <div 
+              className="ci-menu-kebab" 
+              onClick={() => toggleMenu(pipeline._id)} 
+              style={{ cursor: 'pointer', fontSize: '20px' }}
+            >
+              &#8942;
+            </div>
+            {openMenuId === pipeline._id && (
+              <div className="pipeline-menu-options">
+                <div 
+                  className="menu-option edit-option" 
+                  onClick={() => handleEdit(pipeline._id)}
+                >
+                  Edit
+                </div>
+                <div 
+                  className="menu-option delete-option" 
+                  onClick={() => handleDelete(pipeline._id)}
+                >
+                  Delete
+                </div>
+              </div>
+            )}
+          </TableCell>
+                    
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -177,71 +393,103 @@ const PipelineTemp = () => {
                 <Grid container spacing={2} >
                   <Grid xs={12} sm={5.8}>
                     <Box >
-                      <InputLabel>Pipeline Name</InputLabel>
+                      <InputLabel sx={{ color: 'black' }}>Pipeline Name</InputLabel>
                       <TextField
                         fullWidth
                         value={pipelineName}
-                        onChange={handlePipelineNameChange}
+                        onChange={(e) => setPipelineName(e.target.value)}
                         margin="normal"
                         size="small"
                         placeholder='Pipeline Name'
                       />
                     </Box>
-                    <Box mt={2}>
+                    <Box mt={1}>
                       <InputLabel sx={{ color: 'black' }}>Available To</InputLabel>
-                      <Select
-                        size="small"
+                      <Autocomplete
                         multiple
-                        value={userData}
+                        sx={{ marginTop: '8px' }}
+                        options={options}
+                        size='small'
+                        getOptionLabel={(option) => option.label}
+                        value={selectedUser}
                         onChange={handleUserChange}
-                        renderValue={(selected) => (
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selected.map((value) => (
-                              <Chip key={value} label={value} />
-                            ))}
+                        renderOption={(props, option) => (
+                          <Box
+                            component="li"
+                            {...props}
+                            sx={{ cursor: 'pointer', margin: '5px 10px' }} // Add cursor pointer style
+                          >
+                            {option.label}
                           </Box>
                         )}
-                        sx={{ width: '100%', marginTop: '8px' }}
-                      >
-
-                        <MenuItem value="user1">User 1</MenuItem>
-                        <MenuItem value="user2">User 2</MenuItem>
-                        <MenuItem value="user3">User 3</MenuItem>
-                        <MenuItem value="user4">User 4</MenuItem>
-                      </Select>
+                        renderInput={(params) => (
+                          <TextField {...params} variant="outlined" placeholder="Available To" />
+                        )}
+                        isOptionEqualToValue={(option, value) => option.value === value.value}
+                      />
                     </Box>
                     <Box mt={2}>
                       <InputLabel sx={{ color: 'black' }}>Sort jobs by</InputLabel>
-                      <Select
-                        size='small'
-                        value={selectedSortByJob}
-                        sx={{ width: '100%', marginTop: '8px' }}
-                        onChange={handleSortingByJobs}
-                        displayEmpty
-                      >
-                        {/* <MenuItem value="">
-                          <em>Sort jobs by</em>
-                        </MenuItem> */}
-                        {optionsort.map((option) => (
-                          <MenuItem key={option.value} value={option.value}>
+
+                      <Autocomplete
+                        className='select-dropdown'
+                        options={optionsort} // The array of options
+                        value={selectedSortByJob} // The currently selected value
+                        onChange={(event, newValue) => handleSortingByJobs(newValue)} // Handle selection change
+                        getOptionLabel={(option) => option.label || ''} // Display label for each option
+                        renderOption={(props, option) => (
+                          <Box
+                            component="li"
+                            {...props}
+                            sx={{ cursor: 'pointer', margin: '5px 10px' }} // Add cursor pointer style
+                          >
                             {option.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                          </Box>
+                        )}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="Sort By Job"
+                            size="small"
+                            sx={{ width: '100%', marginTop: '8px', }}
+                            variant="outlined"
+                            InputLabelProps={{ shrink: true }}
+                          />
+                        )}
+                        isOptionEqualToValue={(option, value) => option.value === value.value} // To handle equality
+                        disableClearable={false} // Enable clearing selection
+                        clearOnEscape // Clear selection when escape is pressed
+                      />
                     </Box>
                     <Box mt={2}>
-                      <InputLabel>Default job template</InputLabel>
-                      <Select
-                        sx={{ width: '100%', marginTop: '8px' }}
-                        size="small"
+                      <InputLabel sx={{ color: 'black' }}>Default job template</InputLabel>
+                      <Autocomplete
+                        options={optiontemp}
+                        getOptionLabel={(option) => option.label}
                         value={selectedtemp}
-                        onChange={handletemp}
-                      >
+                        onChange={(event, newValue) => handletemp(newValue)}
+                        isOptionEqualToValue={(option, value) => option.value === value.value}
+                        renderOption={(props, option) => (
+                          <Box
+                            component="li"
+                            {...props}
+                            sx={{ cursor: 'pointer', margin: '5px 10px' }} // Add cursor pointer style
+                          >
+                            {option.label}
+                          </Box>
+                        )}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
 
-                        <MenuItem value="jobtemp1">Jobtemp 1</MenuItem>
-                        <MenuItem value="jobtemp2">Jobtemp 2</MenuItem>
-                        <MenuItem value="jobtemp3">Jobtemp 3</MenuItem>
-                      </Select>
+                            placeholder="Default job template"
+                            variant="outlined"
+                            size="small"
+                          />
+                        )}
+                        sx={{ width: '100%', marginTop: '8px' }}
+                        clearOnEscape // Enable clearable functionality
+                      />
                     </Box>
 
                     <Box mt={3}>
@@ -426,6 +674,7 @@ const PipelineTemp = () => {
                                 sx={{ flexGrow: 1 }}
                                 size='small'
                                 margin='normal'
+                                value={stage.name} onChange={(e) => handleStageNameChange(e, index)}
                               />
                             </Box>
                             <IconButton onClick={() => handleDeleteStage(index)}>
@@ -464,11 +713,23 @@ const PipelineTemp = () => {
                         </Box>
                       </Paper>
                     ))}
+                    <Box mt={3}>
+                      <Button
+                        variant="contained"
+                        startIcon={<LuPlusCircle />}
+                        onClick={handleAddStage}
+
+                      >
+                        Add stage
+                      </Button>
+                    </Box>
+
                   </Box>
+
                 </Box>
 
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Button variant="contained" color="primary">Save</Button>
+                  <Button variant="contained" color="primary" onClick={createPipe}>Save</Button>
                   <Button variant="outlined" onClick={handleClosePipelineTemp}>Cancel</Button>
                 </Box>
               </Box>

@@ -1,4 +1,4 @@
-import { Box, Typography, FormControl, RadioGroup, FormControlLabel, Radio, Button, Select, Chip, MenuItem, TextField, useMediaQuery, } from '@mui/material';
+import { Box, Typography, FormControl, RadioGroup, FormControlLabel, Radio, Button, Select, Chip, MenuItem, TextField, useMediaQuery, Autocomplete, } from '@mui/material';
 import { RxCross2 } from "react-icons/rx";
 import { useTheme } from '@mui/material/styles';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
@@ -33,7 +33,7 @@ const AccountForm = ({ handleNewDrawerClose }) => {
   const [state, setstate] = useState('')
   const [postalCode, setpostalCode] = useState('');
   const [activeStep, setActiveStep] = useState("Account Info");
-  const [combinedValues, setCombinedValues] = useState([]);
+
   const [selectedCountry, setSelectedCountry] = useState('');
   const handleCountryChange = (event) => {
     setSelectedCountry(event.target.value);
@@ -56,12 +56,35 @@ const AccountForm = ({ handleNewDrawerClose }) => {
   const handleTeamMemberChange = (event) => {
     setTeamMemberValues(event.target.value);
   };
-  
-  const TeamOptions = [
-    { value: 'team 1', label: 'team1', },
-    { value: 'team2', label: 'team2', },
-    { value: 'team3', label: 'team3', },
-  ]
+  const [selectedUser, setSelectedUser] = useState([]);
+  const [combinedValues, setCombinedValues] = useState([]);
+  const [userData, setUserData] = useState([]);
+
+  console.log(combinedValues)
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const response = await fetch(url);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleUserChange = (event, selectedOptions) => {
+    setSelectedUser(selectedOptions);
+    const selectedValues = selectedOptions.map((option) => option.value);
+    setCombinedValues(selectedValues);
+  };
+  const options = userData.map((user) => ({
+    value: user._id,
+    label: user.username,
+  }));
   useEffect(() => {
     axios
       .get('https://restcountries.com/v3.1/all')
@@ -178,7 +201,17 @@ const AccountForm = ({ handleNewDrawerClose }) => {
       padding: "2px,8px",
       fontSize: '10px',
       width: `${calculateWidth(tag.tagName)}px`,
-      margin: '7px'
+      margin: '10px', cursor: 'pointer',
+    },
+   
+    customTagStyle: {
+      backgroundColor: tag.tagColour,
+      color: "#fff",
+      alignItems: "center",
+      textAlign: "center",
+      padding: "2px,8px",
+      fontSize: '10px',
+       cursor: 'pointer',
     },
   }));
 
@@ -259,75 +292,75 @@ const AccountForm = ({ handleNewDrawerClose }) => {
 
                     <Box mt={1}>
                       <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>
-                      <Select
+                      <Autocomplete
                         multiple
-                        value={selectedValues}
-                        onChange={handleChange}
-                        sx={{ width: '100%', marginTop: '8px' }}
-                        size='small'
-                        renderValue={(selected) => (
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selected.map((value) => {
-                              const option = options.find(opt => opt.value === value);
-                              return (
-                                <Chip
-                                  key={value}
-                                  label={option.label}
-                                  style={option.customStyle}
-                                />
-                              );
-                            })}
+                        options={tagsoptions}
+                        getOptionLabel={(option) => option.label}
+                        value={selectedTags}
+                        onChange={(event, newValue) => {
+                          setSelectedTags(newValue);
+                        }}
+                        renderTags={(value, getTagProps) =>
+                          value.map((option, index) => (
+                            <Chip
+                              key={option.value}
+                              label={option.label}
+                              style={option.customTagStyle}
+                              {...getTagProps({ index })}
+                            />
+                          ))
+                        }
+                        renderOption={(props, option) => (
+                          <Box component="li" {...props} style={option.customStyle}>
+                            {option.label}
                           </Box>
                         )}
-                      >
-                        {options.map((option) => (
-                          <MenuItem key={option.value} value={option.value} style={option.customStyle}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                        renderInput={(params) => (
+                          <TextField {...params} variant="outlined" size="small" placeholder='tags' />
+                        )}
+                        sx={{ width: '100%', marginTop: '8px' }}
+                      />
                     </Box>
                     <Box mt={2}>
                       <InputLabel sx={{ color: 'black' }}>Team Member</InputLabel>
-                      <Select
+                      <Autocomplete
                         multiple
-                        value={temmemberValues}
-                        onChange={handleTeamMemberChange}
-                        sx={{ width: '100%', marginTop: '8px' }}
+                        sx={{ mt: 2 }}
+                        options={options}
                         size='small'
-                        renderValue={(selected) => (
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                            {selected.map((value) => {
-                              const option = TeamOptions.find(opt => opt.value === value);
-                              return (
-                                <Chip
-                                  key={value}
-                                  label={option.label}
-                                  style={option.customStyle}
-                                />
-                              );
-                            })}
-                          </Box>
+                        getOptionLabel={(option) => option.label}
+                        value={selectedUser}
+                        onChange={handleUserChange}
+                        renderInput={(params) => (
+                          <TextField {...params} variant="outlined" placeholder="Assignees" />
                         )}
-                      >
-                        {TeamOptions.map((option) => (
-                          <MenuItem key={option.value} value={option.value} style={option.customStyle}>
-                            {option.label}
-                          </MenuItem>
-                        ))}
-                      </Select>
+                        isOptionEqualToValue={(option, value) => option.value === value.value}
+                      />
 
                     </Box>
 
                     <Box mt={2}
                     >
                       <InputLabel sx={{ color: 'black' }}>Folder Template</InputLabel>
-                      <TextField
+                      <Select
+
+                        value={selectedValue} // Ensure this is a single value, not an array
+                        onChange={handlefolderTempChange}
                         size='small'
-                        fullWidth
-                        margin='normal'
-                        placeholder="Folder Template" value={foldertemplate} onChange={(e) => setfoldertemplate(e.target.value)}
-                      />
+                        sx={{
+
+                          width: '100%',
+                          marginTop: '8px'
+
+                        }}
+                      >
+                        <MenuItem value="" disabled>
+
+                        </MenuItem>
+                        <MenuItem value={10}>Option 1</MenuItem>
+                        <MenuItem value={20}>Option 2</MenuItem>
+                        <MenuItem value={30}>Option 3</MenuItem>
+                      </Select>
 
                     </Box>
                   </Box>
@@ -367,71 +400,56 @@ const AccountForm = ({ handleNewDrawerClose }) => {
 
                       <Box >
 
-                    <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>
-                    <Select
+                        <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>
 
-                        size="small"
-                        multiple
-                        value={selectedTags}
-                        onChange={handleTagChange}
-                        sx={{ width: '100%', marginTop: '8px' }}
-                        renderValue={(selected) => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {selected.map((value) => {
-                                    const option = options.find(opt => opt.value === value);
-                                    return (
-                                        <Chip
-                                            key={value}
-                                            label={option.label}
-                                            style={option.customStyle}
-                                        />
-                                    );
-                                })}
+                        <Autocomplete
+                          multiple
+                          options={tagsoptions}
+                          getOptionLabel={(option) => option.label}
+                          value={selectedTags}
+                          onChange={(event, newValue) => {
+                            setSelectedTags(newValue);
+                          }}
+                          renderTags={(value, getTagProps) =>
+                            value.map((option, index) => (
+                              <Chip
+                                key={option.value}
+                                label={option.label}
+                                style={option.customStyle}
+                                {...getTagProps({ index })}
+                              />
+                            ))
+                          }
+                          renderOption={(props, option) => (
+                            <Box component="li" {...props} style={option.customStyle}>
+                              {option.label}
                             </Box>
-                        )}
-                    >
-                        {options.map((option) => (
-                            <MenuItem key={option.value} value={option.value} style={option.customStyle}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                          )}
+                          renderInput={(params) => (
+                            <TextField {...params} variant="outlined" size="small" />
+                          )}
+                          sx={{ width: '100%', marginTop: '8px' }}
+                        />
 
-                </Box>
+                      </Box>
 
 
                       <Box mt={2}>
                         <InputLabel sx={{ color: 'black' }}>Team Member</InputLabel>
 
-                        <Select
+                        <Autocomplete
                           multiple
-                          value={temmemberValues}
+                          sx={{ mt: 2 }}
+                          options={options}
                           size='small'
-                          onChange={handleTeamMemberChange}
-                          sx={{
-                            width: '100%', marginTop: '8px'
-                          }}
-                          renderValue={(selected) => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                              {selected.map((value) => {
-                                const option = TeamOptions.find(opt => opt.value === value);
-                                return (
-                                  <Chip
-                                    key={value}
-                                    label={option.label}
-                                    style={option.customStyle}
-                                  />
-                                );
-                              })}
-                            </Box>
+                          getOptionLabel={(option) => option.label}
+                          value={selectedUser}
+                          onChange={handleUserChange}
+                          renderInput={(params) => (
+                            <TextField {...params} variant="outlined" placeholder="Assignees" />
                           )}
-                        >
-                          {TeamOptions.map((option) => (
-                            <MenuItem key={option.value} value={option.value} style={option.customStyle}>
-                              {option.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
+                          isOptionEqualToValue={(option, value) => option.value === value.value}
+                        />
 
                       </Box>
 

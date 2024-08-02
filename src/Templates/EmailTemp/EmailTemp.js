@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { toast } from "react-toastify";
 import {
     Box,
     Button,
@@ -16,24 +16,26 @@ import {
     FormControlLabel,
     RadioGroup,
     FormControl,
-    Select,
-    MenuItem,
+    // Select,
+    // MenuItem,
     List,
     ListItem,
     ListItemText,
     Popover,
     InputLabel,
     TextField,
-    OutlinedInput, Chip,
+    // OutlinedInput, Chip,
+    Autocomplete
 } from '@mui/material';
 import Editor from '../Texteditor/Editor';
 
 const EmailTemp = () => {
 
     const [showForm, setShowForm] = useState(false);
-    const [subject, setSubject] = useState('');
+    const [inputText, setInputText] = useState('');
+    const [selectedShortcut, setSelectedShortcut] = useState('');
     const [templateName, setTemplateName] = useState('');
-
+    // const [body, setBody] = useState('');
     const [showDropdown, setShowDropdown] = useState(false);
     const [shortcuts, setShortcuts] = useState([]);
     const [filteredShortcuts, setFilteredShortcuts] = useState([]);
@@ -44,13 +46,7 @@ const EmailTemp = () => {
         setShowForm(true); // Show the form when button is clicked
     };
 
-    const handleSaveTemplate = (e) => {
-        e.preventDefault(); // Prevent default form submission behavior
 
-        // Save template logic here
-
-        setShowForm(false); // Hide the form after saving
-    };
 
     const handleChange = (event) => {
         setSelectedOption(event.target.value);
@@ -62,7 +58,7 @@ const EmailTemp = () => {
     };
 
     const handleAddShortcut = (shortcut) => {
-        setSubject((prevText) => prevText + `[${shortcut}]`);
+        setInputText((prevText) => prevText + `[${shortcut}]`);
         setShowDropdown(false);
     };
 
@@ -152,28 +148,27 @@ const EmailTemp = () => {
             setShortcuts(accountShortcuts);
         }
     }, [selectedOption]);
+    const handlechatsubject = (e) => {
+        const { value } = e.target;
+        setInputText(value);
+    };
     const handleCloseDropdown = () => {
         setAnchorEl(null);
     };
 
-    // user data
-    const [userdata, setUserData] = useState([]);
-    const [selectedUser, setSelectedUser] = useState();
 
-    const handleUserChange = (selectedOptions) => {
-        setSelectedUser(selectedOptions);
-        // Map selected options to their values and send as an array
+    const [selecteduser, setSelectedUser] = useState('');
 
-    }
+    const [userData, setUserData] = useState([]);
+
+
     useEffect(() => {
         fetchData();
     }, []);
 
     const fetchData = async () => {
         try {
-
-            // const url = `${API_KEY}/common/user/`;
-            const url = 'http://127.0.0.1:8080/common/users/roles?roles=Admin';
+            const url = 'http://127.0.0.1:8080/api/auth/users';
             const response = await fetch(url);
             const data = await response.json();
             setUserData(data);
@@ -182,11 +177,86 @@ const EmailTemp = () => {
         }
     };
 
-    // console.log(userdata);
-    const options = userdata.map((user) => ({
+    const handleuserChange = (event, selectedOptions) => {
+        setSelectedUser(selectedOptions);
+
+    };
+    const options = userData.map((user) => ({
         value: user._id,
-        label: user.username
+        label: user.username,
     }));
+    const handleSaveTemplate = (e) => {
+        e.preventDefault();
+
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+            templatename: templateName,
+            from: selecteduser.value,
+            emailsubject: inputText,
+
+            emailbody: emailBody,
+        });
+
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+        const url = 'http://127.0.0.1:7500/workflow/emailtemplate';
+        fetch(url, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then((result) => {
+                toast.success('Email Template create successfully');
+                handleClearTemplate();
+                setShowForm(false);
+                fetchEmailTemplates();
+            })
+            .catch((error) => {
+                console.error(error);
+                toast.error('Failed to create Email Template');
+            });
+    }
+    const [emailBody, setEmailBody] = useState('');
+
+    const handleEditorChange = (content) => {
+        setEmailBody(content);
+    };
+    const handleClearTemplate = () => {
+        setTemplateName('');
+        setSelectedUser('');
+        setInputText('');
+        setEmailBody('');
+
+    }
+    const [emailTemplates, setEmailTemplates] = useState([]);
+    const fetchEmailTemplates = async () => {
+        try {
+            const url = 'http://127.0.0.1:7500/workflow/emailtemplate';
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Failed to fetch email templates');
+            }
+            const data = await response.json();
+
+            setEmailTemplates(data.emailTemplate);
+
+        } catch (error) {
+            console.error('Error fetching email templates:', error);
+
+        }
+    };
+
+    useEffect(() => {
+        fetchEmailTemplates();
+    }, []);
     return (
         <Container>
             {!showForm ? (
@@ -205,12 +275,15 @@ const EmailTemp = () => {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                <TableRow>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
-                                    <TableCell></TableCell>
-                                </TableRow>
+
+                                {emailTemplates.map((template) => (
+                                    <TableRow key={template._id}>
+                                        <TableCell>{template.templatename}</TableCell>
+                                        <TableCell>{template.emailsubject}</TableCell>
+                                        <TableCell>{/* Add logic for "Used in Pipelines" */}</TableCell>
+                                        <TableCell>{/* Add logic for "Settings" */}</TableCell>
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -269,31 +342,26 @@ const EmailTemp = () => {
 
                             <InputLabel sx={{ color: 'black' }}>From</InputLabel>
 
-                            <Select
-                                sx={{ width: '100%', mt: 2, mb: 2 }}
-                                value={selectedUser}
-                                size="small"
-                                onChange={handleUserChange}
-                                input={<OutlinedInput />}
-                                renderValue={(selected) => (
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        <Chip key={selected} label={options.find(option => option.value === selected)?.label} />
-                                    </Box>
+
+                            <Autocomplete
+
+                                options={options}
+                                sx={{ mt: 2, mb: 2 }}
+                                size='small'
+                                value={selecteduser}
+                                onChange={handleuserChange}
+                                isOptionEqualToValue={(option, value) => option.value === value.value}
+                                getOptionLabel={(option) => option.label || ""}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+
+                                        placeholder="Form"
+                                    />
                                 )}
-                                MenuProps={{
-                                    PaperProps: {
-                                        style: {
-                                            maxHeight: 224,
-                                        },
-                                    },
-                                }}
-                            >
-                                {options.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                                isClearable={true}
+
+                            />
 
                         </Box>
                         <Box>
@@ -304,8 +372,7 @@ const EmailTemp = () => {
                                 margin="normal"
                                 fullWidth
                                 name="subject"
-                                value={subject}
-                                onChange={(e) => setSubject(e.target.value)}
+                                value={inputText + selectedShortcut} onChange={handlechatsubject}
                                 placeholder="Subject"
                                 size="small"
                             />
@@ -356,7 +423,7 @@ const EmailTemp = () => {
                         </Box>
                         <Box sx={{ mt: 5 }}>
 
-                            <Editor />
+                            <Editor onChange={handleEditorChange} />
                         </Box>
                         <Box sx={{ mt: 5 }}>
                             <Button variant="contained" color="primary" type="submit">

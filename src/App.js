@@ -10,6 +10,7 @@ import Tags from './Templates/Tags/Tags';
 import EmailTemp from './Templates/EmailTemp/EmailTemp';
 import Templates from './Pages/Templates';
 import JobTemp from './Templates/JobsTemp/Jobtemp';
+import JobTemplateUpdate from './Templates/JobsTemp/JobTemplateUpdate'
 import PipelineTemp from './Templates/PipelineTemp/PipelineTemp';
 import FolderTemp from './Templates/FoldersTemp/FolderTemp';
 import ChatTemp from './Templates/ChatsTemp/ChatTemp';
@@ -21,11 +22,13 @@ import SignatureTemp from './Templates/SignatureTemp/SignatureTemp';
 import ProposalTemp from './Templates/ProposalsTemp/ProposalTemp';
 import CreateJob from './Jobs/CreateJob';
 import Docs from './Pages/Docs'
-import Login from './Login&Signup/Login'
+
 import Invoices from './Billing/Invoices';
+
 import MyAccount from './Settings/MyAccount'
 import Pipeline from './Workflow/Pipeline';
 import WorkflowTask from './Workflow/Tasks'
+import TeamMember from './Users/TeamMember.js';
 const App = () => {
   return (
 
@@ -48,6 +51,7 @@ const App = () => {
             <Route path='tags' element={<Tags />} />
             <Route path='emails' element={<EmailTemp />} />
             <Route path='jobs' element={<JobTemp />} />
+            <Route path="jobs/JobTemplateUpdate/:_id" element={<JobTemplateUpdate />} />
             <Route path='pipelines' element={<PipelineTemp />} />
             <Route path='folders' element={<FolderTemp />} />
             <Route path='chats' element={<ChatTemp />} />
@@ -58,14 +62,18 @@ const App = () => {
             <Route path='signatures' element={<SignatureTemp />} />
             <Route path='proposals' element={<ProposalTemp />} />
           </Route>
+          <Route path='/firmtemp/teammember' element={<TeamMember/>}/>
           <Route path='/settings/myaccount' element={<MyAccount/>}/>
 
           <Route path='*' element={<ErrorPage />} />
         </Route>
-        <Route path='/login' element={<Login />} />
+      
+        
       </Routes>
     </BrowserRouter>
   );
 };
 
 export default App;
+
+

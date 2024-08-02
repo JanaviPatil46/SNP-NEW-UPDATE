@@ -35,7 +35,9 @@ height: 100vh;
 .main::-webkit-scrollbar {
   display: none; /* Hide scrollbar (for WebKit browsers) */
 }
-
+/* .collapsed .main{
+  padding:0;
+} */
 .toggle-button {
   position: absolute !important;
   top: 35px !important;
@@ -79,9 +81,18 @@ height: 100vh;
   border-radius: 10px;
   color: black;
 }
-
-.menu-item:hover {
+.collapsed .menu-icon{
+  justify-content: center;
+  text-align: center;
+}
+.sidebar-contents .menu-icon{
+  color: black;
+}
+.menu-item:hover{
   background-color: #0000ff;
+  color: #fff;
+}
+.menu-icon:hover {
   color: #fff;
 }
 

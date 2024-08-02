@@ -13,7 +13,8 @@ import {
     MenuItem,
     Select,
     TextField,
-    InputLabel
+    InputLabel,
+    Autocomplete
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
@@ -168,16 +169,23 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     const [selectedTags, setSelectedTags] = useState([]);
 
 
-    const handleTagChange = (event) => {
-        const selectedValues = event.target.value;
-        setSelectedTags(selectedValues);
+    // const handleTagChange = (event) => {
+    //     const selectedValues = event.target.value;
+    //     setSelectedTags(selectedValues);
+
+    //     // Send selectedValues array to your backend
+    //     console.log("Selected Values:", selectedValues);
+    //     // Assuming setCombinedValues is a function to send the values to your backend
+    //     setCombinedValues(selectedValues);
+    // };
+    const handleTagChange = (event, newValue) => {
+        setSelectedTags(newValue.map((option) => option.value));
 
         // Send selectedValues array to your backend
-        console.log("Selected Values:", selectedValues);
+        console.log("Selected Values:", newValue.map((option) => option.value));
         // Assuming setCombinedValues is a function to send the values to your backend
-        setCombinedValues(selectedValues);
+        setCombinedValues(newValue.map((option) => option.value));
     };
-
 
     //Tag FetchData ================
     const [tags, setTags] = useState([]);
@@ -223,6 +231,15 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
             fontSize: '10px',
             width: `${calculateWidth(tag.tagName)}px`,
             margin: '7px'
+        },
+        customTagStyle: {
+            backgroundColor: tag.tagColour,
+            color: "#fff",
+            alignItems: "center",
+            textAlign: "center",
+            padding: "2px,8px",
+            fontSize: '10px',
+            cursor: 'pointer',
         },
     }));
 
@@ -372,34 +389,40 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                 <Box >
 
                     <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>
-                    <Select
 
-                        size="small"
+                    <Autocomplete
                         multiple
-                        value={selectedTags}
+                        size='small'
+                        id="tags-outlined"
+                        options={options}
+                        getOptionLabel={(option) => option.label}
+                        value={options.filter(option => selectedTags.includes(option.value))}
                         onChange={handleTagChange}
-                        sx={{ width: '100%', marginTop: '8px' }}
-                        renderValue={(selected) => (
-                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {selected.map((value) => {
-                                    const option = options.find(opt => opt.value === value);
-                                    return (
-                                        <Chip
-                                            key={value}
-                                            label={option.label}
-                                            style={option.customStyle}
-                                        />
-                                    );
-                                })}
+                        renderTags={(selected, getTagProps) =>
+                            selected.map((option, index) => (
+                                <Chip
+                                    key={option.value}
+                                    label={option.label}
+                                    style={option.customTagStyle}
+                                    {...getTagProps({ index })}
+                                />
+                            ))
+                        }
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                variant="outlined"
+
+                                placeholder="Tags"
+                                sx={{ width: '100%', marginTop: '8px' }}
+                            />
+                        )}
+                        renderOption={(props, option) => (
+                            <Box component="li" {...props} style={option.customStyle}>
+                                {option.label}
                             </Box>
                         )}
-                    >
-                        {options.map((option) => (
-                            <MenuItem key={option.value} value={option.value} style={option.customStyle}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </Select>
+                    />
 
                 </Box>
                 <Typography variant="h6" gutterBottom sx={{ ml: 1, fontWeight: 'bold', mt: 3 }}>

@@ -143,7 +143,7 @@ function Sidebar() {
               {sidebarItems.map(item => (
                 <Box key={item._id}>
                   <ListItem onClick={() => handleToggleSubmenu(item._id, item.label)} component={Link} to={item.path} className="menu-item">
-                    <ListItemIcon sx={{ fontSize: '1.5rem', color: 'black', }}>
+                    <ListItemIcon sx={{ fontSize: '1.5rem',  }} className="menu-icon">
                       {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
                     </ListItemIcon>
                     {!isCollapsed && <ListItemText primary={item.label} sx={{ ml: -2 }}/>}
@@ -177,7 +177,7 @@ function Sidebar() {
         <Box
           component="main"
           sx={{
-            padding: 1,
+            // padding: 1,
             // border: '2px solid red',
            
           }}

@@ -1,5 +1,5 @@
-import { Box, Button, Grid, Typography, TextField, InputLabel, Select, MenuItem, Chip, Switch, FormControlLabel } from '@mui/material';
-import React, { useState } from 'react';
+import { Box, Button, Grid, Typography, TextField, InputLabel, Select, MenuItem,  Switch, FormControlLabel, Autocomplete } from '@mui/material';
+import React, { useState, useEffect } from 'react';
 import Priority from '../Templates/Priority/Priority';
 import Editor from '../Templates/Texteditor/Editor';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -7,56 +7,249 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-
+import axios from 'axios';
 // Initialize the plugin
 dayjs.extend(customParseFormat);
 const CreateJob = () => {
   // State to keep track of selected values
-  const [selectedAccounts, setSelectedAccounts] = useState([]);
-  const [selectedJobAssignees, setSelectedJobAssignees] = useState([]);
-  const [pipeline, setPipeline] = useState('');
-  const [jobTemplate, setJobTemplate] = useState('');
+
+ 
+  
+  const [description, setDescription]= useState('');
   const [jobName, setJobName] = useState('');
   const [priority, setPriority] = useState('');
-  const [isAbsoluteDate, setIsAbsoluteDate] = useState(false);
-  const [startTimeSpan, setStartTimeSpan] = useState('');
-  const [dueTimeSpan, setDueTimeSpan] = useState('');
+  const [absoluteDate, setAbsoluteDates] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [dueDate, setDueDate] = useState(null);
-  // Handle change in selection
-  const handleChange = (event) => {
-    setSelectedAccounts(event.target.value);
+  const [startsInDuration, setStartsInDuration] = useState(null);
+  const [dueinduration, setdueinduration] = useState("");
+  const [startsin, setstartsin] = useState("");
+  const [duein, setduein] = useState("");
+  const dayOptions = [
+    { label: "Days", value: "Days" },
+    { label: "Months", value: "Months" },
+    { label: "Years", value: "Years" },
+  ];
+  const handleEditorChange = (content) => {
+    setDescription(content);
   };
-  const handleJobAssigneesChange = (event) => {
-    setSelectedJobAssignees(event.target.value);
+
+  
+
+  // Handler function to update state when dropdown value changes
+  const handleStartInDateChange = (event, newValue) => {
+    setStartsInDuration(newValue ? newValue.value : null);
   };
-  const handlePipelineChange = (event) => {
-    setPipeline(event.target.value);
+  // Handler function to update state when dropdown value changes
+  const handledueindateChange = (event, newValue) => {
+    setdueinduration(newValue ? newValue.value : null);
   };
-  const handleJobtemplateChange = (event) => {
-    setJobTemplate(event.target.value);
-  };
-  const handleJobNameChange = (event) => {
-    setJobName(event.target.value);
-  };
+ 
+
+ 
+  
   const handlePriorityChange = (newPriority) => {
     setPriority(newPriority);
   };
-  const handleDateSwitchChange = (event) => {
-    setIsAbsoluteDate(event.target.checked);
+  const handleAbsolutesDates= (checked) => {
+    setAbsoluteDates(checked);
   };
-  const handleStartTimeSpanChange = (event) => {
-    setStartTimeSpan(event.target.value);
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
   };
-  const handleDueTimeSpanChange = (event) => {
-    setDueTimeSpan(event.target.value);
+  const handleDueDateChange = (date) => {
+    setDueDate(date);
   };
-  const handleStartDateChange = (newDate) => {
-    setStartDate(newDate);
+
+  const [selectedUser, setSelectedUser] = useState([]);
+  const [combinedValues, setCombinedValues] = useState([]);
+  const [userData, setUserData] = useState([]);
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const response = await fetch(url);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
-  const handleDueDateChange = (newDate) => {
-    setDueDate(newDate);
+
+  const handleUserChange = (event, selectedOptions) => {
+    setSelectedUser(selectedOptions);
+    const selectedValues = selectedOptions.map((option) => option.value);
+    setCombinedValues(selectedValues);
   };
+  const options = userData.map((user) => ({
+    value: user._id,
+    label: user.username,
+  }));
+
+   const [selectedAssigneesUser, setSelecteAssigneesdUser] = useState([]);
+   const [combinedAssigneesValues, setCombinedAssigneesValues] = useState([]);
+  const handleJobAssigneesChange = (event, selectedOptions) => {
+    setSelecteAssigneesdUser(selectedOptions);
+    const selectedValues = selectedOptions.map((option) => option.value);
+    setCombinedAssigneesValues(selectedValues);
+  };
+  const assigneesoptions = userData.map((user) => ({
+    value: user._id,
+    label: user.username,
+  }));
+
+  //Default Jobt template get 
+  const [jobTemp, setJobTemp] = useState([]);
+  const [selectedtemp, setselectedTemp] = useState();
+  const handletemp = (selectedOptions) => {
+    setselectedTemp(selectedOptions);
+    console.log(selectedOptions)
+  }
+  useEffect(() => {
+    fetchtemp();
+  }, []);
+
+  const fetchtemp = async () => {
+    try {
+      const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate';
+      const response = await fetch(url);
+      const data = await response.json();
+      setJobTemp(data.JobTemplates);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const optiontemp = jobTemp.map((temp) => ({
+    value: temp._id,
+    label: temp.templatename
+
+  }));
+
+  // pipeline data
+  const [pipelineData, setPipelineData] = useState([]);
+  const [selectedPipeline, setselectedPipeline] = useState();
+
+  const handlePipelineChange = (selectedOptions) => {
+    setselectedPipeline(selectedOptions);
+    console.log(selectedOptions)
+  }
+  useEffect(() => {
+    fetchPipelineData();
+  }, []);
+  const fetchPipelineData = async () => {
+    try {
+      const url = 'http://127.0.0.1:7500/workflow/pipeline/pipelines';
+      const response = await fetch(url);
+      const data = await response.json();
+      setPipelineData(data.pipeline);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  const optionpipeline = pipelineData.map((pipelineData) => ({
+    value: pipelineData._id,
+    label: pipelineData.pipelineName
+
+  }));
+
+//   const createjob = () => {
+  
+//     const myHeaders = new Headers();
+//     myHeaders.append("Content-Type", "application/json");
+
+//     const raw = JSON.stringify({
+//         accounts: combinedValues,
+//         pipeline: selectedPipeline.value,
+//         templatename: selectedtemp.value,
+//         jobname: jobName,
+//         jobassignees: combinedAssigneesValues,
+//         priority: priority.value,
+//         description: description,
+//         absolutedates: absoluteDate,
+//         startsin: startsin,
+//         startsinduration: startsInDuration,
+//         duein: duein,
+//         dueinduration: dueinduration,
+//         comments: "",
+//         startdate: startDate,
+//         enddate: dueDate,
+//     });
+
+//     const requestOptions = {
+//         method: "POST",
+//         headers: myHeaders,
+//         body: raw,
+//         redirect: "follow"
+//     };
+
+//     fetch( 'http://127.0.0.1:7550/workflow/jobs/job', requestOptions)
+//         .then((response) => {
+//             if (!response.ok) {
+//                 throw new Error('Network response was not ok');
+//             }
+//             return response.json();
+//         })
+
+//         .then((result) => {
+//             // Handle success
+//             console.log("Job Template created successfully")
+//             // toast.success("Job Template created successfully");
+//             // window.location.reload()
+
+//         })
+//         .catch((error) => {
+//             // Handle errors
+//             console.error(error);
+//             // toast.error("Failed to create Job Template");
+//         })
+
+// }
+const createjob = () => {
+  
+    const myHeaders = {
+        "Content-Type": "application/json"
+    };
+
+    const data = {
+        accounts: combinedValues,
+        pipeline: selectedPipeline.value,
+        templatename: selectedtemp.value,
+        jobname: jobName,
+        jobassignees: combinedAssigneesValues,
+        priority: priority.value,
+        description: description,
+        absolutedates: absoluteDate,
+        startsin: startsin,
+        startsinduration: startsInDuration,
+        duein: duein,
+        dueinduration: dueinduration,
+        comments: "",
+        startdate: startDate,
+        enddate: dueDate,
+    };
+
+    const config = {
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: 'http://127.0.0.1:7550/workflow/jobs/newjob',
+        headers: myHeaders,
+        data: JSON.stringify(data)
+    };
+
+    axios.request(config)
+        .then((response) => {
+            console.log("Job Template created successfully");
+            console.log(JSON.stringify(response.data));
+            // Handle success, e.g., toast or redirect
+        })
+        .catch((error) => {
+            console.error("Failed to create Job Template:", error);
+            // Handle errors, e.g., toast error
+        });
+};
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -69,64 +262,96 @@ const CreateJob = () => {
               <Grid item xs={12} sm={5} ml={2} className='left-side-container' >
                 <Box >
                   <InputLabel sx={{ color: 'black' }}>Accounts</InputLabel>
-                  <Select
-                    size="small"
+                  <Autocomplete
                     multiple
-                    value={selectedAccounts}
-                    onChange={handleChange}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((value) => (
-                          <Chip key={value} label={value} />
-                        ))}
+                    sx={{ marginTop: '8px' }}
+                    options={options}
+                    size='small'
+                    getOptionLabel={(option) => option.label}
+                    value={selectedUser}
+                    onChange={handleUserChange}
+                    renderOption={(props, option) => (
+                      <Box
+                        component="li"
+                        {...props}
+                        sx={{ cursor: 'pointer', margin: '5px 10px' }} // Add cursor pointer style
+                      >
+                        {option.label}
                       </Box>
                     )}
-                    sx={{ width: '100%', marginTop: '8px' }}
-                  >
-                    <MenuItem value="account1">Account 1</MenuItem>
-                    <MenuItem value="account2">Account 2</MenuItem>
-                    <MenuItem value="account3">Account 3</MenuItem>
-                    <MenuItem value="account4">Account 4</MenuItem>
-                  </Select>
+                    renderInput={(params) => (
+                      <TextField {...params} variant="outlined" placeholder="Available To" />
+                    )}
+                    isOptionEqualToValue={(option, value) => option.value === value.value}
+                  />
                 </Box>
                 <Box mt={2}>
                   <InputLabel>Pipeline</InputLabel>
-                  <Select
+                 
+                  <Autocomplete
+                    options={optionpipeline}
+                    getOptionLabel={(option) => option.label}
+                    value={selectedPipeline}
+                    onChange={(event, newValue) => handlePipelineChange(newValue)}
+                    isOptionEqualToValue={(option, value) => option.value === value.value}
+                    renderOption={(props, option) => (
+                      <Box
+                        component="li"
+                        {...props}
+                        sx={{ cursor: 'pointer', margin: '5px 10px' }} // Add cursor pointer style
+                      >
+                        {option.label}
+                      </Box>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+
+                        placeholder="Pipeline"
+                        variant="outlined"
+                        size="small"
+                      />
+                    )}
                     sx={{ width: '100%', marginTop: '8px' }}
-                    size="small"
-                    value={pipeline}
-                    onChange={handlePipelineChange}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    <MenuItem value="Pipeline1">Pipeline 1</MenuItem>
-                    <MenuItem value="Pipeline2">Pipeline 2</MenuItem>
-                    <MenuItem value="Pipeline3">Pipeline 3</MenuItem>
-                  </Select>
+                    clearOnEscape // Enable clearable functionality
+                  />
                 </Box>
                 <Box mt={2}>
                   <InputLabel>Template</InputLabel>
-                  <Select
+                  <Autocomplete
+                    options={optiontemp}
+                    getOptionLabel={(option) => option.label}
+                    value={selectedtemp}
+                    onChange={(event, newValue) => handletemp(newValue)}
+                    isOptionEqualToValue={(option, value) => option.value === value.value}
+                    renderOption={(props, option) => (
+                      <Box
+                        component="li"
+                        {...props}
+                        sx={{ cursor: 'pointer', margin: '5px 10px' }} // Add cursor pointer style
+                      >
+                        {option.label}
+                      </Box>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+
+                        placeholder="Job Template"
+                        variant="outlined"
+                        size="small"
+                      />
+                    )}
                     sx={{ width: '100%', marginTop: '8px' }}
-                    size="small"
-                    value={jobTemplate}
-                    onChange={handleJobtemplateChange}
-                  >
-                    <MenuItem value="">
-                      <em>None</em>
-                    </MenuItem>
-                    <MenuItem value="jobtemp1">Jobtemp 1</MenuItem>
-                    <MenuItem value="jobtemp2">Jobtemp 2</MenuItem>
-                    <MenuItem value="jobtemp3">Jobtemp 3</MenuItem>
-                  </Select>
+                    clearOnEscape // Enable clearable functionality
+                  />
                 </Box>
                 <Box mt={2}>
                   <InputLabel>Name</InputLabel>
                   <TextField
                     fullWidth
-                    value={jobName}
-                    onChange={handleJobNameChange}
+                    // value={jobName}
+                    onChange={(e) => setJobName(e.target.value)} 
                     margin="normal"
                     size="small"
                     placeholder='Job Name'
@@ -134,31 +359,34 @@ const CreateJob = () => {
                 </Box>
                 <Box mt={2}>
                   <InputLabel sx={{ color: 'black' }}>Job Assignees</InputLabel>
-                  <Select
-                    size="small"
+                  <Autocomplete
                     multiple
-                    value={selectedJobAssignees}
+                    sx={{ marginTop: '8px' }}
+                    options={assigneesoptions}
+                    size='small'
+                    getOptionLabel={(option) => option.label}
+                    value={selectedAssigneesUser}
                     onChange={handleJobAssigneesChange}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((value) => (
-                          <Chip key={value} label={value} />
-                        ))}
+                    renderOption={(props, option) => (
+                      <Box
+                        component="li"
+                        {...props}
+                        sx={{ cursor: 'pointer', margin: '5px 10px' }} // Add cursor pointer style
+                      >
+                        {option.label}
                       </Box>
                     )}
-                    sx={{ width: '100%', marginTop: '8px' }}
-                  >
-                    <MenuItem value="jobassignee1">JobAssignee 1</MenuItem>
-                    <MenuItem value="jobassignee2">JobAssignee 2</MenuItem>
-                    <MenuItem value="jobassignee3">JobAssignee 3</MenuItem>
-                    <MenuItem value="jobassignee4">JobAssignee 4</MenuItem>
-                  </Select>
+                    renderInput={(params) => (
+                      <TextField {...params} variant="outlined" placeholder="Job Assignees" />
+                    )}
+                    isOptionEqualToValue={(option, value) => option.value === value.value}
+                  />
                 </Box>
                 <Box mt={2}>
                   <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
                 </Box>
                 <Box mt={2}>
-                  <Editor />
+                <Editor onChange={handleEditorChange} />
                 </Box>
                 <Box mt={2}>
                   <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
@@ -167,8 +395,9 @@ const CreateJob = () => {
                       <FormControlLabel
                         control={
                           <Switch
-                            checked={isAbsoluteDate}
-                            onChange={handleDateSwitchChange}
+                            checked={absoluteDate}
+                            // onChange={handleAbsolutesDates}
+                            onChange={(event) => handleAbsolutesDates(event.target.checked)}
                             color="primary"
                           />
                         }
@@ -177,15 +406,16 @@ const CreateJob = () => {
                     </Box>
                   </Box>
                 </Box>
-                {isAbsoluteDate && (
+                {absoluteDate && (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                       <Typography>Start Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
                         sx={{ width: '100%', }}
-                        value={startDate}
-                        onChange={handleStartDateChange}
+                        // value={startDate}
+                        // onChange={handleStartDateChange}
+                        selected={startDate} onChange={handleStartDateChange}
                         renderInput={(params) => <TextField {...params} size="small" />}
                       />
                     </Box>
@@ -194,14 +424,15 @@ const CreateJob = () => {
                       <DatePicker
                         format="DD/MM/YYYY"
                         sx={{ width: '100%', }}
-                        value={dueDate}
-                        onChange={handleDueDateChange}
+                        // value={dueDate}
+                        // onChange={handleDueDateChange}
+                        selected={dueDate} onChange={handleDueDateChange}
                         renderInput={(params) => <TextField {...params} size="small" />}
                       />
                     </Box>
                   </>
                 )}
-                {!isAbsoluteDate && (
+                {!absoluteDate && (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Typography>Start In</Typography>
@@ -211,17 +442,19 @@ const CreateJob = () => {
                         fullWidth
                         defaultValue={0}
                         sx={{ ml: 1 }}
+                        onChange={(e) => setstartsin(e.target.value)}
                       />
-                      <Select
-                        sx={{ width: '100%', mt: 1 }}
-                        size="small"
-                        value={startTimeSpan}
-                        onChange={handleStartTimeSpanChange}
-                      >
-                        <MenuItem value="days">Days</MenuItem>
-                        <MenuItem value="months">Months</MenuItem>
-                        <MenuItem value="years">Years</MenuItem>
-                      </Select>
+                      <Autocomplete
+                        options={dayOptions}
+                        size='small'
+                        getOptionLabel={(option) => option.label}
+                        onChange={handleStartInDateChange}
+                        renderInput={(params) => (
+                          <TextField {...params} variant="outlined" />
+                        )}
+                        value={dayOptions.find((option) => option.value === startsInDuration) || null}
+                        className="job-template-select-dropdown"
+                      />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                       <Typography>Due In</Typography>
@@ -231,17 +464,21 @@ const CreateJob = () => {
                         fullWidth
                         defaultValue={0}
                         sx={{ ml: 1.5 }}
+                        onChange={(e) => setduein(e.target.value)}
                       />
-                      <Select
-                        sx={{ width: '100%', mt: 1 }}
-                        size="small"
-                        value={dueTimeSpan}
-                        onChange={handleDueTimeSpanChange}
-                      >
-                        <MenuItem value="days">Days</MenuItem>
-                        <MenuItem value="months">Months</MenuItem>
-                        <MenuItem value="years">Years</MenuItem>
-                      </Select>
+                      
+                      <Autocomplete
+                        options={dayOptions}
+                        getOptionLabel={(option) => option.label}
+                         onChange={handledueindateChange}
+
+                        size='small'
+                        renderInput={(params) => (
+                          <TextField {...params} variant="outlined" />
+                        )}
+                        value={dayOptions.find((option) => option.value === dueinduration) || null}
+                        className="job-template-select-dropdown"
+                      />
                     </Box>
                   </>
                 )}
@@ -273,7 +510,7 @@ const CreateJob = () => {
             <Box mt={3}><hr /></Box>
 
             <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-              <Button variant="contained" color="primary">Add</Button>
+              <Button variant="contained" color="primary" onClick={createjob}>Add</Button>
               <Button variant="outlined">Cancel</Button>
             </Box>
           </Box>
