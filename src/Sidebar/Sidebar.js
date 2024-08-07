@@ -209,7 +209,7 @@ function Sidebar() {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 
           </Box>
-          {rightDrawerContent === 'Account' && <AccountForm handleNewDrawerClose={handleNewDrawerClose}/>}
+          {rightDrawerContent === 'Account' && <AccountForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose}/>}
           {rightDrawerContent === 'Contact' && <ContactForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />}
         </Box>
       </Drawer>

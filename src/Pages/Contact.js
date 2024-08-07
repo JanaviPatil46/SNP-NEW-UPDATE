@@ -221,7 +221,7 @@ const ContactTable = () => {
             header: 'Phone Number',
             Cell: ({ cell }) => (
                 <div>
-                    {cell.row.original.phoneNumbers[0].map((phone, index) => (
+                    {cell.row.original.phoneNumbers.map((phone, index) => (
                         <div key={index}>{phone}</div>
                     ))}
                 </div>

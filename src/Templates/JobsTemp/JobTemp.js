@@ -56,10 +56,10 @@ const JobTemp = () => {
   const [startsInDuration, setStartsInDuration] = useState(null);
   const [dueinduration, setdueinduration] = useState("");
   // const [startsinduration, setstartsinduration] = useState("");
-  const [emailBody, setEmailBody] = useState('');
+  const [description, setDescription] = useState('');
 
   const handleEditorChange = (content) => {
-    setEmailBody(content);
+    setDescription(content);
   };
 
   const toggleDropdown = (event) => {
@@ -75,8 +75,8 @@ const JobTemp = () => {
     setShowForm(true); // Show the form when button is clicked
   };
 
-  const handlePriorityChange = (selectedOption) => {
-    setPriority(selectedOption);
+  const handlePriorityChange = (priority) => {
+    setPriority(priority);
   };
   const handleAbsolutesDates = (checked) => {
     setAbsoluteDates(checked);
@@ -274,7 +274,7 @@ const JobTemp = () => {
         jobassignees: combinedValues,
         addshortcode: "",
         priority: priority.value,
-        description: emailBody,
+        description: description,
         absolutedates: absoluteDate,
         comments: "",
         startdate: startDate,
@@ -317,8 +317,8 @@ const JobTemp = () => {
         jobname: jobName,
         jobassignees: combinedValues,
         addshortcode: "",
-        priority: priority.value,
-        description: emailBody,
+        priority: priority?.value,
+        description: description,
         absolutedates: absoluteDate,
         startsin: startsin,
         startsinduration: startsInDuration,
@@ -510,10 +510,10 @@ const JobTemp = () => {
                   />
                 </Box>
                 <Box mt={2}>
-                  <Priority onPriorityChange={handlePriorityChange} />
+                  <Priority onPriorityChange={handlePriorityChange}  selectedPriority={priority}/>
                 </Box>
                 <Box mt={2}>
-                  <Editor onChange={handleEditorChange} />
+                  <Editor onChange={handleEditorChange} content={description}/>
                 </Box>
                 <Box mt={2}>
                   <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
@@ -568,6 +568,7 @@ const JobTemp = () => {
                         margin='normal'
                         fullWidth
                         defaultValue={0}
+                        value={startsin}
                         sx={{ ml: 1 }}
                         onChange={(e) => setstartsin(e.target.value)}
                       />
@@ -588,6 +589,7 @@ const JobTemp = () => {
                       <TextField
                         size='small'
                         margin='normal'
+                        value={duein}
                         fullWidth
                         defaultValue={0}
                         sx={{ ml: 1.5 }}

@@ -29,6 +29,7 @@ import MyAccount from './Settings/MyAccount'
 import Pipeline from './Workflow/Pipeline';
 import WorkflowTask from './Workflow/Tasks'
 import TeamMember from './Users/TeamMember.js';
+import Jobs from './Pages/Jobs.js';
 const App = () => {
   return (
 
@@ -45,6 +46,7 @@ const App = () => {
           <Route path='addJobs' element={<CreateJob />} />
           <Route path='billing/Invoices' element={<Invoices/>}/>
           <Route path='workflow/tasks' element={<WorkflowTask/>}/>
+          <Route path='workflow/jobs' element={<Jobs/>}/>
           <Route path='workflow/pipelines' element={<Pipeline/>}/>
           <Route path='firmtemp/templates' element={<Templates />}>
             <Route path="tasks" element={<Tasks />} />
