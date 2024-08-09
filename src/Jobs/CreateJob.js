@@ -24,7 +24,7 @@ const CreateJob = () => {
   const [startsInDuration, setStartsInDuration] = useState(null);
   const [dueinduration, setdueinduration] = useState("");
   const [duein, setduein] = useState('');
-  const [selectedPriority, setSelectedPriority] = useState("");
+ 
  
   const dayOptions = [
     { label: "Days", value: "Days" },
@@ -48,8 +48,7 @@ const CreateJob = () => {
 
 
   const handlePriorityChange = (priority) => {
-    setSelectedPriority(priority);
-    console.log("Priority selected:", priority);
+    setPriority(priority);
   };
 
   // const handlePriorityChange = (selectedOption) => {
@@ -118,12 +117,12 @@ const CreateJob = () => {
 
 
 
-  const [selectedAssigneesUser, setSelecteAssigneesdUser] = useState([]);
-  // const [combinedAssigneesValues, setCombinedAssigneesValues] = useState([]);
-  const handleJobAssigneesChange = (event, selectedOptions) => {
-    setSelecteAssigneesdUser(selectedOptions);
-    // const selectedValues = selectedOptions.map((option) => option.value);
-    // setCombinedAssigneesValues(selectedValues);
+  const [selectedUser, setSelectedUser] = useState([]);
+  const [combinedAssigneesValues, setCombinedAssigneesValues] = useState([]);
+  const handleUserChange = (event, selectedOptions) => {
+    setSelectedUser(selectedOptions);
+    const selectedValues = selectedOptions.map((option) => option.value);
+    setCombinedAssigneesValues(selectedValues);
   };
   const assigneesoptions = userData.map((user) => ({
     value: user._id,
@@ -145,8 +144,17 @@ const CreateJob = () => {
 
         // Populate the form fields with template data
         setJobName(template.jobname);
-        setSelecteAssigneesdUser(template.jobassignees.map(assignee => assignee._id));
+
+        const jobAssignees = template.jobassignees.map((assignee) => ({
+          value: assignee._id,
+          label: assignee.username,
+      }));
+      setSelectedUser(jobAssignees);
+      const selectedValues = jobAssignees.map((option) => option.value);
+      setCombinedAssigneesValues(selectedValues);
+        // setSelecteAssigneesdUser(template.jobassignees.map(assignee => assignee._id));
         setPriority(template.priority);
+        console.log(template.priority)
         setDescription(template.description);
         setAbsoluteDates(template.absolutedates);
         setStartDate(template.absolutedates ? dayjs(template.startdate) : null);
@@ -220,8 +228,8 @@ const CreateJob = () => {
       pipeline: selectedPipeline.value,
       templatename: selectedtemp.value,
       jobname: jobName,
-      jobassignees: selectedAssigneesUser,
-      priority: selectedPriority.value,
+      jobassignees: combinedAssigneesValues,
+      priority: priority,
       description: description,
       absolutedates: absoluteDate,
       startsin: startsin,
@@ -369,12 +377,13 @@ const CreateJob = () => {
                     options={assigneesoptions}
                     size='small'
                     getOptionLabel={(option) => option.label}
-                  
-                    value={selectedAssigneesUser.map((value) =>
-                      assigneesoptions.find((option) => option.value === value)
-                    )}
+                    value={selectedUser}
+                    onChange={handleUserChange}
+                    // value={selectedAssigneesUser.map((value) =>
+                    //   assigneesoptions.find((option) => option.value === value)
+                    // )}
 
-                    onChange={handleJobAssigneesChange}
+                    // onChange={handleJobAssigneesChange}
                     renderOption={(props, option) => (
                       <Box
                         component="li"
@@ -391,7 +400,7 @@ const CreateJob = () => {
                   />
                 </Box>
                 <Box mt={2}>
-                <Priority selectedPriority={priority} onPriorityChange={handlePriorityChange} />
+                <Priority onPriorityChange={handlePriorityChange}  selectedPriority={priority}/>
 
                 </Box>
                 <Box mt={2}>

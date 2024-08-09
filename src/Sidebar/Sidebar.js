@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
-import { Box, IconButton, List, ListItem, ListItemIcon, ListItemText, Collapse, Typography, Drawer } from "@mui/material";
-import { ChevronLeft, ChevronRight,Brightness4, Brightness7 } from "@mui/icons-material";
+import { Box, IconButton, List, ListItem, ListItemIcon, ListItemText, Collapse, Typography, Drawer, Button } from "@mui/material";
+import { ChevronLeft, ChevronRight, Brightness4, Brightness7 } from "@mui/icons-material";
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Outlet, Link } from "react-router-dom";
@@ -103,13 +103,14 @@ function Sidebar() {
   return (
     <div className="grid-container">
       <header className="header">
-        <Box component="header" sx={{ p: 2, display: 'flex', gap: 3 }}>
+        <Box component="header" sx={{ p: 2, display: 'flex', gap: 3, ml:2 }}>
           <Box className='bar-icon'>
             <FaBars onClick={handleToggleSidebar} style={{ fontSize: '1.8rem' }} />
           </Box>
-          <Box>
-            <AiOutlinePlusCircle className="add-icon" onClick={handleDrawerOpen} />
-          </Box>
+         
+          <Button variant="contained" color="success" onClick={handleDrawerOpen} >
+          <AiOutlinePlusCircle className="add-icon"  />
+          </Button>
           <Box>
             <IconButton onClick={() => setIsDarkMode(!isDarkMode)}>
               {isDarkMode ? <Brightness7 /> : <Brightness4 />}
@@ -132,24 +133,38 @@ function Sidebar() {
             transition: 'width 0.3s',
           }}
         >
-          <Box sx={{ pt: 1, display: 'flex', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
+          <Box sx={{ pt: 3, display: 'flex', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
             <img src={Logo} alt="logo" style={{ height: "40px", display: 'block' }} />
             {!isCollapsed && (
               <Typography variant="h5">SNP</Typography>
             )}
           </Box>
-          <Box className='sidebar-contents' sx={{ mt: 3 }}>
+          <Box className='sidebar-contents' sx={{ mt: 2 }}>
             <List sx={{ cursor: 'pointer' }}>
               {sidebarItems.map(item => (
                 <Box key={item._id}>
-                  <ListItem onClick={() => handleToggleSubmenu(item._id, item.label)} component={Link} to={item.path} className="menu-item">
-                    <ListItemIcon sx={{ fontSize: '1.5rem',  }} className="menu-icon">
+                  <ListItem onClick={() => handleToggleSubmenu(item._id, item.label)} component={Link} to={item.path} className="menu-item" sx={{
+                    mt: 1, // margin-top: 8px
+                    borderRadius: '10px',
+                    color: 'black',
+
+                    transition: 'background-color 0.3s, color 0.3s',
+                    '&:hover': {
+                      color: '#fff',
+                      backgroundColor: '#0000ff',
+
+                      '.menu-icon': {
+                        color: '#fff',
+                      },
+                    },
+                  }}>
+                    <ListItemIcon sx={{ fontSize: '1.5rem', }} className="menu-icon">
                       {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
                     </ListItemIcon>
-                    {!isCollapsed && <ListItemText primary={item.label} sx={{ ml: -2 }}/>}
+                    {!isCollapsed && <ListItemText primary={item.label} sx={{ ml: -2 }} />}
                     {!isCollapsed && item.submenu.length > 0 && (
                       <ListItemIcon sx={{ justifyContent: 'end' }}>
-                        {openMenu === item._id ? <ExpandLess /> : <ExpandMore />}
+                        {openMenu === item._id ? <ExpandLess className="menu-icon" /> : <ExpandMore className="menu-icon" />}
                       </ListItemIcon>
                     )}
                   </ListItem>
@@ -157,11 +172,25 @@ function Sidebar() {
                     <Collapse in={openMenu === item._id}>
                       <List component="div" disablePadding>
                         {item.submenu.map(subItem => (
-                          <ListItem key={subItem.path} component={Link} to={subItem.path} sx={{ pl: 4 }} className="menu-item">
-                            <ListItemIcon sx={{ fontSize: '1.2rem', color: 'black' }}>
+                          <ListItem key={subItem.path} component={Link} to={subItem.path} className="menu-item" sx={{
+                            mt: 1, // margin-top: 8px
+                            borderRadius: '10px',
+                            color: 'black',
+                            pl: 4,
+                            transition: 'background-color 0.3s, color 0.3s',
+                            '&:hover': {
+                              color: '#fff',
+                              backgroundColor: '#0000ff',
+                              '.menu-icon': {
+                                color: '#fff',
+                              },
+
+                            },
+                          }}>
+                            <ListItemIcon sx={{ fontSize: '1.2rem', }} className="menu-icon" >
                               {iconMapping[subItem.icon] ? React.createElement(iconMapping[subItem.icon]) : null}
                             </ListItemIcon>
-                            {!isCollapsed && <ListItemText primary={subItem.label} sx={{ ml: -2 }}/>}
+                            {!isCollapsed && <ListItemText primary={subItem.label} sx={{ ml: -2 }} />}
                           </ListItem>
                         ))}
                       </List>
@@ -179,7 +208,7 @@ function Sidebar() {
           sx={{
             // padding: 1,
             // border: '2px solid red',
-           
+
           }}
         >
           <Outlet />
@@ -193,8 +222,22 @@ function Sidebar() {
           </Box>
           <List>
             {newSidebarItems.map(item => (
-              <ListItem key={item._id} component={Link} to={item.path} className="menu-item" onClick={() => handleNewItemClick(item.label)}>
-                <ListItemIcon sx={{ fontSize: '1.5rem', color: 'black' }}>
+              <ListItem key={item._id} component={Link} to={item.path} className="menu-item" onClick={() => handleNewItemClick(item.label)} sx={{
+                mt: 1, // margin-top: 8px
+                borderRadius: '10px',
+                color: 'black',
+
+                transition: 'background-color 0.3s, color 0.3s',
+                '&:hover': {
+                  color: '#fff',
+                  backgroundColor: '#0000ff',
+
+                  '.menu-icon': {
+                    color: '#fff',
+                  },
+                },
+              }}>
+                <ListItemIcon sx={{ fontSize: '1.5rem', color: '#2c85de' }} className="menu-icon">
                   {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
                 </ListItemIcon>
                 <ListItemText primary={item.label} />
@@ -209,7 +252,7 @@ function Sidebar() {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
 
           </Box>
-          {rightDrawerContent === 'Account' && <AccountForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose}/>}
+          {rightDrawerContent === 'Account' && <AccountForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />}
           {rightDrawerContent === 'Contact' && <ContactForm handleNewDrawerClose={handleNewDrawerClose} handleDrawerClose={handleDrawerClose} />}
         </Box>
       </Drawer>

@@ -5,13 +5,14 @@ height: 100vh;
 
   display: grid;
   grid-template-columns: auto 1fr;
-  grid-template-rows: 8% 1fr;
+  grid-template-rows: 11% 1fr;
   grid-template-areas: "side nav" "side main";
 }
 
 .header {
   background-color:#EBF4F6;
   grid-area: nav;
+ 
   box-shadow: 4px 0px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -40,7 +41,7 @@ height: 100vh;
 } */
 .toggle-button {
   position: absolute !important;
-  top: 35px !important;
+  top: 55px !important;
   right: -25px !important;
 
   transition: background-color 0.3s ease;
@@ -49,7 +50,8 @@ height: 100vh;
 }
 
 .toggle-button .toggle-icon {
-  background-color: #0000ff;
+  /* background-color: #0000ff; */
+  background-color:#2c85de;
   color: #fff;
   border-radius: 50%;
   font-size: 2rem;
@@ -75,38 +77,20 @@ height: 100vh;
   text-align: center;
 }
 
-.menu-item {
-  transition: background-color 0.3s, color 0.3s;
-  margin-top: 8px;
-  border-radius: 10px;
-  color: black;
-}
 .collapsed .menu-icon{
   justify-content: center;
   text-align: center;
 }
 .sidebar-contents .menu-icon{
-  color: black;
-}
-.menu-item:hover{
-  background-color: #0000ff;
-  color: #fff;
-}
-.menu-icon:hover {
-  color: #fff;
+  color: #2c85de;
 }
 
-.menu-item:hover .MuiListItemIcon-root {
-  color: #fff;
-}
 
 .menu-item .MuiListItemText-root {
   transition: color 0.3s;
 }
 
-.menu-item:hover .MuiListItemText-root {
-  color: #fff;
-}
+
 
 .menu-item .MuiListItemIcon-root {
   transition: color 0.3s;
@@ -118,8 +102,10 @@ height: 100vh;
 
 .add-icon {
   cursor: pointer;
-  color: green;
+  /* color: green; */
   font-size: 1.8rem;
+  margin: 3px;
+  /* border: 1px solid red; */
 }
 .custom-right-drawer {
   border-top-left-radius: 15px;

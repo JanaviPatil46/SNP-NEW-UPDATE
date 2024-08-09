@@ -230,7 +230,8 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
             padding: "2px,8px",
             fontSize: '10px',
             width: `${calculateWidth(tag.tagName)}px`,
-            margin: '7px'
+            margin: '7px',
+            cursor: 'pointer',
         },
         customTagStyle: {
             backgroundColor: tag.tagColour,

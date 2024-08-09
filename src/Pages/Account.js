@@ -1,62 +1,7 @@
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-
-// const AccountsTable = () => {
-//   const [accounts, setAccounts] = useState([]);
-
-//   useEffect(() => {
-//     const fetchAccounts = async () => {
-//       try {
-//         const config = {
-//           method: 'get',
-//           maxBodyLength: Infinity,
-//           url: 'http://127.0.0.1:7000/accounts/account/accountdetailslist/',
-//           headers: {},
-//         };
-//         const response = await axios.request(config);
-//         setAccounts(response.data.accountlist);
-//         console.log(response.data.accountlist)
-//       } catch (error) {
-//         console.error('Error fetching accounts:', error);
-//       }
-//     };
-
-//     fetchAccounts();
-//   }, []);
-  
-//   return (
-//     <TableContainer component={Paper}>
-//       <Table>
-//         <TableHead>
-//           <TableRow>
-            
-//             <TableCell>Account Name</TableCell>
-//             <TableCell>Team</TableCell>
-//             <TableCell>Tags</TableCell>
-//           </TableRow>
-//         </TableHead>
-//         <TableBody>
-//           {accounts.map((account) => (
-//             <TableRow key={account.id}>
-              
-//               <TableCell>{account.Name}</TableCell>
-//               <TableCell>{account.Team}</TableCell>
-//               <TableCell>{account.Tags}</TableCell>
-//             </TableRow>
-//           ))}
-//         </TableBody>
-//       </Table>
-//     </TableContainer>
-//   );
-// };
-
-// export default AccountsTable;
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { MaterialReactTable } from 'material-react-table';
-import { Chip } from '@mui/material';
+import { Box, Tooltip, Badge } from '@mui/material';
 const AccountsTable = () => {
   const [accounts, setAccounts] = useState([]);
 
@@ -95,21 +40,75 @@ const AccountsTable = () => {
         </ul>
       ),
     },
+    
     {
       accessorKey: 'Tags',
       header: 'Tags',
-      Cell: ({ cell }) => (
-        <ul>
-          {cell.getValue()[0].map(tag => (
-            <Chip
-              key={tag._id}
-              label={tag.tagName}
-              style={{ backgroundColor: tag.tagColour, color: '#fff', margin: '2px' }}
-            />
-
-          ))}
-        </ul>
-      ),
+      Cell: ({ cell }) => {
+        const tags = cell.getValue()[0];
+        if (tags.length > 1) {
+          const firstTag = tags[0];
+          const remainingTagsCount = tags.length - 1;
+          return (
+            <Tooltip
+              placement="top"
+              arrow
+              title={tags.map(tag => (
+                <div key={tag._id}>
+                  <span style={{
+                    backgroundColor: tag.tagColour,
+                    color: "#fff",
+                    borderRadius: "60px",
+                    padding: "0.1rem 0.8rem",
+                    fontSize: "10px",
+                    display: 'inline-block',
+                    margin: '2px'
+                  }}>
+                    {tag.tagName}
+                  </span>
+                </div>
+              ))}
+            >
+              <Box>
+                <span style={{
+                  backgroundColor: firstTag.tagColour,
+                  color: "#fff",
+                  borderRadius: "60px",
+                  padding: "0.1rem 0.8rem",
+                  fontSize: "10px",
+                  display: 'inline-block',
+                  margin: '2px',
+                  cursor: 'pointer'
+                }}>
+                  {firstTag.tagName}
+                </span>
+                {remainingTagsCount > 0 && (
+                  <Badge
+                    badgeContent={`+${remainingTagsCount}`}
+                   color="#7D7C7C"
+                    overlap="rectangular"
+                    anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    sx={{ ml: 1 }}
+                  />
+                )}
+              </Box>
+            </Tooltip>
+          );
+        }
+        return (
+          <span style={{
+            backgroundColor: tags[0].tagColour,
+            color: "#fff",
+            borderRadius: "60px",
+            padding: "0.1rem 0.8rem",
+            fontSize: "10px",
+            display: 'inline-block',
+            margin: '2px'
+          }}>
+            {tags[0].tagName}
+          </span>
+        );
+      },
     },
   ];
 
@@ -128,57 +127,3 @@ export default AccountsTable;
 
 
 
-
-// import React, { useEffect, useState } from 'react';
-// import axios from 'axios';
-// import { MaterialReactTable } from 'material-react-table';
-
-// const AccountsTable = () => {
-//   const [accounts, setAccounts] = useState([]);
-
-//   useEffect(() => {
-//     const fetchAccounts = async () => {
-//       try {
-//         const config = {
-//           method: 'get',
-//           maxBodyLength: Infinity,
-//           url: 'http://127.0.0.1:7000/accounts/account/accountdetailslist/',
-//           headers: {},
-//         };
-//         const response = await axios.request(config);
-//         setAccounts(response.data);
-//       } catch (error) {
-//         console.error('Error fetching accounts:', error);
-//       }
-//     };
-
-//     fetchAccounts();
-//   }, []);
-
-//   const columns = [
-//     {
-//       accessorKey: 'Name',
-//       header: 'Account Name',
-//     },
-//     {
-//       accessorKey: 'Team',
-//       header: 'Team Member',
-//     },
-//     {
-//       accessorKey: 'Tags',
-//       header: 'Tags',
-//     },
-//   ];
-
-//   return (
-//     <MaterialReactTable
-//       columns={columns}
-//       data={accounts}
-//       enableColumnResizing
-//       enableRowSelection
-//       initialState={{ density: 'compact' }}
-//     />
-//   );
-// };
-
-// export default AccountsTable;

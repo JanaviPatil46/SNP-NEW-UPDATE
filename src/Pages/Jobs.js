@@ -38,6 +38,7 @@ const Example = () => {
         StartDate: format(new Date(job.StartDate), 'MMMM dd, yyyy'),
         DueDate: format(new Date(job.DueDate), 'MMMM dd, yyyy'),
         updatedAt: formatDistanceToNow(new Date(job.updatedAt), { addSuffix: true }),
+        JobAssignee: Array.isArray(job.JobAssignee) ? job.JobAssignee.join(', ') : job.JobAssignee,
       }));
       setJobData(formattedData);
     } catch (error) {

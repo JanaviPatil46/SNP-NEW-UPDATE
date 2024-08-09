@@ -91,6 +91,22 @@ const JobTemp = () => {
   const handleCloseJobTemp = () => {
     setShowForm(false);
   }
+  const dayOptions = [
+    { label: "Days", value: "Days" },
+    { label: "Months", value: "Months" },
+    { label: "Years", value: "Years" },
+  ];
+
+  
+
+  // Handler function to update state when dropdown value changes
+  const handleStartInDateChange = (event, newValue) => {
+    setStartsInDuration(newValue ? newValue.value : null);
+  };
+  // Handler function to update state when dropdown value changes
+  const handledueindateChange = (event, newValue) => {
+    setdueinduration(newValue ? newValue.value : null);
+  };
 
   useEffect(() => {
     // Simulate filtered shortcuts based on some logic (e.g., search)
@@ -211,22 +227,7 @@ const JobTemp = () => {
     setCombinedValues(selectedValues);
   };
 
-  const dayOptions = [
-    { label: "Days", value: "Days" },
-    { label: "Months", value: "Months" },
-    { label: "Years", value: "Years" },
-  ];
-
   
-
-  // Handler function to update state when dropdown value changes
-  const handleStartInDateChange = (event, newValue) => {
-    setStartsInDuration(newValue ? newValue.value : null);
-  };
-  // Handler function to update state when dropdown value changes
-  const handledueindateChange = (event, newValue) => {
-    setdueinduration(newValue ? newValue.value : null);
-  };
   const options = userData.map((user) => ({
     value: user._id,
     label: user.username,
@@ -317,7 +318,7 @@ const JobTemp = () => {
         jobname: jobName,
         jobassignees: combinedValues,
         addshortcode: "",
-        priority: priority?.value,
+        priority: priority.value,
         description: description,
         absolutedates: absoluteDate,
         startsin: startsin,

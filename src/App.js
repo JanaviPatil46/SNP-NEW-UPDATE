@@ -24,7 +24,7 @@ import CreateJob from './Jobs/CreateJob';
 import Docs from './Pages/Docs'
 
 import Invoices from './Billing/Invoices';
-
+import Services from './Pages/Service';
 import MyAccount from './Settings/MyAccount'
 import Pipeline from './Workflow/Pipeline';
 import WorkflowTask from './Workflow/Tasks'
@@ -65,6 +65,7 @@ const App = () => {
             <Route path='proposals' element={<ProposalTemp />} />
           </Route>
           <Route path='/firmtemp/teammember' element={<TeamMember/>}/>
+          <Route path='/firmtemp/services' element={<Services/>}/>
           <Route path='/settings/myaccount' element={<MyAccount/>}/>
 
           <Route path='*' element={<ErrorPage />} />
