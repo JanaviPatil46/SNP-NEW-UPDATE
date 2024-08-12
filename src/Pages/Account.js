@@ -30,17 +30,21 @@ const AccountsTable = () => {
       header: 'Account Name',
     },
     {
+      accessorKey: 'Type',
+      header: 'Type',
+    },
+    {
       accessorKey: 'Team',
       header: 'Team Members',
       Cell: ({ cell }) => (
         <ul>
           {cell.getValue().map(member => (
-            <li key={member._id}>{member.username}</li>
+            <div key={member._id}>{member.username}</div>
           ))}
         </ul>
       ),
     },
-    
+   
     {
       accessorKey: 'Tags',
       header: 'Tags',

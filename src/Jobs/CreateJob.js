@@ -379,11 +379,7 @@ const CreateJob = () => {
                     getOptionLabel={(option) => option.label}
                     value={selectedUser}
                     onChange={handleUserChange}
-                    // value={selectedAssigneesUser.map((value) =>
-                    //   assigneesoptions.find((option) => option.value === value)
-                    // )}
-
-                    // onChange={handleJobAssigneesChange}
+                    
                     renderOption={(props, option) => (
                       <Box
                         component="li"
@@ -404,7 +400,7 @@ const CreateJob = () => {
 
                 </Box>
                 <Box mt={2}>
-                  {/* <Editor onChange={handleEditorChange} /> */}
+                  
                   <Editor initialContent={description} onChange={handleEditorChange}/>
                 </Box>
                 <Box mt={2}>
