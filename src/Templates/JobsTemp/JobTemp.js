@@ -433,8 +433,7 @@ const JobTemp = () => {
                 <Box mt={1}>
                   <InputLabel sx={{ color: 'black' }}>Job Name</InputLabel>
                   <TextField
-                    // value={jobName}
-                    // onChange={(e) => setJobName(e.target.value)}
+                   
                     value={jobName + selectedShortcut} onChange={handlejobName}
                     size='small'
                     margin='normal'

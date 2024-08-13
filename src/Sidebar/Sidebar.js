@@ -9,8 +9,9 @@ import axios from "axios";
 import "./Sidebar.css";
 import iconMapping from './icons/index';
 import Logo from '../Images/Logo.svg';
-import { FaBars } from "react-icons/fa6";
-import { AiOutlinePlusCircle } from "react-icons/ai";
+import { FaBars  } from "react-icons/fa6";
+// import { AiOutlinePlusCircle } from "react-icons/ai";
+import { FaPlusCircle } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
 import ContactForm from '../Contact/ContactForm';
 import AccountForm from '../Contact/AccountForm';
@@ -108,9 +109,9 @@ function Sidebar() {
             <FaBars onClick={handleToggleSidebar} style={{ fontSize: '1.8rem' }} />
           </Box>
          
-          <Button variant="contained" color="success" onClick={handleDrawerOpen} >
-          <AiOutlinePlusCircle className="add-icon"  />
-          </Button>
+          {/* <Button variant="contained" color="success"  > */}
+          <FaPlusCircle   className="add-icon"  onClick={handleDrawerOpen}/>
+          {/* </Button> */}
           <Box>
             <IconButton onClick={() => setIsDarkMode(!isDarkMode)}>
               {isDarkMode ? <Brightness7 /> : <Brightness4 />}
