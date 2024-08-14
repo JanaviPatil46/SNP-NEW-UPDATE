@@ -28,6 +28,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Priority from '../Priority/Priority';
 import Status from '../Status/Status';
 import { toast } from "react-toastify";
+
 const Tasks = () => {
   const [templatename, settemplatename] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -336,7 +337,7 @@ const Tasks = () => {
           <Box sx={{ mt: 2 }}>
             <Box>
               <form>
-                <Box>
+                <Box className='box-b'>
                   <Typography variant='h5' gutterBottom>Create Task Template</Typography>
                   <Box mt={2} mb={2}><hr /></Box>
                   <Grid container spacing={2}>
@@ -346,13 +347,14 @@ const Tasks = () => {
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
                             <Box>
-                              <InputLabel sx={{ color: 'black' }}>Template Name</InputLabel>
+                              <InputLabel  className='input-label'>Template Name</InputLabel>
                               <TextField
                                 fullWidth
                                 name="TemplateName"
                                 placeholder="Template Name"
                                 size="small"
-                                sx={{ mt: 1 }}
+                                sx={{background:'#fff',mt: 1}}
+                                
                                 onChange={(e) => settemplatename(e.target.value)}
                               />
                             </Box>
@@ -371,10 +373,10 @@ const Tasks = () => {
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
                             <Box>
-                              <InputLabel sx={{ color: 'black' }}>Task Assignee</InputLabel>
+                              <InputLabel  className='input-label'>Task Assignee</InputLabel>
                               <Autocomplete
                                 multiple
-                                sx={{ mt: 1 }}
+                                sx={{background:'#fff',mt: 1}}
                                 options={options}
                                 size='small'
                                 getOptionLabel={(option) => option.label}
@@ -409,7 +411,7 @@ const Tasks = () => {
                       </Box>
                       <Box mt={2}>
 
-                        <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>
+                        <InputLabel  className='input-label'>Tags</InputLabel>
 
                         <Autocomplete
                           multiple
@@ -435,7 +437,7 @@ const Tasks = () => {
                               variant="outlined"
 
                               placeholder="Tags"
-                              sx={{ width: '100%', marginTop: '8px' }}
+                              sx={{ width: '100%', marginTop: '8px', backgroundColor:'#fff' }}
                             />
                           )}
                           renderOption={(props, option) => (
@@ -448,7 +450,7 @@ const Tasks = () => {
                       </Box>
                       <Box mt={2}>
                         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-                          <Typography variant='h6'>Start and Due Date</Typography>
+                          <Typography variant='h6' className='input-label'>Start and Due Date</Typography>
                           <Box className='absolutes-dates'>
                             <FormControlLabel
                               control={
@@ -457,6 +459,7 @@ const Tasks = () => {
                                   // onChange={handleAbsolutesDates}
                                   onChange={(event) => handleAbsolutesDates(event.target.checked)}
                                   color="primary"
+                                  
                                 />
                               }
                               label={"Absolute Date"}
@@ -467,10 +470,10 @@ const Tasks = () => {
                       {absoluteDate && (
                         <>
                           <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <Typography>Start Date</Typography>
+                            <Typography className='input-label'>Start Date</Typography>
                             <DatePicker
                               format="DD/MM/YYYY"
-                              sx={{ width: '100%', }}
+                              sx={{ width: '100%',backgroundColor:'#fff' }}
                               // value={startDate}
                               // onChange={handleStartDateChange}
                               selected={startDate} onChange={handleStartDateChange}
@@ -478,10 +481,10 @@ const Tasks = () => {
                             />
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <Typography>Due Date</Typography>
+                            <Typography className='input-label'>Due Date</Typography>
                             <DatePicker
                               format="DD/MM/YYYY"
-                              sx={{ width: '100%', }}
+                              sx={{ width: '100%', backgroundColor:'#fff'}}
                               // value={dueDate}
                               // onChange={handleDueDateChange}
                               selected={dueDate} onChange={handleDueDateChange}
@@ -493,14 +496,14 @@ const Tasks = () => {
                       {!absoluteDate && (
                         <>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography>Start In</Typography>
+                            <Typography className='input-label'>Start In</Typography>
                             <TextField
                               size='small'
                               margin='normal'
                               fullWidth
                               defaultValue={0}
                               value={startsin}
-                              sx={{ ml: 1 }}
+                              sx={{background:'#fff',ml: 1.5}}
                               onChange={(e) => setstartsin(e.target.value)}
                             />
                             <Autocomplete
@@ -509,21 +512,22 @@ const Tasks = () => {
                               getOptionLabel={(option) => option.label}
                               onChange={handleStartInDateChange}
                               renderInput={(params) => (
-                                <TextField {...params} variant="outlined" />
+                                <TextField {...params} variant="outlined" sx={{backgroundColor:'#fff'}} />
                               )}
                               value={dayOptions.find((option) => option.value === startsInDuration) || null}
                               className="job-template-select-dropdown"
                             />
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography>Due In</Typography>
+                            <Typography className='input-label'>Due In</Typography>
                             <TextField
                               size='small'
                               margin='normal'
                               value={duein}
                               fullWidth
                               defaultValue={0}
-                              sx={{ ml: 1.5 }}
+                              
+                              sx={{background:'#fff',ml: 1.8,}}
                               onChange={(e) => setduein(e.target.value)}
                             />
 
@@ -534,7 +538,7 @@ const Tasks = () => {
 
                               size='small'
                               renderInput={(params) => (
-                                <TextField {...params} variant="outlined" />
+                                <TextField {...params} variant="outlined" sx={{backgroundColor:'#fff'}}/>
                               )}
                               value={dayOptions.find((option) => option.value === dueinduration) || null}
                               className="job-template-select-dropdown"

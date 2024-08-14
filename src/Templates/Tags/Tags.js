@@ -6,7 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { IoClose } from "react-icons/io5";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
-import './tag.css';
+import '../../App.css'
 import { toast } from 'react-toastify';
 
 const Tags = () => {
@@ -336,7 +336,7 @@ const Tags = () => {
             </Box>
             <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
               <Box>
-                <InputLabel htmlFor="outlined-required">Name</InputLabel>
+                <InputLabel  className='input-label'>Name</InputLabel>
 
                 <TextField
                   placeholder="Tag Name"
@@ -345,18 +345,19 @@ const Tags = () => {
                   fullWidth
                   margin="normal"
                   size="small"
+                  sx={{backgroundColor:'#fff'}}
                 />
                
               </Box>
               <Box sx={{ mt: 3 }}>
-                <InputLabel htmlFor="outlined-required">Color</InputLabel>
+                <InputLabel className='input-label'>Color</InputLabel>
                 <Select
                   value={selectedOption ? selectedOption.tagColour : ''}
                   onChange={handleChange}
                   labelId="color-select-label"
                   id="color-select"
                   size="small"
-                  sx={{ width: '100%', marginTop: '10px' }}
+                  sx={{ width: '100%', marginTop: '10px' ,backgroundColor:'#fff'}}
                 >
                   {options.map((option) => (
                     <MenuItem key={option.value} value={option.tagColour}>

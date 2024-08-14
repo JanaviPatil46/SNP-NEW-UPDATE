@@ -1,7 +1,7 @@
 import React from "react";
 import Select from "react-select";
 import { InputLabel, Box } from '@mui/material';
-
+import './style.css'
 const Priority = ({ onPriorityChange, selectedPriority }) => {
 
 
@@ -62,12 +62,14 @@ const Priority = ({ onPriorityChange, selectedPriority }) => {
 
   return (
     <Box>
-      <InputLabel sx={{ color: 'black' }}>Priority</InputLabel>
+      <InputLabel sx={{ marginBottom:"8px" }} className='input-label'>Priority</InputLabel>
       <Select options={options}
         onChange={handleChange}
         styles={colorStyles}
-        sx={{ width: '100%', marginTop: '8px' }}
+        // sx={{ width: '100%', marginTop: '8px' }}
+       
         size="small"
+        
         value={options.find(option => option.value === selectedPriority)}
         isSearchable // Enable search
         isClearable

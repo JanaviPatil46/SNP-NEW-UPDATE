@@ -1,3 +1,5 @@
+
+@import url("./theme.css");
 .grid-container {
   margin: 0;
   padding: 0;
@@ -10,31 +12,42 @@ height: 100vh;
 }
 
 .header {
-  background-color:#EBF4F6;
+  /* background-color:#fff; */
+  background-color: var(--color-header-bg);
   grid-area: nav;
- 
-  box-shadow: 4px 0px 12px rgba(0, 0, 0, 0.3);
+/* height: 100%; */
+/* padding: 5px; */
+border-bottom: 1px solid grey;
+  /* box-shadow: 4px 0px 12px rgba(0, 0, 0, 0.3); */
 }
 
 .sidebar {
   height: 100%;
-  background-color: var(--sidebar-bg-color);
+  background-color: var(--color-sidebar-bg);
   grid-area: side;
-  transition: 0.3s all;
+  /* transition: 0.3s all; */
   position: relative;
   box-shadow: 4px 0px 12px rgba(0, 0, 0, 0.3);
+  
 }
-
+.newSidebar{
+   background-color: var(--color-sidebar-bg);
+   color: var(--color-text);
+}
 .main {
   padding: 20px;
   grid-area: main;
-  background-color: var(--main-bg-color);
+  background-color: var(--color-main-bg);
   /* background-color: #f0f0f0; */
   overflow-y: auto;
+  color: var(--color-text);
   
 }
 .main::-webkit-scrollbar {
   display: none; /* Hide scrollbar (for WebKit browsers) */
+}
+.company-name-text,.menu-text{
+  color: var(--color-text);
 }
 /* .collapsed .main{
   padding:0;
@@ -62,9 +75,9 @@ height: 100vh;
   background-color: #e0e0e0;
 }
 
-/* ::-webkit-scrollbar {
-  display: none;
-} */
+.company-name-text{
+ color: var(--color-text);
+}
 
 
 .collapsed .menu-item .MuiListItemIcon-root {

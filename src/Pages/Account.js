@@ -123,6 +123,7 @@ const AccountsTable = () => {
       enableColumnResizing
       enableRowSelection
       initialState={{ density: 'compact' }}
+      
     />
   );
 };

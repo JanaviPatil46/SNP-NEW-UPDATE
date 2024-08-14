@@ -1,0 +1,22 @@
+
+
+.light-theme{
+  /* 088395 */
+  --color-sidebar-bg:  #ffffff;
+  --color-header-bg:#ffffff;
+  --color-main-bg: #ffffff;
+  --color-text: #000000;
+  --color-menu-icon: #000000;
+  --color-navbar-temp: #1976d2; 
+}
+
+.dark-theme{
+  
+  --color-sidebar-bg: #1a1a1a;
+  --color-header-bg: #333333;
+  --color-main-bg: #121212;
+  --color-text: #ffffff;
+  --color-menu-icon: #000000;
+  --color-navbar-temp:#ffffff;
+}
+

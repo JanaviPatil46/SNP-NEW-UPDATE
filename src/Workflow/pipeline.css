@@ -1,8 +1,9 @@
 .stage{
     height: 100vh;
     overflow-y: auto;
-    min-width: 150px;
+    min-width: 180px;
   display: flex;
+ 
   flex-direction: column;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -14,6 +15,11 @@
 }
 .stage::-webkit-scrollbar{
     display: none;
+}
+.stage-container{
+  /* border: 1px solid red; */
+  width: 100%;
+  overflow-x: auto;
 }
 
 .job-card {

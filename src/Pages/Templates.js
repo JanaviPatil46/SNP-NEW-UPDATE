@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material'
 import React from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
-
+import './temp.css'
 const Templates = () => {
     return (
         <Box>
@@ -19,7 +19,7 @@ const Templates = () => {
                         textDecoration: 'none',
                         padding: '8px 16px',
                         borderRadius: '4px',
-                        color: 'primary.main',
+                        // color: 'primary.main',
                         '&:hover': {
                             backgroundColor: 'primary.light',
                             color: 'white'

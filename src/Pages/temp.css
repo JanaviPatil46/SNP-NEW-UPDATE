@@ -1,0 +1,7 @@
+@import url("../Sidebar/theme.css");
+.firmtemp-nav a{
+    color: var(--color-navbar-temp);
+}
+.input-label{
+    color:var(--color-text);
+}

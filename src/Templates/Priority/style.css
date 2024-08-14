@@ -1,0 +1,17 @@
+/* @import url("../../Sidebar/theme.css"); */
+.light-theme{
+   
+    --color-text: #000000;
+    
+  }
+  
+  .dark-theme{
+    
+   
+    --color-text: #ffffff;
+    
+  }
+
+.input-label{
+    color:var(--color-text);
+}

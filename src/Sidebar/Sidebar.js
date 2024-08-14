@@ -100,11 +100,21 @@ function Sidebar() {
       setIsRightDrawerOpen(true);
     }
   };
-
+  const [theme, setTheme] = useState("light-theme");
+  const toggleTheme = () => {
+    if (theme === "dark-theme") {
+      setTheme("light-theme");
+    } else {
+      setTheme("dark-theme");
+    }
+  };
+  useEffect(() => {
+    document.body.className = theme;
+  }, [theme]);
   return (
     <div className="grid-container">
-      <header className="header">
-        <Box component="header" sx={{ p: 2, display: 'flex', gap: 3, ml:2 }}>
+      <header className="header" >
+        <Box component="header" sx={{ p: 2, display: 'flex', gap: 3,  }} >
           <Box className='bar-icon'>
             <FaBars onClick={handleToggleSidebar} style={{ fontSize: '1.8rem' }} />
           </Box>
@@ -113,8 +123,9 @@ function Sidebar() {
           <FaPlusCircle   className="add-icon"  onClick={handleDrawerOpen}/>
           {/* </Button> */}
           <Box>
-            <IconButton onClick={() => setIsDarkMode(!isDarkMode)}>
-              {isDarkMode ? <Brightness7 /> : <Brightness4 />}
+            {/* onClick={() => setIsDarkMode(!isDarkMode)} */}
+            <IconButton >
+              {isDarkMode ? <Brightness7 onClick={toggleTheme}/> : <Brightness4 onClick={toggleTheme}/>}
             </IconButton>
           </Box>
         </Box>
@@ -137,7 +148,7 @@ function Sidebar() {
           <Box sx={{ pt: 3, display: 'flex', alignItems: 'center', justifyContent: 'start', gap: 1 }}>
             <img src={Logo} alt="logo" style={{ height: "40px", display: 'block' }} />
             {!isCollapsed && (
-              <Typography variant="h5">SNP</Typography>
+              <Typography variant="h5" className="company-name-text">SNP</Typography>
             )}
           </Box>
           <Box className='sidebar-contents' sx={{ mt: 2 }}>
@@ -162,7 +173,7 @@ function Sidebar() {
                     <ListItemIcon sx={{ fontSize: '1.5rem', }} className="menu-icon">
                       {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
                     </ListItemIcon>
-                    {!isCollapsed && <ListItemText primary={item.label} sx={{ ml: -2 }} />}
+                    {!isCollapsed && <ListItemText primary={item.label} sx={{ ml: -2 }} className="menu-text"/>}
                     {!isCollapsed && item.submenu.length > 0 && (
                       <ListItemIcon sx={{ justifyContent: 'end' }}>
                         {openMenu === item._id ? <ExpandLess className="menu-icon" /> : <ExpandMore className="menu-icon" />}
@@ -191,7 +202,7 @@ function Sidebar() {
                             <ListItemIcon sx={{ fontSize: '1.2rem', }} className="menu-icon" >
                               {iconMapping[subItem.icon] ? React.createElement(iconMapping[subItem.icon]) : null}
                             </ListItemIcon>
-                            {!isCollapsed && <ListItemText primary={subItem.label} sx={{ ml: -2 }} />}
+                            {!isCollapsed && <ListItemText primary={subItem.label} sx={{ ml: -2 }} className="menu-text"/>}
                           </ListItem>
                         ))}
                       </List>
@@ -215,8 +226,8 @@ function Sidebar() {
           <Outlet />
         </Box>
       </main>
-      <Drawer anchor="left" open={isDrawerOpen} onClose={handleDrawerClose}>
-        <Box sx={{ width: 300, p: 2 }}>
+      <Drawer anchor="left" open={isDrawerOpen} onClose={handleDrawerClose} >
+        <Box sx={{ width: 300, p: 2,height:'100%' }} className="newSidebar" >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h6" fontWeight='bold'>New Sidebar Content</Typography>
             <RxCross2 onClick={handleDrawerClose} style={{ cursor: 'pointer' }} />
@@ -241,7 +252,7 @@ function Sidebar() {
                 <ListItemIcon sx={{ fontSize: '1.5rem', color: '#2c85de' }} className="menu-icon">
                   {iconMapping[item.icon] ? React.createElement(iconMapping[item.icon]) : null}
                 </ListItemIcon>
-                <ListItemText primary={item.label} />
+                <ListItemText primary={item.label} className="menu-text"/>
               </ListItem>
             ))}
           </List>

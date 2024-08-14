@@ -270,14 +270,15 @@ const Pipeline = () => {
     const stageJobs = jobs.filter(job => job.Pipeline === selectedPipeline.pipelineName && job.Stage.includes(stage.name));
     const [displayCount, setDisplayCount] = useState(3);
     const displayedJobs = stageJobs.slice(0, displayCount);
-
+// const truncatedStageName = stage.name.length > 10 ? `${stage.name.slice(0, 10)}...` : stage.name;
     return (
       <Box
         ref={drop} className={`stage ${isOver ? 'drag-over' : ''}`}
         
       >
-        <Typography variant="h6" sx={{ fontWeight: 'bold', marginBottom: '12px' }}>
+        <Typography sx={{  marginBottom: '12px' }}>
           {stage.name}
+          {/*    {truncatedStageName} */}
         </Typography>
         <Typography variant="body2" sx={{ marginBottom: '12px' }}>
           {stageJobs.length > 0 && <span>({stageJobs.length})</span>}
@@ -356,7 +357,7 @@ const Pipeline = () => {
             </Box>
             <Box>
 
-              <Box display="flex" gap={2}>
+              <Box className='stage-container' display="flex" gap={2} >
                 {stages.map((stage, index) => (
                   <Stage key={index} stage={stage} selectedPipeline={selectedPipeline} handleDrop={handleDrop} />
                 ))}

@@ -1,6 +1,6 @@
 import React from "react";
 import { Autocomplete, TextField, Box, Chip ,InputLabel} from '@mui/material';
-
+import '../../App.css'
 const Status = ({ onStatusChange, selectedStatus }) => {
 
   const options = [
@@ -29,9 +29,11 @@ const Status = ({ onStatusChange, selectedStatus }) => {
 
   return (
     <Box>
-       <InputLabel sx={{ color: 'black' }}>Status</InputLabel>
+       <InputLabel  className='input-label'>Status</InputLabel>
     
     <Autocomplete
+    
+    className='autocomplete'
       multiple
       size="small"
       id="status-autocomplete"
@@ -58,7 +60,7 @@ const Status = ({ onStatusChange, selectedStatus }) => {
           {...params}
           variant="outlined"
           placeholder="Select Status"
-          sx={{ width: '100%', marginTop: '8px' }}
+          sx={{ width: '100%', marginTop: '8px',background:'#fff', }}
         />
       )}
       renderOption={(props, option) => (
