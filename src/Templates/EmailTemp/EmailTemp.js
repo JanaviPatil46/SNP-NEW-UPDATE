@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+// import './email.css'
 import { toast } from "react-toastify";
 import {
     Box,
@@ -301,9 +302,10 @@ const EmailTemp = () => {
                     <form onSubmit={handleSaveTemplate}>
                         <Box>
 
-                            <InputLabel sx={{ color: 'black' }}>Template Name</InputLabel>
+                            <InputLabel id='email-input-label'>Template Name</InputLabel>
 
                             <TextField
+                            sx={{background:'#fff'}}
                                 margin="normal"
                                 fullWidth
                                 name="templateName"
@@ -323,15 +325,17 @@ const EmailTemp = () => {
                                     name="controlled-radio-buttons-group"
                                     value={selectedOption}
                                     onChange={handleChange}
+                                    
                                 >
                                     <FormControlLabel
                                         value="contacts"
-                                        control={<Radio />}
+                                        control={<Radio className='radio-button'/>}
                                         label="Contact Shortcodes"
+                                        
                                     />
                                     <FormControlLabel
                                         value="account"
-                                        control={<Radio />}
+                                        control={<Radio className='radio-button'/>}
                                         label="Account Shortcodes"
                                     />
                                 </RadioGroup>
@@ -340,13 +344,13 @@ const EmailTemp = () => {
                         <Box>
 
 
-                            <InputLabel sx={{ color: 'black' }}>From</InputLabel>
+                            <InputLabel id='email-input-label'>From</InputLabel>
 
 
                             <Autocomplete
 
                                 options={options}
-                                sx={{ mt: 2, mb: 2 }}
+                                sx={{ mt: 2, mb: 2 ,backgroundColor:'#fff'}}
                                 size='small'
                                 value={selecteduser}
                                 onChange={handleuserChange}
@@ -366,7 +370,7 @@ const EmailTemp = () => {
                         </Box>
                         <Box>
 
-                            <InputLabel sx={{ color: 'black' }}>Subject</InputLabel>
+                            <InputLabel id='email-input-label'>Subject</InputLabel>
 
                             <TextField
                                 margin="normal"
@@ -375,6 +379,7 @@ const EmailTemp = () => {
                                 value={inputText + selectedShortcut} onChange={handlechatsubject}
                                 placeholder="Subject"
                                 size="small"
+                                sx={{background:'#fff'}}
                             />
                         </Box>
                         <Box>

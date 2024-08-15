@@ -1,4 +1,4 @@
-@import url("../Sidebar/theme.css");
+@import url("../../src/theme.css");
 .firmtemp-nav a{
     color: var(--color-navbar-temp);
 }

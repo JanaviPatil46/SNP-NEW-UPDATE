@@ -29,7 +29,7 @@ const Status = ({ onStatusChange, selectedStatus }) => {
 
   return (
     <Box>
-       <InputLabel  className='input-label'>Status</InputLabel>
+       <InputLabel  id='input-label'>Status</InputLabel>
     
     <Autocomplete
     

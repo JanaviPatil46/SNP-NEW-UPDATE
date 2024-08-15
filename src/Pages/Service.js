@@ -8,8 +8,7 @@ import Grid from '@mui/material/Unstable_Grid2';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { RxCross2 } from "react-icons/rx";
 import { toast } from 'react-toastify';
-import { unstable_ClassNameGenerator as ClassNameGenerator } from '@mui/material/className';//autoclassnameGenerator
-ClassNameGenerator.configure((componentName) => `foo-bar-${componentName}`);//autoclassnameGenerator
+
 
 const Service = () => {
 

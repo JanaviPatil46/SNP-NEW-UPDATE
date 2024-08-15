@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+
+
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import {
@@ -347,7 +349,7 @@ const Tasks = () => {
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
                             <Box>
-                              <InputLabel  className='input-label'>Template Name</InputLabel>
+                              <InputLabel  id='task-input-label' >Template Name</InputLabel>
                               <TextField
                                 fullWidth
                                 name="TemplateName"
@@ -373,7 +375,7 @@ const Tasks = () => {
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
                             <Box>
-                              <InputLabel  className='input-label'>Task Assignee</InputLabel>
+                              <InputLabel  id='task-input-label'>Task Assignee</InputLabel>
                               <Autocomplete
                                 multiple
                                 sx={{background:'#fff',mt: 1}}
@@ -411,7 +413,7 @@ const Tasks = () => {
                       </Box>
                       <Box mt={2}>
 
-                        <InputLabel  className='input-label'>Tags</InputLabel>
+                        <InputLabel  id='task-input-label'>Tags</InputLabel>
 
                         <Autocomplete
                           multiple
@@ -450,7 +452,7 @@ const Tasks = () => {
                       </Box>
                       <Box mt={2}>
                         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-                          <Typography variant='h6' className='input-label'>Start and Due Date</Typography>
+                          <Typography variant='h6' id='task-input-label'>Start and Due Date</Typography>
                           <Box className='absolutes-dates'>
                             <FormControlLabel
                               control={
@@ -470,7 +472,7 @@ const Tasks = () => {
                       {absoluteDate && (
                         <>
                           <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <Typography className='input-label'>Start Date</Typography>
+                            <Typography id='task-input-label'>Start Date</Typography>
                             <DatePicker
                               format="DD/MM/YYYY"
                               sx={{ width: '100%',backgroundColor:'#fff' }}
@@ -481,7 +483,7 @@ const Tasks = () => {
                             />
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <Typography className='input-label'>Due Date</Typography>
+                            <Typography id='task-input-label'>Due Date</Typography>
                             <DatePicker
                               format="DD/MM/YYYY"
                               sx={{ width: '100%', backgroundColor:'#fff'}}
@@ -496,7 +498,7 @@ const Tasks = () => {
                       {!absoluteDate && (
                         <>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography className='input-label'>Start In</Typography>
+                            <Typography id='task-input-label'>Start In</Typography>
                             <TextField
                               size='small'
                               margin='normal'
@@ -519,7 +521,7 @@ const Tasks = () => {
                             />
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography className='input-label'>Due In</Typography>
+                            <Typography id='task-input-label'>Due In</Typography>
                             <TextField
                               size='small'
                               margin='normal'

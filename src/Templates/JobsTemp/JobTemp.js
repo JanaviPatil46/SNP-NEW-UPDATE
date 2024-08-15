@@ -420,7 +420,7 @@ const JobTemp = () => {
             <Grid container spacing={2} >
               <Grid xs={12} sm={5.8} >
                 <Box mt={2}>
-                  <InputLabel sx={{ color: 'black' }}>Template Name</InputLabel>
+                  <InputLabel id='jobtemp-input-label'>Template Name</InputLabel>
                   <TextField
                     size='small'
                     margin='normal'
@@ -428,12 +428,13 @@ const JobTemp = () => {
                     placeholder='Template Name'
                     value={templatename}
                     onChange={(e) => settemplatename(e.target.value)}
+                    sx={{backgroundColor:'#fff'}}
                   />
                 </Box>
                 <Box mt={1}>
-                  <InputLabel sx={{ color: 'black' }}>Job Name</InputLabel>
+                  <InputLabel id='jobtemp-input-label'>Job Name</InputLabel>
                   <TextField
-                   
+                   sx={{backgroundColor:'#fff'}}
                     value={jobName + selectedShortcut} onChange={handlejobName}
                     size='small'
                     margin='normal'
@@ -485,10 +486,10 @@ const JobTemp = () => {
                   </Popover>
                 </Box>
                 <Box mt={2}>
-                  <InputLabel sx={{ color: 'black' }}>Job Assignees</InputLabel>
+                  <InputLabel id='jobtemp-input-label'>Job Assignees</InputLabel>
                   <Autocomplete
                     multiple
-                    sx={{ mt: 2 }}
+                    sx={{ mt: 2,backgroundColor:'#FFF' }}
                     options={options}
                     size='small'
                     getOptionLabel={(option) => option.label}
@@ -517,7 +518,7 @@ const JobTemp = () => {
                 </Box>
                 <Box mt={2}>
                   <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-                    <Typography variant='h6'>Start and Due Date</Typography>
+                    <Typography variant='h6' id='jobtemp-input-label'>Start and Due Date</Typography>
                     <Box className='absolutes-dates'>
                       <FormControlLabel
                         control={
@@ -536,10 +537,10 @@ const JobTemp = () => {
                 {absoluteDate && (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                      <Typography>Start Date</Typography>
+                      <Typography id='jobtemp-input-label'>Start Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
-                        sx={{ width: '100%', }}
+                        sx={{ width: '100%',backgroundColor:'#fff' }}
                         // value={startDate}
                         // onChange={handleStartDateChange}
                         selected={startDate} onChange={handleStartDateChange}
@@ -547,10 +548,10 @@ const JobTemp = () => {
                       />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                      <Typography>Due Date</Typography>
+                      <Typography id='jobtemp-input-label'>Due Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
-                        sx={{ width: '100%', }}
+                        sx={{ width: '100%',backgroundColor:'#fff' }}
                         // value={dueDate}
                         // onChange={handleDueDateChange}
                         selected={dueDate} onChange={handleDueDateChange}
@@ -562,19 +563,20 @@ const JobTemp = () => {
                 {!absoluteDate && (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Typography>Start In</Typography>
+                      <Typography id='jobtemp-input-label'>Start In</Typography>
                       <TextField
                         size='small'
                         margin='normal'
                         fullWidth
                         defaultValue={0}
                         value={startsin}
-                        sx={{ ml: 1 }}
+                        sx={{ ml: 1 ,backgroundColor:'#fff'}}
                         onChange={(e) => setstartsin(e.target.value)}
                       />
                       <Autocomplete
                         options={dayOptions}
                         size='small'
+                        sx={{backgroundColor:'#fff' ,mt:1}}
                         getOptionLabel={(option) => option.label}
                         onChange={handleStartInDateChange}
                         renderInput={(params) => (
@@ -585,14 +587,14 @@ const JobTemp = () => {
                       />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Typography>Due In</Typography>
+                      <Typography id='jobtemp-input-label'>Due In</Typography>
                       <TextField
                         size='small'
                         margin='normal'
                         value={duein}
                         fullWidth
                         defaultValue={0}
-                        sx={{ ml: 1.5 }}
+                        sx={{ ml: 1.5 ,backgroundColor:'#fff'}}
                         onChange={(e) => setduein(e.target.value)}
                       />
                       
@@ -600,7 +602,7 @@ const JobTemp = () => {
                         options={dayOptions}
                         getOptionLabel={(option) => option.label}
                          onChange={handledueindateChange}
-
+                         sx={{backgroundColor:'#fff',mt:1 }}
                         size='small'
                         renderInput={(params) => (
                           <TextField {...params} variant="outlined" />

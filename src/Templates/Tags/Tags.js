@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import './tag.css'
 import { Box, Button, Typography, Drawer, InputLabel, Select, MenuItem, IconButton, TextField } from '@mui/material';
 import { FiSettings } from "react-icons/fi";
 import { CiMenuKebab } from "react-icons/ci";
@@ -6,7 +7,7 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { IoClose } from "react-icons/io5";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
-import '../../App.css'
+
 import { toast } from 'react-toastify';
 
 const Tags = () => {
@@ -289,7 +290,7 @@ const Tags = () => {
     },
     muiTableBodyCellProps: {
       sx: (theme) => ({
-        backgroundColor: theme.palette.mode === "dark" ? theme.palette.grey[900] : theme.palette.grey[50],
+        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
       }),
     },
   });
@@ -316,6 +317,7 @@ const Tags = () => {
         open={isDrawerOpen}
         onClose={handleDrawerClose}
         PaperProps={{
+          id:'tag-drawer',
           sx: {
             borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
             width: isSmallScreen ? '100%' : 500,
@@ -323,6 +325,7 @@ const Tags = () => {
             [theme.breakpoints.down('sm')]: {
               width: '100%',
             },
+            
           }
         }}
       >
@@ -336,7 +339,7 @@ const Tags = () => {
             </Box>
             <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
               <Box>
-                <InputLabel  className='input-label'>Name</InputLabel>
+                <InputLabel  id='input-label'>Name</InputLabel>
 
                 <TextField
                   placeholder="Tag Name"
@@ -350,7 +353,7 @@ const Tags = () => {
                
               </Box>
               <Box sx={{ mt: 3 }}>
-                <InputLabel className='input-label'>Color</InputLabel>
+                <InputLabel id='input-label'>Color</InputLabel>
                 <Select
                   value={selectedOption ? selectedOption.tagColour : ''}
                   onChange={handleChange}
@@ -390,12 +393,14 @@ const Tags = () => {
         onClose={handleUpdateDrawerClose}
         PaperProps={{
           sx: {
+            
             borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
             width: isSmallScreen ? '100%' : 500,
             maxWidth: '100%',
             [theme.breakpoints.down('sm')]: {
               width: '100%',
             },
+            id:'tag-drawer',
           }
         }}
       >
@@ -409,7 +414,7 @@ const Tags = () => {
             </Box>
             <Box sx={{ pr: 2, pl: 2, pt: 2}}>
               <Box>
-                <InputLabel htmlFor="outlined-required">Name</InputLabel>
+                <InputLabel id='input-label'>Name</InputLabel>
 
                 <TextField
 
@@ -423,7 +428,7 @@ const Tags = () => {
                 />
               </Box>
               <Box sx={{ mt: 3 }}>
-                <InputLabel htmlFor="outlined-required">Color</InputLabel>
+                <InputLabel id='input-label'>Color</InputLabel>
 
                 <Select
                   value={selectedOption ? selectedOption.tagColour : ''}

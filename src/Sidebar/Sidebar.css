@@ -1,5 +1,5 @@
 
-@import url("./theme.css");
+@import url("../../src/theme.css");
 .grid-container {
   margin: 0;
   padding: 0;
@@ -49,6 +49,10 @@ border-bottom: 1px solid grey;
 .company-name-text,.menu-text{
   color: var(--color-text);
 }
+
+/* .menu-text:hover{
+  color: #fff;
+} */
 /* .collapsed .main{
   padding:0;
 } */
@@ -158,35 +162,6 @@ border-bottom: 1px solid grey;
     }
   }
 }
-/* Define CSS variables for light mode */
-:root {
-  --sidebar-bg-color: #fff;
-  --sidebar-text-color: #000;
-  /* --main-bg-color: #f0f0f0; */
-  --main-text-color: #000;
-  --newsidebar-bg-color: #f0f0f0
-}
 
-/* Define CSS variables for dark mode */
-[data-theme='dark'] {
-  --sidebar-bg-color: #333;
-  --sidebar-text-color: #fff;
-  --main-bg-color: #222;
-  --main-text-color: #ddd;
-  --newsidebar-bg-color:pink
-}
 
-/* Apply styles using CSS variables */
-/* .sidebar {
-  background-color: var(--sidebar-bg-color);
-  color: var(--sidebar-text-color);
-}
 
-.main {
-  background-color: var(--main-bg-color);
-  color: var(--main-text-color);
-}
-.new-sidebar{
-  background-color: var(--newsidebar-bg-color);
-} */
-/* Add any additional styles here */

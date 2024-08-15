@@ -158,7 +158,7 @@ function Sidebar() {
                   <ListItem onClick={() => handleToggleSubmenu(item._id, item.label)} component={Link} to={item.path} className="menu-item" sx={{
                     mt: 1, // margin-top: 8px
                     borderRadius: '10px',
-                    color: 'black',
+                    // color: 'black',
 
                     transition: 'background-color 0.3s, color 0.3s',
                     '&:hover': {
@@ -168,6 +168,9 @@ function Sidebar() {
                       '.menu-icon': {
                         color: '#fff',
                       },
+                      '.menu-text':{
+                        color: '#fff',
+                      }
                     },
                   }}>
                     <ListItemIcon sx={{ fontSize: '1.5rem', }} className="menu-icon">
@@ -196,6 +199,9 @@ function Sidebar() {
                               '.menu-icon': {
                                 color: '#fff',
                               },
+                              '.menu-text':{
+                                color: '#fff',
+                              }
 
                             },
                           }}>
@@ -247,6 +253,9 @@ function Sidebar() {
                   '.menu-icon': {
                     color: '#fff',
                   },
+                  '.menu-text':{
+                    color: '#fff',
+                  }
                 },
               }}>
                 <ListItemIcon sx={{ fontSize: '1.5rem', color: '#2c85de' }} className="menu-icon">

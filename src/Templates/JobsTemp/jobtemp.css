@@ -1,3 +1,7 @@
+/* @import '../../App.css'; */
+@import url('../../App.css');
+
+
 .jobtemp-form{
     
     /* margin: 50px; */
@@ -8,6 +12,7 @@
     margin: 20px;
     
 }
+
 
 
 .create-job-form{
@@ -55,3 +60,4 @@ button {
     color: black; 
     border:1px solid #c6c7c7
   }
+ 
