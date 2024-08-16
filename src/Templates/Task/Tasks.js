@@ -17,7 +17,7 @@ import {
   Paper,
   Autocomplete,
   TextField,
-  InputLabel,
+ 
 
   Switch,
   FormControlLabel,
@@ -349,7 +349,7 @@ const Tasks = () => {
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
                             <Box>
-                              <InputLabel  id='task-input-label' >Template Name</InputLabel>
+                              <label  className='task-input-label' >Template Name</label>
                               <TextField
                                 fullWidth
                                 name="TemplateName"
@@ -375,7 +375,7 @@ const Tasks = () => {
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
                             <Box>
-                              <InputLabel  id='task-input-label'>Task Assignee</InputLabel>
+                              <label  className='task-input-label'>Task Assignee</label>
                               <Autocomplete
                                 multiple
                                 sx={{background:'#fff',mt: 1}}
@@ -413,7 +413,7 @@ const Tasks = () => {
                       </Box>
                       <Box mt={2}>
 
-                        <InputLabel  id='task-input-label'>Tags</InputLabel>
+                        <label  className='task-input-label'>Tags</label>
 
                         <Autocomplete
                           multiple
@@ -452,7 +452,7 @@ const Tasks = () => {
                       </Box>
                       <Box mt={2}>
                         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-                          <Typography variant='h6' id='task-input-label'>Start and Due Date</Typography>
+                          <Typography variant='h6' className='task-input-label'>Start and Due Date</Typography>
                           <Box className='absolutes-dates'>
                             <FormControlLabel
                               control={
@@ -472,7 +472,7 @@ const Tasks = () => {
                       {absoluteDate && (
                         <>
                           <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <Typography id='task-input-label'>Start Date</Typography>
+                            <Typography className='task-input-label'>Start Date</Typography>
                             <DatePicker
                               format="DD/MM/YYYY"
                               sx={{ width: '100%',backgroundColor:'#fff' }}
@@ -483,7 +483,7 @@ const Tasks = () => {
                             />
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                            <Typography id='task-input-label'>Due Date</Typography>
+                            <Typography className='task-input-label'>Due Date</Typography>
                             <DatePicker
                               format="DD/MM/YYYY"
                               sx={{ width: '100%', backgroundColor:'#fff'}}
@@ -498,7 +498,7 @@ const Tasks = () => {
                       {!absoluteDate && (
                         <>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography id='task-input-label'>Start In</Typography>
+                            <Typography className='task-input-label'>Start In</Typography>
                             <TextField
                               size='small'
                               margin='normal'
@@ -521,7 +521,7 @@ const Tasks = () => {
                             />
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography id='task-input-label'>Due In</Typography>
+                            <Typography className='task-input-label'>Due In</Typography>
                             <TextField
                               size='small'
                               margin='normal'

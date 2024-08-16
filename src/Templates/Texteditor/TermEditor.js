@@ -104,6 +104,7 @@ export default function Editor({ initialContent, onChange, }) {
 
   return (
     <Box
+    className='editor-box'
       sx={{
         border: '1px solid grey',
         borderRadius: '4px',

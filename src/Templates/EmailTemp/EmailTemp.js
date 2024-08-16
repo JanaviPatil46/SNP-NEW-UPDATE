@@ -23,7 +23,7 @@ import {
     ListItem,
     ListItemText,
     Popover,
-    InputLabel,
+   
     TextField,
     // OutlinedInput, Chip,
     Autocomplete
@@ -302,7 +302,7 @@ const EmailTemp = () => {
                     <form onSubmit={handleSaveTemplate}>
                         <Box>
 
-                            <InputLabel id='email-input-label'>Template Name</InputLabel>
+                            <label className='email-input-label'>Template Name</label>
 
                             <TextField
                             sx={{background:'#fff'}}
@@ -329,13 +329,13 @@ const EmailTemp = () => {
                                 >
                                     <FormControlLabel
                                         value="contacts"
-                                        control={<Radio className='radio-button'/>}
+                                        control={<Radio sx={{color:'#ADD8E6'}}/>}
                                         label="Contact Shortcodes"
                                         
                                     />
                                     <FormControlLabel
                                         value="account"
-                                        control={<Radio className='radio-button'/>}
+                                        control={<Radio sx={{color:'#ADD8E6'}}/>}
                                         label="Account Shortcodes"
                                     />
                                 </RadioGroup>
@@ -344,7 +344,7 @@ const EmailTemp = () => {
                         <Box>
 
 
-                            <InputLabel id='email-input-label'>From</InputLabel>
+                            <label className='email-input-label'>From</label>
 
 
                             <Autocomplete
@@ -370,7 +370,7 @@ const EmailTemp = () => {
                         </Box>
                         <Box>
 
-                            <InputLabel id='email-input-label'>Subject</InputLabel>
+                            <label className='email-input-label'>Subject</label>
 
                             <TextField
                                 margin="normal"

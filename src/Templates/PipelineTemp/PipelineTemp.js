@@ -14,7 +14,7 @@ import {
   Paper,
   Autocomplete,
   TextField,
-  InputLabel,
+
   Switch, FormControlLabel,
   Divider, IconButton,
   useMediaQuery,
@@ -297,33 +297,33 @@ const PipelineTemp = () => {
     // Implement logic for editing here
     // console.log("Edit action triggered for template id: ", templateId);
     navigate('PipelineTemplateUpdate/' + _id)
-};
-
-const [openMenuId, setOpenMenuId] = useState(null);
-const toggleMenu = (_id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
-};
-
-
-//delete template
-const handleDelete = async (_id) => {
-  const config = {
-    method: 'delete',
-    maxBodyLength: Infinity,
-    url: `http://127.0.0.1:7500/workflow/pipeline/pipeline/${_id}`,
-    headers: {}
   };
 
-  try {
-    const response = await axios.request(config);
-    console.log('Delete response:', response.data);
-    toast.success('Item deleted successfully');
-    fetchPipelineData();
-    // Optionally, you can refresh the data or update the state to reflect the deletion
-  } catch (error) {
-    console.error('Error deleting pipeline:', error);
-  }
-};
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const toggleMenu = (_id) => {
+    setOpenMenuId(openMenuId === _id ? null : _id);
+  };
+
+
+  //delete template
+  const handleDelete = async (_id) => {
+    const config = {
+      method: 'delete',
+      maxBodyLength: Infinity,
+      url: `http://127.0.0.1:7500/workflow/pipeline/pipeline/${_id}`,
+      headers: {}
+    };
+
+    try {
+      const response = await axios.request(config);
+      console.log('Delete response:', response.data);
+      toast.success('Item deleted successfully');
+      fetchPipelineData();
+      // Optionally, you can refresh the data or update the state to reflect the deletion
+    } catch (error) {
+      console.error('Error deleting pipeline:', error);
+    }
+  };
 
   return (
     <Container>
@@ -346,31 +346,31 @@ const handleDelete = async (_id) => {
 
                     <TableCell>{pipeline.pipelineName}</TableCell>
                     <TableCell>
-            <div 
-              className="ci-menu-kebab" 
-              onClick={() => toggleMenu(pipeline._id)} 
-              style={{ cursor: 'pointer', fontSize: '20px' }}
-            >
-              &#8942;
-            </div>
-            {openMenuId === pipeline._id && (
-              <div className="pipeline-menu-options">
-                <div 
-                  className="menu-option edit-option" 
-                  onClick={() => handleEdit(pipeline._id)}
-                >
-                  Edit
-                </div>
-                <div 
-                  className="menu-option delete-option" 
-                  onClick={() => handleDelete(pipeline._id)}
-                >
-                  Delete
-                </div>
-              </div>
-            )}
-          </TableCell>
-                    
+                      <div
+                        className="ci-menu-kebab"
+                        onClick={() => toggleMenu(pipeline._id)}
+                        style={{ cursor: 'pointer', fontSize: '20px' }}
+                      >
+                        &#8942;
+                      </div>
+                      {openMenuId === pipeline._id && (
+                        <div className="pipeline-menu-options">
+                          <div
+                            className="menu-option edit-option"
+                            onClick={() => handleEdit(pipeline._id)}
+                          >
+                            Edit
+                          </div>
+                          <div
+                            className="menu-option delete-option"
+                            onClick={() => handleDelete(pipeline._id)}
+                          >
+                            Delete
+                          </div>
+                        </div>
+                      )}
+                    </TableCell>
+
                   </TableRow>
                 ))}
               </TableBody>
@@ -393,21 +393,23 @@ const handleDelete = async (_id) => {
                 <Grid container spacing={2} >
                   <Grid xs={12} sm={5.8}>
                     <Box >
-                      <InputLabel sx={{ color: 'black' }}>Pipeline Name</InputLabel>
+                      {/* <InputLabel className="pipeline-lable">Pipeline Name</InputLabel> */}
+                      <label className="pipeline-lable">Pipeline Name</label>
                       <TextField
                         fullWidth
                         value={pipelineName}
                         onChange={(e) => setPipelineName(e.target.value)}
-                        margin="normal"
+                        // margin="normal"
+                        sx={{ mt: 1.5, backgroundColor: '#fff' }}
                         size="small"
                         placeholder='Pipeline Name'
                       />
                     </Box>
                     <Box mt={1}>
-                      <InputLabel sx={{ color: 'black' }}>Available To</InputLabel>
+                      <label className="pipeline-lable">Available To</label>
                       <Autocomplete
                         multiple
-                        sx={{ marginTop: '8px' }}
+                        sx={{ marginTop: '8px', backgroundColor: '#fff' }}
                         options={options}
                         size='small'
                         getOptionLabel={(option) => option.label}
@@ -429,8 +431,8 @@ const handleDelete = async (_id) => {
                       />
                     </Box>
                     <Box mt={2}>
-                      <InputLabel sx={{ color: 'black' }}>Sort jobs by</InputLabel>
-
+                      {/* <InputLabel sx={{ color: 'black' }}>Sort jobs by</InputLabel> */}
+                      <label className="pipeline-lable">Sort jobs by</label>
                       <Autocomplete
                         className='select-dropdown'
                         options={optionsort} // The array of options
@@ -451,7 +453,7 @@ const handleDelete = async (_id) => {
                             {...params}
                             placeholder="Sort By Job"
                             size="small"
-                            sx={{ width: '100%', marginTop: '8px', }}
+                            sx={{ width: '100%', marginTop: '8px', backgroundColor: '#fff' }}
                             variant="outlined"
                             InputLabelProps={{ shrink: true }}
                           />
@@ -462,7 +464,8 @@ const handleDelete = async (_id) => {
                       />
                     </Box>
                     <Box mt={2}>
-                      <InputLabel sx={{ color: 'black' }}>Default job template</InputLabel>
+                      {/* <InputLabel sx={{ color: 'black' }}>Default job template</InputLabel> */}
+                      <label className="pipeline-lable">Default job template</label>
                       <Autocomplete
                         options={optiontemp}
                         getOptionLabel={(option) => option.label}
@@ -481,7 +484,7 @@ const handleDelete = async (_id) => {
                         renderInput={(params) => (
                           <TextField
                             {...params}
-
+                            sx={{ backgroundColor: '#fff' }}
                             placeholder="Default job template"
                             variant="outlined"
                             size="small"

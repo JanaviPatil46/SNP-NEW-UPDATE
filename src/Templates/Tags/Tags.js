@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './tag.css'
-import { Box, Button, Typography, Drawer, InputLabel, Select, MenuItem, IconButton, TextField } from '@mui/material';
+import { Box, Button, Typography, Drawer,  Select, MenuItem, IconButton, TextField } from '@mui/material';
 import { FiSettings } from "react-icons/fi";
 import { CiMenuKebab } from "react-icons/ci";
 import { useTheme } from '@mui/material/styles';
@@ -339,7 +339,7 @@ const Tags = () => {
             </Box>
             <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
               <Box>
-                <InputLabel  id='input-label'>Name</InputLabel>
+                <label  className='tag-input-label'>Name</label>
 
                 <TextField
                   placeholder="Tag Name"
@@ -353,7 +353,7 @@ const Tags = () => {
                
               </Box>
               <Box sx={{ mt: 3 }}>
-                <InputLabel id='input-label'>Color</InputLabel>
+                <label className='tag-input-label'>Color</label>
                 <Select
                   value={selectedOption ? selectedOption.tagColour : ''}
                   onChange={handleChange}
@@ -414,7 +414,8 @@ const Tags = () => {
             </Box>
             <Box sx={{ pr: 2, pl: 2, pt: 2}}>
               <Box>
-                <InputLabel id='input-label'>Name</InputLabel>
+               
+                <label className='tag-input-label'>Name</label>
 
                 <TextField
 
@@ -428,7 +429,7 @@ const Tags = () => {
                 />
               </Box>
               <Box sx={{ mt: 3 }}>
-                <InputLabel id='input-label'>Color</InputLabel>
+                <label className='tag-input-label'>Color</label>
 
                 <Select
                   value={selectedOption ? selectedOption.tagColour : ''}

@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography, TextField, InputLabel,  Switch, FormControlLabel, Autocomplete } from '@mui/material';
+import { Box, Button, Grid, Typography, TextField, label,  Switch, FormControlLabel, Autocomplete } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import Priority from '../Templates/Priority/Priority';
 import Editor from '../Templates/Texteditor/Editor';
@@ -271,9 +271,9 @@ const CreateJob = () => {
             <Typography variant='h5' gutterBottom>Add Jobs</Typography>
             <Box mt={2} mb={2}><hr /></Box>
             <Grid container spacing={2} >
-              <Grid item xs={12} sm={5} ml={2} className='left-side-container' >
+              <Grid item xs={12} sm={5} ml={2} className='left-side-container' mt={2}>
                 <Box >
-                  <InputLabel sx={{ color: 'black' }}>Accounts</InputLabel>
+                  <label className='job-input-label'>Accounts</label>
                  
                   <Autocomplete
                     multiple
@@ -291,12 +291,12 @@ const CreateJob = () => {
                     )}
                     renderInput={(params) => <TextField {...params} placeholder="Select Accounts" 
                     variant="outlined"
-                    size="small"/>}
+                    size="small" sx={{backgroundColor:'#fff'}}/>}
                     sx={{ width: '100%', marginTop: '8px' }}
                   />
                 </Box>
                 <Box mt={2}>
-                  <InputLabel>Pipeline</InputLabel>
+                <label className='job-input-label'>Pipeline</label>
 
                   <Autocomplete
                     options={optionpipeline}
@@ -316,7 +316,7 @@ const CreateJob = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-
+                        sx={{backgroundColor:'#fff'}}
                         placeholder="Pipeline"
                         variant="outlined"
                         size="small"
@@ -327,7 +327,7 @@ const CreateJob = () => {
                   />
                 </Box>
                 <Box mt={2}>
-                  <InputLabel>Template</InputLabel>
+                <label className='job-input-label'>Template</label>
                   <Autocomplete
                     options={optiontemp}
                     getOptionLabel={(option) => option.label}
@@ -348,7 +348,7 @@ const CreateJob = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-
+                        sx={{backgroundColor:'#fff'}}
                         placeholder="Job Template"
                         variant="outlined"
                         size="small"
@@ -359,7 +359,7 @@ const CreateJob = () => {
                   />
                 </Box>
                 <Box mt={2}>
-                  <InputLabel>Name</InputLabel>
+                <label className='job-input-label'>Name</label>
                   <TextField
                     fullWidth
                     value={jobName}
@@ -367,10 +367,11 @@ const CreateJob = () => {
                     margin="normal"
                     size="small"
                     placeholder='Job Name'
+                    sx={{backgroundColor:'#fff'}}
                   />
                 </Box>
                 <Box mt={2}>
-                  <InputLabel sx={{ color: 'black' }}>Job Assignees</InputLabel>
+                <label className='job-input-label'>Job Assignees</label>
                   <Autocomplete
                     multiple
                     sx={{ marginTop: '8px' }}
@@ -390,7 +391,7 @@ const CreateJob = () => {
                       </Box>
                     )}
                     renderInput={(params) => (
-                      <TextField {...params} variant="outlined" placeholder="Job Assignees" />
+                      <TextField {...params} variant="outlined" placeholder="Job Assignees" sx={{backgroundColor:'#fff'}} />
                     )}
                     isOptionEqualToValue={(option, value) => option.value === value.value}
                   />
@@ -427,7 +428,7 @@ const CreateJob = () => {
                       <Typography>Start Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
-                        sx={{ width: '100%', }}
+                        sx={{ width: '100%',backgroundColor:'#fff' }}
                         // value={startDate}
                         // onChange={handleStartDateChange}
                         value={startDate}
@@ -439,7 +440,7 @@ const CreateJob = () => {
                       <Typography>Due Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
-                        sx={{ width: '100%', }}
+                        sx={{ width: '100%', backgroundColor:'#fff'}}
                         // value={dueDate}
                         // onChange={handleDueDateChange}
                         value={dueDate}
@@ -458,7 +459,7 @@ const CreateJob = () => {
                         margin='normal'
                         fullWidth
                         defaultValue={0}
-                        sx={{ ml: 1 }}
+                        sx={{ ml: 1 ,backgroundColor:'#fff'}}
                         value={startsin}
                         onChange={(e) => setstartsin(e.target.value)}
                       />
@@ -469,7 +470,7 @@ const CreateJob = () => {
                         value={startsInDuration ? dayOptions.find(option => option.value === startsInDuration) : null}
                         onChange={handleStartInDateChange}
                         renderInput={(params) => (
-                          <TextField {...params} variant="outlined" />
+                          <TextField {...params} variant="outlined" sx={{backgroundColor:'#fff'}}/>
                         )}
                          isOptionEqualToValue={(option, value) => option.value === value.value}
                             renderOption={(props, option) => (
@@ -489,7 +490,7 @@ const CreateJob = () => {
                         margin='normal'
                         fullWidth
                         defaultValue={0}
-                        sx={{ ml: 1.5 }}
+                        sx={{ ml: 1.5,backgroundColor:'#fff' }}
                         value={duein}
                             onChange={(e) => setduein(e.target.value)}
                         // onChange={(e) => setduein(e.target.value)}
@@ -503,7 +504,7 @@ const CreateJob = () => {
                         onChange={handleDueInDateChange}
                         size='small'
                         renderInput={(params) => (
-                          <TextField {...params} variant="outlined" />
+                          <TextField {...params} variant="outlined" sx={{backgroundColor:'#fff'}} />
                         )}
                         isOptionEqualToValue={(option, value) => option.value === value.value}
                             renderOption={(props, option) => (
@@ -522,14 +523,15 @@ const CreateJob = () => {
               </Grid>
               <Grid item xs={12} sm={1} sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <Box
+                className='vertical-line'
                   sx={{
-                    borderLeft: '1px solid black',
+                    // borderLeft: '1px solid black',
                     height: '100%',
                     margin: '0 20px'
                   }}
                 ></Box>
               </Grid>
-              <Grid item xs={12} sm={5} ml={{ xs: 0, sm: 3 }} className='right-side-container'>
+              <Grid item xs={12} sm={5} ml={{ xs: 0, sm: 3 }} className='right-side-container' mt={2}>
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                   <Box>
                     <Typography variant='h5' fontWeight={'bold'}>Comments</Typography>

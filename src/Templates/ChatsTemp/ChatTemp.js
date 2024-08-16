@@ -14,12 +14,12 @@ import {
   Paper,
   Grid,
   TextField,
-  InputLabel,
+
   Select,
 
   Switch,
   FormControlLabel,
-  Divider,
+ 
   List,
   ListItem,
   ListItemText,
@@ -188,27 +188,27 @@ const ChatTemp = () => {
                     <Box>
 
                       <Box>
-                        <InputLabel sx={{ color: 'black' }}> Name</InputLabel>
+                        <label className='chat-input-label'> Name</label>
                         <TextField
 
                           fullWidth
                           name="TemplateName"
                           placeholder="Template Name"
                           size="small"
-                          sx={{ mt: 2 }}
+                          sx={{ mt: 2 , backgroundColor:'#fff',mb:1}}
                         />
                       </Box>
 
                       <Box>
-                        <InputLabel sx={{ color: 'black', mt: 2 }}>From</InputLabel>
+                      <label className='chat-input-label' >From</label>
                         <Select
                           size='small'
-                          sx={{ width: '100%', mt: 2 }}
+                          sx={{ width: '100%', mt: 2 ,backgroundColor:'#fff',mb:1}}
                         />
                       </Box>
 
                       <Box>
-                        <InputLabel sx={{ color: 'black' }}>Subject</InputLabel>
+                        <label sx={{ color: 'black' }}>Subject</label>
                         <TextField
 
                           fullWidth
@@ -217,7 +217,7 @@ const ChatTemp = () => {
                           onChange={(e) => setSubject(e.target.value)}
                           placeholder="Subject"
                           size="small"
-                          sx={{ mt: 2 }}
+                          sx={{ mt: 2 ,backgroundColor:'#fff',mb:1}}
                         />
                       </Box>
 
@@ -226,7 +226,7 @@ const ChatTemp = () => {
                           variant="contained"
                           color="primary"
                           onClick={toggleDropdown}
-                          sx={{ mt: 2 }}
+                          sx={{ mt: 2 ,}}
                         >
                           Add Shortcode
                         </Button>
@@ -292,7 +292,7 @@ const ChatTemp = () => {
                             <Box sx={{ display: 'flex', alignItems: 'center',gap:3 }}>
 
                               <Box>
-                                <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>
+                                <label sx={{ color: 'black' }}>Days until next reminder</label>
                                 <TextField
                                   // margin="normal"
                                   fullWidth
@@ -300,12 +300,12 @@ const ChatTemp = () => {
 
                                   placeholder="Days until next reminder"
                                   size="small"
-                                  sx={{ mt: 2 }}
+                                  sx={{ mt: 2 ,backgroundColor:'#fff'}}
                                 />
                               </Box>
 
                               <Box>
-                                <InputLabel sx={{ color: 'black' }}>No Of reminders</InputLabel>
+                                <label sx={{ color: 'black' }}>No Of reminders</label>
                                 <TextField
 
                                   fullWidth
@@ -313,7 +313,7 @@ const ChatTemp = () => {
 
                                   placeholder="NoOfreminders"
                                   size="small"
-                                  sx={{ mt: 2 }}
+                                  sx={{ mt: 2 ,backgroundColor:'#fff'}}
                                 />
                               </Box>
 
@@ -325,8 +325,9 @@ const ChatTemp = () => {
                   </Grid>
                   <Grid item xs={12} sm={1} sx={{ display: { xs: 'none', sm: 'block' } }}>
                     <Box
+                    className='vertical-line'
                       sx={{
-                        borderLeft: '1px solid black',
+                        // borderLeft: '1px solid black',
                         height: '100%',
                         margin: '0 20px'
                       }}
@@ -336,7 +337,7 @@ const ChatTemp = () => {
 
                   </Grid>
                 </Grid>
-                <Divider mt={2} />
+                <Box mt={2} mb={2}><hr /></Box>
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
                   <Button variant="contained" color="primary">Save</Button>
                   <Button variant="outlined" onClick={handleCloseChatTemp}>Cancel</Button>

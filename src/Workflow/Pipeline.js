@@ -3,7 +3,7 @@ import './pipeline.css'
 import { useDrag, DndProvider, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import axios from 'axios';
-import { Box, Button, CircularProgress,TextField, Autocomplete,Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Button, CircularProgress, TextField, Autocomplete, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 // import Select from 'react-select';
 import { differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns';
 const Pipeline = () => {
@@ -75,18 +75,18 @@ const Pipeline = () => {
   //   }
   // };
   const handleSelectChange = (event, option) => {
-  setSelectedPipelineOption(option);
-  
-  if (option) {
-    const pipeline = pipelineData.find(p => p.pipelineName === option.label);
-    if (pipeline) {
-      handleBoardsList(pipeline);
+    setSelectedPipelineOption(option);
+
+    if (option) {
+      const pipeline = pipelineData.find(p => p.pipelineName === option.label);
+      if (pipeline) {
+        handleBoardsList(pipeline);
+      }
     }
-  } 
-  // else {
-  //   handleBackToPipelineList();
-  // }
-};
+    // else {
+    //   handleBackToPipelineList();
+    // }
+  };
 
 
   const handleBoardsList = async (pipeline) => {
@@ -221,15 +221,15 @@ const Pipeline = () => {
     return (
       <Box className={`job-card ${isDragging ? 'dragging' : ''}`}
         ref={drag}
-      
+
         onDrop={updateLastUpdatedTime}
       >
-        <Typography>{job.Account.join(', ')}</Typography>
-        <Typography sx={{ fontWeight: 'bold', marginBottom: '8px' }}>
+        <Typography color={'black'}>{job.Account.join(', ')}</Typography>
+        <Typography sx={{ fontWeight: 'bold', marginBottom: '8px' }} color={'black'}>
           {truncateName(job.Name)}
         </Typography>
-        <Typography variant="body2" sx={{ marginBottom: '8px' }}>{job.JobAssignee.join(', ')}</Typography>
-        <Typography variant="body2" sx={{ marginBottom: '8px' }}>
+        <Typography color={'black'}  variant="body2" sx={{ marginBottom: '8px' }}>{job.JobAssignee.join(', ')}</Typography>
+        <Typography color={'black'} variant="body2" sx={{ marginBottom: '8px' }}>
           {truncateDescription(stripHtmlTags(job.Description))}
         </Typography>
 
@@ -237,13 +237,13 @@ const Pipeline = () => {
 
         <br />
 
-        <Typography variant="body2" sx={{ marginBottom: '4px', mt: 2 }}>
+        <Typography color={'black'} sx={{ marginBottom: '4px', mt: 2 }}>
           Starts : {startDateFormatted}
         </Typography>
-        <Typography variant="body2">
+        <Typography color={'black'} variant="body2">
           Due : {dueDateFormatted}
         </Typography>
-        <Typography variant="body2" sx={{ marginBottom: '5px', mt: 2 }}>
+        <Typography color={'black'} variant="body2" sx={{ marginBottom: '5px', mt: 2 }}>
           {timeAgo()}
         </Typography>
       </Box>
@@ -251,7 +251,7 @@ const Pipeline = () => {
   };
 
 
-  
+
   const Stage = ({ stage, selectedPipeline, handleDrop }) => {
     const [{ isOver }, drop] = useDrop({
       accept: 'JOB_CARD',
@@ -270,17 +270,17 @@ const Pipeline = () => {
     const stageJobs = jobs.filter(job => job.Pipeline === selectedPipeline.pipelineName && job.Stage.includes(stage.name));
     const [displayCount, setDisplayCount] = useState(3);
     const displayedJobs = stageJobs.slice(0, displayCount);
-// const truncatedStageName = stage.name.length > 10 ? `${stage.name.slice(0, 10)}...` : stage.name;
+    // const truncatedStageName = stage.name.length > 10 ? `${stage.name.slice(0, 10)}...` : stage.name;
     return (
       <Box
         ref={drop} className={`stage ${isOver ? 'drag-over' : ''}`}
-        
+
       >
-        <Typography sx={{  marginBottom: '12px' }}>
+        <Typography sx={{ marginBottom: '12px',  }} className='stage-name'>
           {stage.name}
           {/*    {truncatedStageName} */}
         </Typography>
-        <Typography variant="body2" sx={{ marginBottom: '12px' }}>
+        <Typography variant="body2" sx={{ marginBottom: '12px' }} >
           {stageJobs.length > 0 && <span>({stageJobs.length})</span>}
         </Typography>
         {displayedJobs.map(job => (
@@ -326,31 +326,24 @@ const Pipeline = () => {
         ) : selectedPipeline ? (
           <>
             <Box mb={2}>
-              {/* <Select
+
+              <Autocomplete
                 value={selectedPipelineOption}
                 onChange={handleSelectChange}
                 options={optionpipeline}
-                isClearable
-                placeholder="Search pipelines..."
+                getOptionLabel={(option) => option.label}
+                isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    // label="Search pipelines..."
+                    placeholder="Search pipelines..."
+                    sx={{ backgroundColor: '#fff' }}
+                  />
+                )}
+                // isClearable
                 className="pipeline-select"
-                isSearchable
-              /> */}
-               <Autocomplete
-      value={selectedPipelineOption}
-      onChange={handleSelectChange}
-      options={optionpipeline}
-      getOptionLabel={(option) => option.label}
-      isOptionEqualToValue={(option, value) => option.value === value?.value}
-      renderInput={(params) => (
-        <TextField
-          {...params}
-          // label="Search pipelines..."
-          placeholder="Search pipelines..."
-        />
-      )}
-      // isClearable
-      className="pipeline-select"
-    />
+              />
               <Button variant="outlined" color="primary" onClick={handleBackToPipelineList} sx={{ mt: 2 }}>
                 Back to Pipeline List
               </Button>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Autocomplete, TextField, Box, Chip ,InputLabel} from '@mui/material';
+import { Autocomplete, TextField, Box, Chip } from '@mui/material';
 import '../../App.css'
 const Status = ({ onStatusChange, selectedStatus }) => {
 
@@ -29,7 +29,7 @@ const Status = ({ onStatusChange, selectedStatus }) => {
 
   return (
     <Box>
-       <InputLabel  id='input-label'>Status</InputLabel>
+       <label  className="priority-custom-label">Status</label>
     
     <Autocomplete
     

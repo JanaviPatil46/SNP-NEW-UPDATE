@@ -16,7 +16,7 @@ const ContactTable = () => {
                 console.log(response.data.contactlist);
             } catch (error) {
                 console.error('API Error:', error);
-                toast.error('Failed to fetch contacts');
+                // toast.error('Failed to fetch contacts');
             }
         };
 

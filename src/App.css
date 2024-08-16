@@ -1,35 +1,49 @@
+.light-theme {
 
-.light-theme{
- 
-  --color-sidebar-bg:  #ffffff;
-  --color-header-bg:#ffffff;
+  --color-sidebar-bg: #ffffff;
+  --color-header-bg: #ffffff;
   --color-main-bg: #ffffff;
   --color-text: #000000;
   --color-menu-icon: #000000;
-  --color-navbar-temp: #1976d2; 
+  --color-navbar-temp: #1976d2;
 }
 
-.dark-theme{
-  
+.dark-theme {
+
   --color-sidebar-bg: #1a1a1a;
   --color-header-bg: #333333;
   --color-main-bg: #121212;
   --color-text: #ffffff;
   --color-menu-icon: #000000;
-  --color-navbar-temp:#ffffff;
+  --color-navbar-temp: #ffffff;
 }
-#input-label{
+
+#steps-label {
   color: var(--color-text);
 }
-#task-input-label{
+
+.priority-custom-label,
+.pipeline-lable,
+.tag-input-label,
+.email-input-label,
+.task-input-label,
+.jobtemp-input-label,
+.custom-input-label,
+.organizer-input-label,.job-input-label {
   color: var(--color-text);
+  font-size: 1.1rem;
 }
-.tag-drawer{
-  background-color: red;
+
+.vertical-line {
+  border-left: 1px solid var(--color-text);
 }
-#jobtemp-input-label{
-  color: var(--color-text) ;
+.stage{
+  background-color: var(--color-header-bg);
 }
-#email-input-label{
-  color: var(--color-text);
+
+.firmtemp-nav a{
+  color: var(--color-navbar-temp);
+}
+.input-label{
+  color:var(--color-text);
 }

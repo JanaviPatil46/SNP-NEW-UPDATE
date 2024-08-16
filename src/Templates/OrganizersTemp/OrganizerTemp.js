@@ -9,7 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import {
   Box,
   Button,
-  InputLabel,
+  
   Table,
   TableBody,
   TableCell,
@@ -83,8 +83,8 @@ const OrganizersTemp = () => {
       {!showOrganizerTemplateForm && (
         <Box>
           <Box sx={{ mb: 5 }}><Typography variant="h5">Organizer Template</Typography></Box>
-          <Button variant="contained" onClick={handleCreateInvoiceClick} className='btn1'>Create Template</Button>
-          <TableContainer>
+          <Button variant="contained" onClick={handleCreateInvoiceClick} sx={{mb:3}}>Create Template</Button>
+          <TableContainer sx={{backgroundColor:'#fff'}}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -104,7 +104,7 @@ const OrganizersTemp = () => {
         <>
           <Box>
             <Box>
-              <InputLabel sx={{ color: 'black' }}>Template Name</InputLabel>
+              <label className='organizer-input-label'>Template Name</label>
               <TextField
                 label="Template name"
                 value={templateName}
@@ -112,10 +112,12 @@ const OrganizersTemp = () => {
                 fullWidth
                 size='small'
                 margin='normal'
+                sx={{backgroundColor:'#fff'}}
+                className='organizer-input-label'
               />
             </Box>
             <Box mt={2}>
-              <InputLabel sx={{ color: 'black' }}>Organizer name</InputLabel>
+              <label className='organizer-input-label'>Organizer name</label>
               <TextField
                 label="Organizer name"
                 value={organizerName}
@@ -123,6 +125,8 @@ const OrganizersTemp = () => {
                 fullWidth
                 size='small'
                 margin='normal'
+                className='organizer-input-label'
+                sx={{backgroundColor:'#fff'}}
               />
             </Box>
 
@@ -141,6 +145,7 @@ const OrganizersTemp = () => {
                       InputProps={{
                         readOnly: true
                       }}
+                      sx={{backgroundColor:'#fff'}}
                       onClick={() => handleSectionClick(section)}
                       fullWidth
                     />

@@ -14,7 +14,7 @@ import {
   Paper,
   Autocomplete,
   TextField,
-  InputLabel,
+ 
   Switch, FormControlLabel,
   List,
   ListItem,
@@ -420,7 +420,7 @@ const JobTemp = () => {
             <Grid container spacing={2} >
               <Grid xs={12} sm={5.8} >
                 <Box mt={2}>
-                  <InputLabel id='jobtemp-input-label'>Template Name</InputLabel>
+                  <label className='jobtemp-input-label'>Template Name</label>
                   <TextField
                     size='small'
                     margin='normal'
@@ -432,7 +432,7 @@ const JobTemp = () => {
                   />
                 </Box>
                 <Box mt={1}>
-                  <InputLabel id='jobtemp-input-label'>Job Name</InputLabel>
+                  <label className='jobtemp-input-label'>Job Name</label>
                   <TextField
                    sx={{backgroundColor:'#fff'}}
                     value={jobName + selectedShortcut} onChange={handlejobName}
@@ -486,7 +486,7 @@ const JobTemp = () => {
                   </Popover>
                 </Box>
                 <Box mt={2}>
-                  <InputLabel id='jobtemp-input-label'>Job Assignees</InputLabel>
+                  <label className='jobtemp-input-label'>Job Assignees</label>
                   <Autocomplete
                     multiple
                     sx={{ mt: 2,backgroundColor:'#FFF' }}
@@ -518,7 +518,7 @@ const JobTemp = () => {
                 </Box>
                 <Box mt={2}>
                   <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
-                    <Typography variant='h6' id='jobtemp-input-label'>Start and Due Date</Typography>
+                    <Typography variant='h6' className='jobtemp-input-label'>Start and Due Date</Typography>
                     <Box className='absolutes-dates'>
                       <FormControlLabel
                         control={
@@ -537,7 +537,7 @@ const JobTemp = () => {
                 {absoluteDate && (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                      <Typography id='jobtemp-input-label'>Start Date</Typography>
+                      <Typography className='jobtemp-input-label'>Start Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
                         sx={{ width: '100%',backgroundColor:'#fff' }}
@@ -548,7 +548,7 @@ const JobTemp = () => {
                       />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                      <Typography id='jobtemp-input-label'>Due Date</Typography>
+                      <Typography className='jobtemp-input-label'>Due Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
                         sx={{ width: '100%',backgroundColor:'#fff' }}
@@ -563,7 +563,7 @@ const JobTemp = () => {
                 {!absoluteDate && (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Typography id='jobtemp-input-label'>Start In</Typography>
+                      <Typography className='jobtemp-input-label'>Start In</Typography>
                       <TextField
                         size='small'
                         margin='normal'
@@ -587,7 +587,7 @@ const JobTemp = () => {
                       />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Typography id='jobtemp-input-label'>Due In</Typography>
+                      <Typography className='jobtemp-input-label'>Due In</Typography>
                       <TextField
                         size='small'
                         margin='normal'
@@ -617,8 +617,9 @@ const JobTemp = () => {
               </Grid>
               <Grid item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <Box
+                className='vertical-line'
                   sx={{
-                    borderLeft: '1px solid black',
+                    // borderLeft: '1px solid black',
                     height: '100%',
                     ml: 1.5
                   }}

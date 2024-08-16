@@ -10,10 +10,9 @@ import {
   TextField,
   FormControl,
   FormControlLabel,
-  RadioGroup,
-  Radio,
+ 
   Switch,
-  InputLabel,
+ 
   List,
   ListItem,
   ListItemText,
@@ -377,24 +376,24 @@ const MyStepper = () => {
           <Box >
             <Typography sx={{ fontWeight: 'bold', }}>General </Typography>
             <Box mt={2}>
-              <InputLabel sx={{ color: 'black' }}>Template name (not visible to clients)</InputLabel>
+              <label className='custom-input-label'>Template name (not visible to clients)</label>
               <TextField
                 placeholder='Template name (not visible to clients)'
                 size='small'
                 margin='normal'
                 fullWidth
-
+sx={{backgroundColor:'#fff'}}
               />
             </Box>
             <Box sx={{ width: '100%', marginTop: '30px' }}>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <Box ml={2}>
-                    <InputLabel sx={{ color: 'black' }}>Team Member</InputLabel>
+                    <label className='custom-input-label'>Team Member</label>
 
                     <Autocomplete
                       multiple
-                      sx={{ mt: 2 }}
+                      sx={{ mt: 2,backgroundColor:'#fff' }}
                       options={options}
                       size='small'
                       getOptionLabel={(option) => option.label}
@@ -409,13 +408,13 @@ const MyStepper = () => {
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Box ml={3}>
-                    <InputLabel sx={{ color: 'black' }}>Proposal name (visible to clients)</InputLabel>
+                    <label className='custom-input-label'>Proposal name (visible to clients)</label>
                     <TextField
                       fullWidth
                       value={proposalName + selectedShortcut} onChange={handleProposalName}
                       placeholder="Proposal name (visible to clients)"
                       size="small"
-                      sx={{ mt: 2 }}
+                      sx={{ mt: 2,backgroundColor:'#fff' }}
 
                     />
                     <Box>
@@ -515,10 +514,11 @@ const MyStepper = () => {
             <Box mt={1} mb={3}>
               <TextField
                 size="small"
-                variant="standard"
+                // variant="standard"
                 fullWidth
                 margin="normal"
                 placeholder="Introduction"
+                sx={{backgroundColor:'#fff'}}
               />
             </Box>
             <Editor
@@ -535,10 +535,11 @@ const MyStepper = () => {
             <Box mt={1} mb={3}>
               <TextField
                 size="small"
-                variant="standard"
+                // variant="standard"
                 fullWidth
                 margin="normal"
                 placeholder="Engagement letter"
+                sx={{backgroundColor:'#fff'}}
               />
             </Box>
             <TermEditor
@@ -605,15 +606,15 @@ const MyStepper = () => {
                 <div className='invoice-section-three'>
                   <Box sx={{ margin: '20px 0 10px 0' }}>
                     <Typography variant="h6">Line items</Typography>
-                    <Typography variant="body2" color="textSecondary">
+                    <Typography variant="body2" >
                       Client-facing itemized list of products and services
                     </Typography>
                   </Box>
 
-                  <Table sx={{ width: '100%' }}>
+                  <Table sx={{ width: '100%',backgroundColor:'#fff' }}>
                     <TableHead>
                       <TableRow>
-                        <TableCell>PRODUCT OR SERVICE</TableCell>
+                        <TableCell >PRODUCT OR SERVICE</TableCell>
                         <TableCell>DESCRIPTION</TableCell>
                         <TableCell>RATE</TableCell>
                         <TableCell>QTY</TableCell>
@@ -675,7 +676,7 @@ const MyStepper = () => {
 
                   <div className='one-time-summary' style={{ marginTop: '20px' }}>
                     <Typography variant="h6">Summary</Typography>
-                    <Table>
+                    <Table sx={{backgroundColor:'#fff'}}>
                       <TableHead>
                         <TableRow>
                           <TableCell>SUBTOTAL</TableCell>
@@ -719,20 +720,23 @@ const MyStepper = () => {
         return <Typography>Unknown Step</Typography>;
     }
   };
-
+ 
   return (
     <Box sx={{ width: '100%' }}>
       {showStepper ? (
         <Box>
           <Grid container spacing={3} mr={5} p={5}>
-            <Grid item xs={8}>
-              <Stepper activeStep={activeStep}>
+            <Grid item xs={8} >
+              <Box sx={{p:2,backgroundColor:'#fff'}}>
+              <Stepper  activeStep={activeStep}  >
                 {steps.map((label, index) => (
-                  <Step key={index} onClick={() => handleStepClick(index)}>
-                    <StepLabel style={{ cursor: 'pointer' }}>{label}</StepLabel>
+                  <Step key={index} onClick={() => handleStepClick(index)} >
+                    <StepLabel style={{ cursor: 'pointer',}} >{label}</StepLabel>
                   </Step>
                 ))}
               </Stepper>
+              </Box>
+              
             </Grid>
             <Grid
               item

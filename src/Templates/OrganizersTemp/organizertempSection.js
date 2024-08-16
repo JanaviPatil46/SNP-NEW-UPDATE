@@ -122,6 +122,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
               size='small'
               margin='normal'
               fullWidth
+              className='organizer-input-label'
               onChange={(e) => handleOptionChange(element.id, option.id, e.target.value)}
               
             />
@@ -149,6 +150,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
               size='small'
               margin='normal'
               fullWidth
+              sx={{backgroundColor:'#fff'}}
               onChange={(e) => handleElementTextChange(element.id, e.target.value)}
               
             />
@@ -168,7 +170,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
               margin='normal'
               fullWidth
               onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-              
+              sx={{backgroundColor:'#fff'}}
             />
             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
               <RiDeleteBinLine />
@@ -186,7 +188,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
               margin='normal'
               fullWidth
               onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-              
+              sx={{backgroundColor:'#fff'}}
             />
             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
               <RiDeleteBinLine />
@@ -200,7 +202,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
               type="date"
               value={element.text}
               onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-              sx={{ marginRight: '8px' }}
+              sx={{ marginRight: '8px' , backgroundColor:'#fff'}}
             />
             <IconButton onClick={() => handleDeleteFormElement(element.id)}>
               <RiDeleteBinLine />
@@ -221,7 +223,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
                 margin='normal'
                 fullWidth
                 onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-                
+                sx={{backgroundColor:'#fff'}}
               />
               <IconButton onClick={() => handleDeleteFormElement(element.id)}>
                 <RiDeleteBinLine />
@@ -244,7 +246,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
                 margin='normal'
                 fullWidth
                 onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
-                
+                sx={{backgroundColor:'#fff'}}
               />
               <IconButton onClick={() => handleDeleteFormElement(element.id)}>
                 <RiDeleteBinLine />
@@ -266,7 +268,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
                 margin='normal'
                 fullWidth
                 onChange={(e) => handleCheckboxTextChange(element.id, e.target.value)}
-                
+                sx={{backgroundColor:'#fff'}}
               />
               <IconButton onClick={() => handleDeleteFormElement(element.id)}>
                 <RiDeleteBinLine />
@@ -288,7 +290,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
                 margin='normal'
                 fullWidth
                 onChange={(e) => handleElementTextChange(element.id, e.target.value)}
-                
+                sx={{backgroundColor:'#fff'}}
               />
               <IconButton onClick={() => handleDeleteFormElement(element.id)}>
                 <RiDeleteBinLine />
@@ -310,6 +312,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
         marginBottom: '16px',
         borderRadius: '8px',
         position: 'relative',
+        backgroundColor:'#fff'
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>

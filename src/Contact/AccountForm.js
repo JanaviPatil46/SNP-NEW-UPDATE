@@ -1605,6 +1605,17 @@ const tagsOptions = tags.map((tag) => ({
           )}
         </Box>
 
+        <Box sx={{ p: 2 }}>
+          {selectedOption === 'Contact Info' && (
+            <Box>
+              
+              <Typography>contact</Typography>
+              
+             
+            </Box>
+          )}
+        </Box>
+
 
       </Box>
     </Box >
