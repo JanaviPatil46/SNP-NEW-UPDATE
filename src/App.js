@@ -18,6 +18,7 @@ import ChatTemp from './Templates/ChatsTemp/ChatTemp';
 import SMSTemp from './Templates/SMSTemp/SmsTemp';
 import InvoiceTemp from './Templates/InvoicesTemp/InvoiceTemp';
 import OrganizerTemp from './Templates/OrganizersTemp/OrganizerTemp';
+import OrganizersTempUpdate from './Templates/OrganizersTemp/OrganizersTempUpdate.js'
 import RecurringInvoiceTemp from './Templates/RecurringInvoiceTemp/RecurringInvoiceTemp';
 import SignatureTemp from './Templates/SignatureTemp/SignatureTemp';
 import ProposalTemp from './Templates/ProposalsTemp/ProposalTemp';
@@ -31,6 +32,9 @@ import Pipeline from './Workflow/Pipeline';
 import WorkflowTask from './Workflow/Tasks'
 import TeamMember from './Users/TeamMember.js';
 import Jobs from './Pages/Jobs.js';
+import PipelineTempUpdate from './Templates/PipelineTemp/PipelineTempUpdate.js';
+import TasksUpdate from './Templates/Task/TasksUpdate.js'
+import EmailTempUpdate from './Templates/EmailTemp/EmailTempUpdate.js'
 const App = () => {
   return (
 
@@ -51,16 +55,21 @@ const App = () => {
           <Route path='workflow/pipelines' element={<Pipeline/>}/>
           <Route path='firmtemp/templates' element={<Templates />}>
             <Route path="tasks" element={<Tasks />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path='tasks/taskTempUpdate/:_id' element={<TasksUpdate/>} />
             <Route path='tags' element={<Tags />} />
             <Route path='emails' element={<EmailTemp />} />
+            <Route path='emails/emailTempUpdate/:_id' element={<EmailTempUpdate/>}/>
             <Route path='jobs' element={<JobTemp />} />
             <Route path="jobs/JobTemplateUpdate/:_id" element={<JobTemplateUpdate />} />
             <Route path='pipelines' element={<PipelineTemp />} />
+            <Route path='pipelines/PipelineTemplateUpdate/:id' element={<PipelineTempUpdate/>}/>
             <Route path='folders' element={<FolderTemp />} />
             <Route path='chats' element={<ChatTemp />} />
             <Route path='sms' element={<SMSTemp />} />
             <Route path='invoices' element={<InvoiceTemp />} />
             <Route path='organizers' element={<OrganizerTemp />} />
+            <Route path='organizers/OrganizerTempUpdate/:id' element={<OrganizersTempUpdate/>}/>
             <Route path='recurring-invoices' element={<RecurringInvoiceTemp />} />
             <Route path='signatures' element={<SignatureTemp />} />
             <Route path='proposals' element={<ProposalTemp />} />

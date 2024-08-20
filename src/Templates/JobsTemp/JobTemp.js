@@ -14,7 +14,7 @@ import {
   Paper,
   Autocomplete,
   TextField,
- 
+  Menu, MenuItem,
   Switch, FormControlLabel,
   List,
   ListItem,
@@ -24,15 +24,17 @@ import {
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import Priority from '../Priority/Priority';
-import Editor from '../Texteditor/Editor';
+import EditorShortcodes from '../Texteditor/EditorShortcodes';
 import { toast } from "react-toastify";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+// import EditIcon from '@mui/icons-material/Edit';
+// import DeleteIcon from '@mui/icons-material/Delete';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
 import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
 dayjs.extend(customParseFormat);
 
@@ -97,7 +99,7 @@ const JobTemp = () => {
     { label: "Years", value: "Years" },
   ];
 
-  
+
 
   // Handler function to update state when dropdown value changes
   const handleStartInDateChange = (event, newValue) => {
@@ -227,7 +229,7 @@ const JobTemp = () => {
     setCombinedValues(selectedValues);
   };
 
-  
+
   const options = userData.map((user) => ({
     value: user._id,
     label: user.username,
@@ -263,6 +265,8 @@ const JobTemp = () => {
     setStartDate(null);
     setDueDate(null);
   }
+
+
   const createjobtemp = () => {
     if (absoluteDate === true) {
 
@@ -360,11 +364,63 @@ const JobTemp = () => {
 
 
   //delete template
-  const handleEdit = (_id) => {
+  const handleEdit = () => {
 
-    navigate("JobTemplateUpdate/" + _id);
+    navigate("JobTemplateUpdate/" + selectedTemplateId);
+  };
+  //delete template
+  const handleDelete = () => {
+    const requestOptions = {
+      method: "DELETE",
+      redirect: "follow",
+    };
+    const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate/';
+    fetch(url + selectedTemplateId, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete item");
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log(result);
+        toast.success("Item deleted successfully");
+        setShowForm(false);
+        fetchJobTemplatesData();
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Failed to delete item");
+      })
+
   };
 
+  // const [anchorEl, setAnchorEl] = useState(null);
+  // const open = Boolean(anchorEl);
+
+
+
+  // const handleClose = () => {
+  //   setAnchorEl(null);
+  // };
+  // const [currentTemplateId, setCurrentTemplateId] = useState(null);
+
+  // const handleClick = (event, templateId) => {
+  //   setAnchorEl(event.currentTarget);
+  //   setCurrentTemplateId(templateId);
+  // };
+  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState(null);
+  const openMenu = Boolean(menuAnchorEl);
+  const handleClickMenu = (event, templateId) => {
+    setSelectedTemplateId(templateId);
+    setMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setMenuAnchorEl(null);
+    setSelectedTemplateId(null);
+  };
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
@@ -386,19 +442,17 @@ const JobTemp = () => {
                   {JobTemplates.map((template) => (
                     <TableRow key={template._id}>
                       <TableCell>{template.templatename}</TableCell>
-                      <TableCell>
-                        <IconButton
-                          aria-label="edit"
-                          onClick={() => handleEdit(template._id)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          aria-label="delete"
 
+                      <TableCell>
+                        <PiDotsThreeOutlineVerticalLight onClick={(e) => handleClickMenu(e, template._id)} />
+                        <Menu
+                          anchorEl={menuAnchorEl}
+                          open={openMenu}
+                          onClose={handleCloseMenu}
                         >
-                          <DeleteIcon />
-                        </IconButton>
+                          <MenuItem onClick={handleEdit}>Edit</MenuItem>
+                          <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                        </Menu>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -428,13 +482,13 @@ const JobTemp = () => {
                     placeholder='Template Name'
                     value={templatename}
                     onChange={(e) => settemplatename(e.target.value)}
-                    sx={{backgroundColor:'#fff'}}
+                    sx={{ backgroundColor: '#fff' }}
                   />
                 </Box>
                 <Box mt={1}>
                   <label className='jobtemp-input-label'>Job Name</label>
                   <TextField
-                   sx={{backgroundColor:'#fff'}}
+                    sx={{ backgroundColor: '#fff' }}
                     value={jobName + selectedShortcut} onChange={handlejobName}
                     size='small'
                     margin='normal'
@@ -489,7 +543,7 @@ const JobTemp = () => {
                   <label className='jobtemp-input-label'>Job Assignees</label>
                   <Autocomplete
                     multiple
-                    sx={{ mt: 2,backgroundColor:'#FFF' }}
+                    sx={{ mt: 2, backgroundColor: '#FFF' }}
                     options={options}
                     size='small'
                     getOptionLabel={(option) => option.label}
@@ -511,10 +565,10 @@ const JobTemp = () => {
                   />
                 </Box>
                 <Box mt={2}>
-                  <Priority onPriorityChange={handlePriorityChange}  selectedPriority={priority}/>
+                  <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
                 </Box>
                 <Box mt={2}>
-                  <Editor onChange={handleEditorChange} content={description}/>
+                  <EditorShortcodes onChange={handleEditorChange} content={description} />
                 </Box>
                 <Box mt={2}>
                   <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
@@ -540,7 +594,7 @@ const JobTemp = () => {
                       <Typography className='jobtemp-input-label'>Start Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
-                        sx={{ width: '100%',backgroundColor:'#fff' }}
+                        sx={{ width: '100%', backgroundColor: '#fff' }}
                         // value={startDate}
                         // onChange={handleStartDateChange}
                         selected={startDate} onChange={handleStartDateChange}
@@ -551,7 +605,7 @@ const JobTemp = () => {
                       <Typography className='jobtemp-input-label'>Due Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
-                        sx={{ width: '100%',backgroundColor:'#fff' }}
+                        sx={{ width: '100%', backgroundColor: '#fff' }}
                         // value={dueDate}
                         // onChange={handleDueDateChange}
                         selected={dueDate} onChange={handleDueDateChange}
@@ -570,13 +624,13 @@ const JobTemp = () => {
                         fullWidth
                         defaultValue={0}
                         value={startsin}
-                        sx={{ ml: 1 ,backgroundColor:'#fff'}}
+                        sx={{ ml: 1, backgroundColor: '#fff' }}
                         onChange={(e) => setstartsin(e.target.value)}
                       />
                       <Autocomplete
                         options={dayOptions}
                         size='small'
-                        sx={{backgroundColor:'#fff' ,mt:1}}
+                        sx={{ backgroundColor: '#fff', mt: 1 }}
                         getOptionLabel={(option) => option.label}
                         onChange={handleStartInDateChange}
                         renderInput={(params) => (
@@ -594,15 +648,15 @@ const JobTemp = () => {
                         value={duein}
                         fullWidth
                         defaultValue={0}
-                        sx={{ ml: 1.5 ,backgroundColor:'#fff'}}
+                        sx={{ ml: 1.5, backgroundColor: '#fff' }}
                         onChange={(e) => setduein(e.target.value)}
                       />
-                      
+
                       <Autocomplete
                         options={dayOptions}
                         getOptionLabel={(option) => option.label}
-                         onChange={handledueindateChange}
-                         sx={{backgroundColor:'#fff',mt:1 }}
+                        onChange={handledueindateChange}
+                        sx={{ backgroundColor: '#fff', mt: 1 }}
                         size='small'
                         renderInput={(params) => (
                           <TextField {...params} variant="outlined" />
@@ -617,7 +671,7 @@ const JobTemp = () => {
               </Grid>
               <Grid item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <Box
-                className='vertical-line'
+                  className='vertical-line'
                   sx={{
                     // borderLeft: '1px solid black',
                     height: '100%',

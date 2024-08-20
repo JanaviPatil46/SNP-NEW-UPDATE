@@ -19,7 +19,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Priority from '../Priority/Priority';
-import Editor from '../Texteditor/Editor';
+import EditorShortcodes from '../Texteditor/EditorShortcodes';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -45,7 +45,7 @@ const JobTemplateUpdate = () => {
   const [selectedOption, setSelectedOption] = useState('contacts');
   const [selectedShortcut, setSelectedShortcut] = useState("");
   const [tempNameNew, setTempNameNew] = useState("");
- 
+
   const [AssigneesNew, setAssigneesNew] = useState([]);
   const [PriorityNew, setPriorityNew] = useState();
   const [JobDescriptionNew, setJobDescriptionNew] = useState();
@@ -165,14 +165,14 @@ const JobTemplateUpdate = () => {
 
 
 
-  // Handler function to update state when dropdown value changes
-  const handleStartInDateChange = (event, newValue) => {
-    setStartsInNew(newValue ? newValue.value : null);
-  };
-  // Handler function to update state when dropdown value changes
-  const handledueindateChange = (event, newValue) => {
-    setDueInDurationNew(newValue ? newValue.value : null);
-  };
+  // // Handler function to update state when dropdown value changes
+  // const handleStartInDateChange = (event, newValue) => {
+  //   setStartsInNew(newValue ? newValue.value : null);
+  // };
+  // // Handler function to update state when dropdown value changes
+  // const handledueindateChange = (event, newValue) => {
+  //   setDueInDurationNew(newValue ? newValue.value : null);
+  // };
   const handlePriorityChange = (priority) => {
     setPriorityNew(priority);
   };
@@ -203,17 +203,24 @@ const JobTemplateUpdate = () => {
     value: user._id,
     label: user.username,
   }));
-  const handleuserChange = (AssigneesNew) => {
-    setAssigneesNew(AssigneesNew);
+  // const handleuserChange = (AssigneesNew) => {
+  //   setAssigneesNew(AssigneesNew);
+  //   // Map selected options to their values and send as an array
+  //   const selectedValues = AssigneesNew.map((option) => option.value);
+  //   console.log(selectedValues);
+  //   setCombinedValues(selectedValues);
+  // };
+  const handleuserChange = (event, newValue) => {
+    setAssigneesNew(newValue);
     // Map selected options to their values and send as an array
-    const selectedValues = AssigneesNew.map((option) => option.value);
+    const selectedValues = newValue.map((option) => option.value);
     console.log(selectedValues);
     setCombinedValues(selectedValues);
   };
   const handleCloseDropdown = () => {
     setAnchorEl(null);
   };
- 
+
 
   const [templateData, setTemplateData] = useState(null);
   const [tempvalues, setTempValues] = useState();
@@ -249,6 +256,7 @@ const JobTemplateUpdate = () => {
 
         const selectedValues = assigneesData.map((option) => option.value);
         setCombinedValues(selectedValues);
+        console.log(selectedValues)
       }
       tempallvalue();
     } catch (error) {
@@ -302,7 +310,7 @@ const JobTemplateUpdate = () => {
 
 
   const updatejobtemp = () => {
-    
+
 
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -350,9 +358,9 @@ const JobTemplateUpdate = () => {
       });
   };
 
-const handleJobTempCancle=()=>{
- navigate("/firmtemp/templates/jobs")
-}
+  const handleJobTempCancle = () => {
+    navigate("/firmtemp/templates/jobs")
+  }
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
@@ -461,7 +469,7 @@ const handleJobTempCancle=()=>{
                 <Priority onPriorityChange={handlePriorityChange} selectedPriority={PriorityNew} />
               </Box>
               <Box mt={2}>
-              <Editor initialContent={JobDescriptionNew} onChange={handleEditorChange}/>
+                <EditorShortcodes initialContent={JobDescriptionNew} onChange={handleEditorChange} />
               </Box>
               <Box mt={2}>
                 <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
@@ -471,7 +479,7 @@ const handleJobTempCancle=()=>{
                       control={
                         <Switch
                           checked={AbsoluteDateNew}
-                          
+
                           onChange={(event) => handleAbsolutesDates(event.target.checked)}
                           color="primary"
                         />
@@ -485,11 +493,11 @@ const handleJobTempCancle=()=>{
                 <>
                   <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                     <Typography>Start Date</Typography>
-                    
+
                     <DatePicker
                       format="DD/MM/YYYY"
                       sx={{ width: '100%', }}
-                     
+
                       value={StartsDateNew} onChange={handleStartDateChange}
                       renderInput={(params) => <TextField {...params} size="small" />}
                     />
@@ -499,14 +507,14 @@ const handleJobTempCancle=()=>{
                     <DatePicker
                       format="DD/MM/YYYY"
                       sx={{ width: '100%', }}
-                       
+
                       value={DueDateNew} onChange={handleDueDateChange}
                       renderInput={(params) => <TextField {...params} size="small" />}
                     />
                   </Box>
                 </>
               )}
-              {!AbsoluteDateNew && (
+              {/* {!AbsoluteDateNew && (
                 <>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Typography>Start In</Typography>
@@ -554,6 +562,60 @@ const handleJobTempCancle=()=>{
                       )}
                       value={dayOptions.find((option) => option.value === DueInDurationNew) || null}
 
+                      className="job-template-select-dropdown"
+                    />
+                  </Box>
+                </>
+              )} */}
+              {!AbsoluteDateNew && (
+                <>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography>Start In</Typography>
+                    <TextField
+                      size="small"
+                      margin="normal"
+                      fullWidth
+                      value={StartsInNew}
+                      onChange={(e) => setStartsInNew(e.target.value)}
+                      sx={{ ml: 1 }}
+                    />
+                    <Autocomplete
+                      options={dayOptions}
+                      size="small"
+                      getOptionLabel={(option) => option.label}
+                      onChange={(event, newValue) => {
+                        if (newValue) {
+                          setStartsInDurationNew(newValue.value); // Update the duration state
+                          // Update the TextField state with the selected option's label
+                        }
+                      }}
+                      renderInput={(params) => <TextField {...params} variant="outlined" />}
+                      value={dayOptions.find((option) => option.value === StartsInDurationNew) || null}
+                      className="job-template-select-dropdown"
+                    />
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Typography>Due In</Typography>
+                    <TextField
+                      size="small"
+                      margin="normal"
+                      fullWidth
+                      value={DueInNew}
+                      onChange={(e) => setDueInNew(e.target.value)}
+                      sx={{ ml: 1.5 }}
+                    />
+                    <Autocomplete
+                      options={dayOptions}
+                      size="small"
+                      getOptionLabel={(option) => option.label}
+                      onChange={(event, newValue) => {
+                        if (newValue) {
+                          setDueInDurationNew(newValue.value); // Update the duration state
+                          // Update the TextField state with the selected option's label
+                        }
+                      }}
+                      renderInput={(params) => <TextField {...params} variant="outlined" />}
+                      value={dayOptions.find((option) => option.value === DueInDurationNew) || null}
                       className="job-template-select-dropdown"
                     />
                   </Box>

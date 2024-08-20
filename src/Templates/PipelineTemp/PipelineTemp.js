@@ -14,12 +14,13 @@ import {
   Paper,
   Autocomplete,
   TextField,
-
+  MenuItem, Menu,
   Switch, FormControlLabel,
   Divider, IconButton,
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Grid from '@mui/material/Unstable_Grid2';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LuPlusCircle, LuPenLine } from "react-icons/lu";
@@ -258,21 +259,7 @@ const PipelineTemp = () => {
 
   };
 
-  // const fetchPipelineData = async () => {
-  //   // try {
-  //   //   const response = await axios.get('http://127.0.0.1:7500/workflow/pipeline/pipelines');
-  //   //   setPipelineData(response.data);
-  //   // } catch (error) {
-  //   //   console.error('API Error:', error);
-  //   //   toast.error('Failed to fetch pipeline');
-  //   // }
 
-  // };
-
-  // useEffect(() => {
-  //   fetchPipelineData();
-  // }, []);
-  //get all templateName Record 
   const [pipelineData, setPipelineData] = useState([]);
 
   useEffect(() => {
@@ -299,11 +286,20 @@ const PipelineTemp = () => {
     navigate('PipelineTemplateUpdate/' + _id)
   };
 
-  const [openMenuId, setOpenMenuId] = useState(null);
-  const toggleMenu = (_id) => {
-    setOpenMenuId(openMenuId === _id ? null : _id);
+  
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [activePipelineId, setActivePipelineId] = useState(null);
+
+  const handleClick = (event, pipelineId) => {
+    setAnchorEl(event.currentTarget);
+    setActivePipelineId(pipelineId);
   };
 
+  const handleClose = () => {
+    setAnchorEl(null);
+    setActivePipelineId(null);
+  };
 
   //delete template
   const handleDelete = async (_id) => {
@@ -346,29 +342,27 @@ const PipelineTemp = () => {
 
                     <TableCell>{pipeline.pipelineName}</TableCell>
                     <TableCell>
-                      <div
-                        className="ci-menu-kebab"
-                        onClick={() => toggleMenu(pipeline._id)}
-                        style={{ cursor: 'pointer', fontSize: '20px' }}
+                      <IconButton
+                        aria-controls={activePipelineId === pipeline._id ? 'pipeline-menu' : undefined}
+                        aria-haspopup="true"
+                        onClick={(event) => handleClick(event, pipeline._id)}
                       >
-                        &#8942;
-                      </div>
-                      {openMenuId === pipeline._id && (
-                        <div className="pipeline-menu-options">
-                          <div
-                            className="menu-option edit-option"
-                            onClick={() => handleEdit(pipeline._id)}
-                          >
-                            Edit
-                          </div>
-                          <div
-                            className="menu-option delete-option"
-                            onClick={() => handleDelete(pipeline._id)}
-                          >
-                            Delete
-                          </div>
-                        </div>
-                      )}
+                        <MoreVertIcon fontSize="small" />
+                      </IconButton>
+                      <Menu
+                        id="pipeline-menu"
+                        anchorEl={anchorEl}
+                        open={activePipelineId === pipeline._id}
+                        onClose={handleClose}
+                        sx={{ ml: 3 }}
+                      >
+                        <MenuItem onClick={() => { handleEdit(pipeline._id); handleClose(); }}>
+                          Edit
+                        </MenuItem>
+                        <MenuItem onClick={() => { handleDelete(pipeline._id); handleClose(); }}>
+                          Delete
+                        </MenuItem>
+                      </Menu>
                     </TableCell>
 
                   </TableRow>

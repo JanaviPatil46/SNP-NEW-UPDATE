@@ -28,6 +28,7 @@ const AccountsTable = () => {
     {
       accessorKey: 'Name',
       header: 'Account Name',
+    
     },
     {
       accessorKey: 'Type',

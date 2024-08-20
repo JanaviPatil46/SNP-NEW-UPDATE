@@ -17,21 +17,24 @@ import {
   Paper,
   Autocomplete,
   TextField,
- 
+  IconButton,
 
   Switch,
   FormControlLabel,
   Chip
 
 } from '@mui/material';
-
+import { useNavigate } from "react-router-dom";
 import Editor from '../Texteditor/Editor';
 import Grid from '@mui/material/Unstable_Grid2';
 import Priority from '../Priority/Priority';
 import Status from '../Status/Status';
 import { toast } from "react-toastify";
-
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 const Tasks = () => {
+  const navigate = useNavigate();
+
   const [templatename, settemplatename] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [startsin, setstartsin] = useState("");
@@ -88,7 +91,7 @@ const Tasks = () => {
   const [combinedValues, setCombinedValues] = useState([]);
   const [userData, setUserData] = useState([]);
 
-  console.log(combinedValues)
+  // console.log(combinedValues)
   useEffect(() => {
     fetchData();
   }, []);
@@ -195,7 +198,7 @@ const Tasks = () => {
         throw new Error("Failed to fetch task templates");
       }
       const data = await response.json();
-      console.log(data)
+      // console.log(data)
       setTaskTemplates(data.TaskTemplates
       );
     } catch (error) {
@@ -212,7 +215,7 @@ const Tasks = () => {
         templatename: templatename,
         status: status.value,
         taskassignees: combinedValues,
-        tags: combinedTagsValues,
+        tasktags: combinedTagsValues,
         priority: priority.value,
         description: description,
         absolutedates: absoluteDate,
@@ -256,7 +259,7 @@ const Tasks = () => {
         templatename: templatename,
         status: status.value,
         taskassignees: combinedValues,
-        tags: combinedTagsValues,
+        tasktags: combinedTagsValues,
         priority: priority.value,
         description: description,
         absolutedates: absoluteDate,
@@ -306,6 +309,11 @@ const Tasks = () => {
     settemplatename("");
     setStatus("");
   };
+
+  const handleEdit = (_id) => {
+
+    navigate("taskTempUpdate/" + _id);
+  };
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
@@ -315,6 +323,38 @@ const Tasks = () => {
               Create Task Template
             </Button>
             <TableContainer component={Paper} sx={{ mt: 2 }}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+
+                    <TableCell>Settings</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {TaskTemplates.map((template) => (
+                    <TableRow key={template._id}>
+                      <TableCell>{template.templatename}</TableCell>
+                      <TableCell>
+                        <IconButton
+                          aria-label="edit"
+                          onClick={() => handleEdit(template._id)}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                        <IconButton
+                          aria-label="delete"
+
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            {/* <TableContainer component={Paper} sx={{ mt: 2 }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -333,7 +373,7 @@ const Tasks = () => {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer>
+            </TableContainer> */}
           </Box>
         ) : (
           <Box sx={{ mt: 2 }}>
@@ -378,7 +418,7 @@ const Tasks = () => {
                               <label  className='task-input-label'>Task Assignee</label>
                               <Autocomplete
                                 multiple
-                                sx={{background:'#fff',mt: 1}}
+                                sx={{background:'#fff',mt: 1,}}
                                 options={options}
                                 size='small'
                                 getOptionLabel={(option) => option.label}
