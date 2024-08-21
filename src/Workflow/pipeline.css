@@ -7,7 +7,7 @@
   display: flex;
 
   flex-direction: column;
-  border: 1px solid #000;
+  /* border: 1px solid #000; */
   border-radius: 8px;
   /* background-color: #fafafa; */
   /* background-color: var(--color-header-bg); */
@@ -48,4 +48,11 @@
 .stepsCard:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   transform: scale(1.02);
+}
+.automation-batch{
+  background-color: red;
+  border-radius: 50%;
+  padding: 4px 7px;
+  color: #fff;
+  font-size: 15px;
 }

@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-
-
+import React, { useState, useEffect ,useMemo} from 'react';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import {
@@ -8,21 +6,12 @@ import {
   Button,
   Typography,
   Container,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
   Autocomplete,
   TextField,
   IconButton,
-
   Switch,
   FormControlLabel,
   Chip
-
 } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import Editor from '../Texteditor/Editor';
@@ -30,8 +19,8 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Priority from '../Priority/Priority';
 import Status from '../Status/Status';
 import { toast } from "react-toastify";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import { CiMenuKebab } from "react-icons/ci";
 const Tasks = () => {
   const navigate = useNavigate();
 
@@ -314,15 +303,95 @@ const Tasks = () => {
 
     navigate("taskTempUpdate/" + _id);
   };
+
+
+//delete template
+const handleDelete = (_id) => {
+  const requestOptions = {
+    method: "DELETE",
+    redirect: "follow"
+  };
+  const url = 'http://127.0.0.1:7500/workflow/tasks/tasktemplate/';
+  fetch(url + _id, requestOptions)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to delete item');
+      }
+      return response.text();
+    })
+    .then((result) => {
+      console.log(result);
+      toast.success('Item deleted successfully');
+      fetchTaskData();
+      // setshowOrganizerTemplateForm(false);
+    })
+    .catch((error) => {
+      console.error(error);
+      toast.error('Failed to delete item');
+    })
+};
+const [tempIdget, setTempIdGet] = useState("");
+const [openMenuId, setOpenMenuId] = useState(null);
+const toggleMenu = (_id) => {
+  setOpenMenuId(openMenuId === _id ? null : _id);
+  setTempIdGet(_id);
+};
+// console.log(tempIdget)
+const columns = useMemo(() => [
+  {
+    accessorKey: 'templatename',
+    header: 'Name',
+
+  },
+  {
+    accessorKey: 'Setting', header: 'Setting',
+    Cell: ({ row }) => (
+      <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+        <CiMenuKebab style={{ fontSize: "25px" }} />
+        {openMenuId === row.original._id && (
+          <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
+              handleEdit(row.original._id);
+             
+            }} >Edit</Typography>
+            <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)} >Delete</Typography>
+          </Box>
+        )}
+      </IconButton>
+
+    ),
+
+  },
+
+], [openMenuId]);
+
+const table = useMaterialReactTable({
+  columns,
+  data: TaskTemplates,
+  enableBottomToolbar: true,
+  enableStickyHeader: true,
+  columnFilterDisplayMode: "custom", // Render own filtering UI
+  enableRowSelection: true, // Enable row selection
+  enablePagination: true,
+  muiTableContainerProps: { sx: { maxHeight: "400px" } },
+  initialState: {
+    columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+  },
+  muiTableBodyCellProps: {
+    sx: (theme) => ({
+      backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+    }),
+  },
+});
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
         {!showForm ? (
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleCreateTask}>
+            <Button variant="contained" color="primary" onClick={handleCreateTask} sx={{mb:3}}>
               Create Task Template
             </Button>
-            <TableContainer component={Paper} sx={{ mt: 2 }}>
+            {/* <TableContainer component={Paper} sx={{ mt: 2 }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -353,27 +422,8 @@ const Tasks = () => {
                   ))}
                 </TableBody>
               </Table>
-            </TableContainer>
-            {/* <TableContainer component={Paper} sx={{ mt: 2 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-                    <TableCell>Settings</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {TaskTemplates.map((template) => (
-                    <TableRow key={template._id}>
-                      <TableCell>{template.templatename}</TableCell>
-                      <TableCell>
-                       
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
             </TableContainer> */}
+             <MaterialReactTable columns={columns} table={table} />
           </Box>
         ) : (
           <Box sx={{ mt: 2 }}>

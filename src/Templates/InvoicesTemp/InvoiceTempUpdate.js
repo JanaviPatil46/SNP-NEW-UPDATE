@@ -1,54 +1,49 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, } from 'react';
 import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { CiDiscount1 } from 'react-icons/ci';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { RiCloseLine } from 'react-icons/ri';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import Select from 'react-select';
 import { toast } from "react-toastify";
-import Select from 'react-select'
 import {
   Box,
   Button,
   Typography,
   Container,
   Table,
-  TableContainer,
   TableHead,
   TableBody,
   TableRow,
   TableCell,
   IconButton,
-  Paper,
   Grid,
   TextField,
   InputLabel,
- 
+
+
   Switch,
   FormControlLabel,
   Divider,
-  useMediaQuery,
+
   List,
   ListItem,
   ListItemText,
   Popover,
   Checkbox
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { useNavigate } from 'react-router-dom';
+
+import { useNavigate, useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable';
-const InvoiceTemp = () => {
+const InvoiceTempUpdate = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
 
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const [showForm, setShowForm] = useState(false);
-  const handleCreateInvoiceTemp = () => {
-    setShowForm(true);
-  };
+  
+
   const handleCloseInvoiceTemp = () => {
-    setShowForm(false);
+    // window.location.reload();
+    navigate('/firmtemp/templates/invoices')
   };
 
   const paymentsOptions = [
@@ -57,22 +52,22 @@ const InvoiceTemp = () => {
     { value: 'Credit Card or Bank Debits', label: 'Credit Card or Bank Debits' }
   ];
 
- 
-// add row
-const [rows, setRows] = useState([
-  { productName: '', description: '', rate: '$0.00', qty: '1', amount: '$0.00', tax: false, isDiscount: false }
-]);
-const addRow = (isDiscountRow = false) => {
-  const newRow = isDiscountRow
-    ? { productName: '', description: '', rate: '$-10.00', qty: '1', amount: '$-10.00', tax: false, isDiscount: true }
-    : { productName: '', description: '', rate: '$0.00', qty: '1', amount: '$0.00', tax: false, isDiscount: false };
-  setRows([...rows, newRow]);
-};
-const deleteRow = (index) => {
-  const newRows = [...rows];
-  newRows.splice(index, 1);
-  setRows(newRows);
-};
+
+  // add row
+  const [rows, setRows] = useState([
+    { productName: '', description: '', rate: '$0.00', qty: '1', amount: '$0.00', tax: false, isDiscount: false }
+  ]);
+  const addRow = (isDiscountRow = false) => {
+    const newRow = isDiscountRow
+      ? { productName: '', description: '', rate: '$-10.00', qty: '1', amount: '$-10.00', tax: false, isDiscount: true }
+      : { productName: '', description: '', rate: '$0.00', qty: '1', amount: '$0.00', tax: false, isDiscount: false };
+    setRows([...rows, newRow]);
+  };
+  const deleteRow = (index) => {
+    const newRows = [...rows];
+    newRows.splice(index, 1);
+    setRows(newRows);
+  };
 
 
   //  for shortcodes
@@ -185,61 +180,61 @@ const deleteRow = (index) => {
     setAnchorEl(null);
   };
 
+  ///
+
+  const [invoice, setInvoice] = useState();
 
 
-  // Calculate Summary Data
-  const calculateSummary = () => {
-    const subtotal = rows.reduce((acc, row) => acc + (parseFloat(row.amount.replace('$', '')) || 0), 0).toFixed(2);
-    const taxRate = 0;
-    const taxTotal = (subtotal * (taxRate / 100)).toFixed(2);
-    const total = (parseFloat(subtotal) + parseFloat(taxTotal)).toFixed(2);
+  useEffect(() => {
+    fetchInvoiceTemp(id);
+  }, []);
 
-    return {
-      subtotal: `$${subtotal}`,
-      taxRate: `${taxRate}%`,
-      taxTotal: `$${taxTotal}`,
-      total: `$${total}`,
+  const fetchInvoiceTemp = () => {
+    const requestOptions = {
+      method: "GET",
+      redirect: "follow"
     };
-  };
+    const url = 'http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate/';;
 
-  
- 
+    fetch(url + id, requestOptions)
+      .then((response) => response.text())
+      .then((result) => {
+        const invoiceResult = JSON.parse(result);
+        console.log(invoiceResult);
+        // console.log(invoiceResult.invoice)
+        setInvoice(invoiceResult.invoiceTemplate);
 
-   //Integration
-
-   const handleEdit = (_id) => {
-    navigate("invoiceTempUpdate/" + _id);
-  };
-    //get all templateName Record 
-  const [invoiceTemplates, setInvoiceTemplates] = useState([]);
-
-
-
-  const fetchInvoiceTemplates = async () => {
-          try {
-
-        const url = 'http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate';
-
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Failed to fetch InvoiceTemplate');
-        }
-        const data = await response.json();
-        setInvoiceTemplates(data.invoiceTemplate);
-        console.log(data);
-      } catch (error) {
-        console.error('Error fetching Invoice Templates:', error);
-      }
-};
-
-useEffect(() => {
-  fetchInvoiceTemplates();
-}, []);
-
-  
-
-  console.log(invoiceTemplates);
-
+        setTemplatename(invoiceResult.invoiceTemplate.templatename)
+        setDescription(invoiceResult.invoiceTemplate.description)
+        setClientmsg(invoiceResult.invoiceTemplate.messageForClient)
+        const paymentMethod = ({
+          value: invoiceResult.invoiceTemplate.paymentMethod,
+          label: invoiceResult.invoiceTemplate.paymentMethod,
+        });
+        setPaymentMode(paymentMethod)
+        setDaysNextReminder(invoiceResult.invoiceTemplate.daysuntilnextreminder)
+        setnumOfReminder(invoiceResult.invoiceTemplate.numberOfreminder)
+        setEmailToClient(invoiceResult.invoiceTemplate.sendEmailWhenInvCreated)
+        setPayUsingCredits(invoiceResult.invoiceTemplate.payInvoicewithcredits)
+        setInvoiceReminders(invoiceResult.invoiceTemplate.sendReminderstoClients)
+        // Map lineItems to the format needed for rows
+        const formattedRows = invoiceResult.invoiceTemplate.lineItems.map(item => ({
+          productName: item.productorService,
+          description: item.description,
+          rate: `$${item.rate.toFixed(2)}`,
+          qty: item.quantity.toString(),
+          amount: `$${item.amount.toFixed(2)}`,
+          tax: item.tax,
+          isDiscount: false // Assuming this is default false or you can adjust based on your logic
+        }));
+        setRows(formattedRows);
+        setSubtotal(result.invoiceTemplate.summary.subtotal)
+        setTaxRate(result.invoiceTemplate.summary.taxRate)
+        setTaxTotal(result.invoiceTemplate.summary.taxTotal)
+        setTotalAmount(result.invoiceTemplate.summary.total)
+      })
+      .catch((error) => console.error(error));
+  }
 
 
   const createInvoiceTemp = () => {
@@ -266,16 +261,15 @@ useEffect(() => {
       active: "true",
     });
 
-    console.log(raw)
     const requestOptions = {
-      method: "POST",
+      method: "PATCH",
       headers: myHeaders,
       body: raw,
       redirect: "follow"
     };
 
-    const url = "http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate";
-    fetch(url, requestOptions)
+    const url = "http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate/";
+    fetch(url + id, requestOptions)
       .then((response) => {
         console.log(response)
         if (!response.ok) {
@@ -284,15 +278,15 @@ useEffect(() => {
         return response.json();
       })
       .then((result) => {
-        console.log(result.message)
-        toast.success("Invoice created successfully");
+        console.log(result)
+        // toast.success("Invoice created successfully");
 
-        if (result && result.message === "InvoiceTemplate created successfully") {
-          setShowForm(false);
-          fetchInvoiceTemplates();
-          handleClear()
+        if (result && result.message === "InvoiceTemplate Updated successfully") {
+          toast.success("InvoiceTemplate Updated successfully");
+          navigate("/firmtemp/templates/invoices")
+
         } else {
-          // toast.error(result.message || "Failed to create InvoiceTemplate");
+          toast.error(result.message || "Failed to create InvoiceTemplate");
         }
       })
 
@@ -302,16 +296,15 @@ useEffect(() => {
         toast.error(errorMessage);
       });
   }
+
+
+
   const [templatename, setTemplatename] = useState();
   
   const [paymentMode, setPaymentMode] = useState('');
-  // const handlePaymentOptionChange = (event) => {
-  //   setPaymentMode(event.target.value);
-  //   console.log(event.target.value)
-  // };
   const handlePaymentOptionChange = (selectedOption) => {
     setPaymentMode(selectedOption);
-};
+  };
   const [emailToClient, setEmailToClient] = useState(false)
   const handleEmailToClient = (event) => {
     setEmailToClient(event.target.checked);
@@ -353,34 +346,8 @@ const[numOfReminder,setnumOfReminder]=useState();
     calculateSubtotal();
   }, [rows]);
 
-  //delete template
-  const handleDelete = (_id) => {
-    const requestOptions = {
-      method: "DELETE",
-      redirect: "follow",
-    };
 
-    const url = `http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate/${_id}`;
 
-    fetch(url, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to delete item');
-        }
-        return response.text();
-      })
-      .then((result) => {
-        console.log(result);
-
-        toast.success('Item deleted successfully');
-        fetchInvoiceTemplates();
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error('Failed to delete item');
-      });
-  };
   // services data
   useEffect(() => {
 
@@ -403,6 +370,9 @@ const[numOfReminder,setnumOfReminder]=useState();
     label: service.serviceName,
   }));
   const [selectedservice, setselectedService] = useState();
+
+
+  //for service
   const fetchservicebyid = async (id, rowIndex) => {
     const requestOptions = {
       method: "GET",
@@ -527,64 +497,14 @@ const[numOfReminder,setnumOfReminder]=useState();
     // Simulate filtered shortcuts based on some logic (e.g., search)
     setSwitchFilteredShortcuts(shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes('')));
   }, [shortcuts]);
-
-  const handleClear = () => {
-    setTemplatename('');
-    setDescription('');
-    setPaymentMode('');
-    setPayUsingCredits(false);
-    setEmailToClient(false);
-    setInvoiceReminders(false);
-    setClientmsg('');
-    setselectedService('');
-  }
   return (
     <Container>
-      {!showForm ? (
-        <Box sx={{ mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={handleCreateInvoiceTemp}>
-            Create Invoice Template
-          </Button>
-          <TableContainer component={Paper} sx={{ mt: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-
-                  <TableCell>Settings</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {invoiceTemplates.map((template) => (
-                  <TableRow key={template._id}>
-                    <TableCell>{template.templatename}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="edit"
-
-                      >
-                        <EditIcon onClick={() => handleEdit(template._id)} />
-                      </IconButton>
-                      <IconButton
-
-                        aria-label="delete"
-
-                      >
-                        <DeleteIcon onClick={() => handleDelete(template._id)} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      ) : (
+   
         <Box sx={{ mt: 2 }}>
           <Box>
             <form>
               <Box>
-                <Typography variant='h5' gutterBottom>Create Invoice Template</Typography>
+                <Typography variant='h5' gutterBottom>Edit Invoice Template</Typography>
                 <Box mt={2} mb={2}><hr /></Box>
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={3}>
@@ -680,11 +600,10 @@ const[numOfReminder,setnumOfReminder]=useState();
                             </MenuItem>
                           ))}
                         </Select> */}
-                        <Select options={paymentsOptions}
+                         <Select options={paymentsOptions}
                             onChange={handlePaymentOptionChange}
                             value={paymentMode}
                         />
-                        
                       </Box>
 
 
@@ -874,16 +793,6 @@ const[numOfReminder,setnumOfReminder]=useState();
                             <TableBody>
                               {rows.map((row, index) => (
                                 <TableRow key={index}>
-                                  {/* <TableCell>
-                            <CreatableSelect 
-                              placeholder='Product or Service'
-                              options={serviceoptions}
-                              value={serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName }}
-                              onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
-                              onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
-                              isClearable
-                            />
-                          </TableCell> */}
                                   <TableCell>
                                     <CreatableSelect
                                       placeholder="Product or Service"
@@ -1003,19 +912,20 @@ const[numOfReminder,setnumOfReminder]=useState();
                 </Grid>
                 <Divider mt={2} />
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Button onClick={createInvoiceTemp} variant="contained" color="primary" >Save</Button>
+                  <Button   onClick={createInvoiceTemp} variant="contained" color="primary" >Save</Button>
                   <Button variant="outlined" onClick={handleCloseInvoiceTemp}>Cancel</Button>
                 </Box>
               </Box>
             </form>
           </Box>
         </Box>
-      )}
+
     </Container>
   );
 };
 
-export default InvoiceTemp;
+export default InvoiceTempUpdate;
+
 
 
 

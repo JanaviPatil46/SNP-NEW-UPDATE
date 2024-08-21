@@ -1,20 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useMemo} from 'react';
 import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
   Typography,
   Container,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
+ 
   Autocomplete,
   TextField,
-  Menu, MenuItem,
+  
   Switch, FormControlLabel,
   List,
   ListItem,
@@ -26,15 +20,15 @@ import Grid from '@mui/material/Unstable_Grid2';
 import Priority from '../Priority/Priority';
 import EditorShortcodes from '../Texteditor/EditorShortcodes';
 import { toast } from "react-toastify";
-// import EditIcon from '@mui/icons-material/Edit';
-// import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { PiDotsThreeOutlineVerticalLight } from "react-icons/pi";
+
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import { CiMenuKebab } from "react-icons/ci";
 import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
 dayjs.extend(customParseFormat);
 
@@ -364,18 +358,18 @@ const JobTemp = () => {
 
 
   //delete template
-  const handleEdit = () => {
+  const handleEdit = (_id) => {
 
-    navigate("JobTemplateUpdate/" + selectedTemplateId);
+    navigate("JobTemplateUpdate/" + _id);
   };
   //delete template
-  const handleDelete = () => {
+  const handleDelete = (_id) => {
     const requestOptions = {
       method: "DELETE",
       redirect: "follow",
     };
     const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate/';
-    fetch(url + selectedTemplateId, requestOptions)
+    fetch(url + _id, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to delete item");
@@ -421,44 +415,71 @@ const JobTemp = () => {
     setMenuAnchorEl(null);
     setSelectedTemplateId(null);
   };
+
+  const [tempIdget, setTempIdGet] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const toggleMenu = (_id) => {
+    setOpenMenuId(openMenuId === _id ? null : _id);
+    setTempIdGet(_id);
+  };
+  // console.log(tempIdget)
+  const columns = useMemo(() => [
+    {
+      accessorKey: 'templatename',
+      header: 'Name',
+
+    },
+    {
+      accessorKey: 'Setting', header: 'Setting',
+      Cell: ({ row }) => (
+        <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+          <CiMenuKebab style={{ fontSize: "25px" }} />
+          {openMenuId === row.original._id && (
+            <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+              <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
+                handleEdit(row.original._id);
+               
+              }} >Edit</Typography>
+              <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
+            </Box>
+          )}
+        </IconButton>
+
+      ),
+
+    },
+
+  ], [openMenuId]);
+
+  const table = useMaterialReactTable({
+    columns,
+    data: JobTemplates,
+    enableBottomToolbar: true,
+    enableStickyHeader: true,
+    columnFilterDisplayMode: "custom", // Render own filtering UI
+    enableRowSelection: true, // Enable row selection
+    enablePagination: true,
+    muiTableContainerProps: { sx: { maxHeight: "400px" } },
+    initialState: {
+      columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+    },
+    muiTableBodyCellProps: {
+      sx: (theme) => ({
+        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+      }),
+    },
+  });
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
         {!showForm ? (
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleCreateJobTemplate}>
+            <Button variant="contained" color="primary" onClick={handleCreateJobTemplate} sx={{mb:3}}>
               Job Template
             </Button>
-            <TableContainer component={Paper} sx={{ mt: 2 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
+            
+             <MaterialReactTable columns={columns} table={table} />
 
-                    <TableCell>Settings</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {JobTemplates.map((template) => (
-                    <TableRow key={template._id}>
-                      <TableCell>{template.templatename}</TableCell>
-
-                      <TableCell>
-                        <PiDotsThreeOutlineVerticalLight onClick={(e) => handleClickMenu(e, template._id)} />
-                        <Menu
-                          anchorEl={menuAnchorEl}
-                          open={openMenu}
-                          onClose={handleCloseMenu}
-                        >
-                          <MenuItem onClick={handleEdit}>Edit</MenuItem>
-                          <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                        </Menu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
           </Box>
         ) : (
           <Box

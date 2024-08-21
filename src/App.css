@@ -6,6 +6,7 @@
   --color-text: #000000;
   --color-menu-icon: #000000;
   --color-navbar-temp: #1976d2;
+  --color-stage-back: #fafafa;
 }
 
 .dark-theme {
@@ -16,6 +17,7 @@
   --color-text: #ffffff;
   --color-menu-icon: #000000;
   --color-navbar-temp: #ffffff;
+  --color-stage-back: #333333;
 }
 
 #steps-label {
@@ -38,7 +40,8 @@
   border-left: 1px solid var(--color-text);
 }
 .stage{
-  background-color: var(--color-header-bg);
+  background-color: var(--color-stage-back);
+  color: var(--color-text);
 }
 
 .firmtemp-nav a{
@@ -48,3 +51,6 @@
   color:var(--color-text);
 }
 
+/* .stage{
+  background-color: red;
+} */

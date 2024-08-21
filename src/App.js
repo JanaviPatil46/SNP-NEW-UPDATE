@@ -24,7 +24,7 @@ import SignatureTemp from './Templates/SignatureTemp/SignatureTemp';
 import ProposalTemp from './Templates/ProposalsTemp/ProposalTemp';
 import CreateJob from './Jobs/CreateJob';
 import Docs from './Pages/Docs'
-
+import AccountDash from './Pages/AccountDash.js'
 import Invoices from './Billing/Invoices';
 import Services from './Pages/Service';
 import MyAccount from './Settings/MyAccount'
@@ -35,6 +35,32 @@ import Jobs from './Pages/Jobs.js';
 import PipelineTempUpdate from './Templates/PipelineTemp/PipelineTempUpdate.js';
 import TasksUpdate from './Templates/Task/TasksUpdate.js'
 import EmailTempUpdate from './Templates/EmailTemp/EmailTempUpdate.js'
+
+import Overview from "./nested-navbar/NewPages/Overview.js";
+import Notes from "./nested-navbar/NewPages/Notes.js";
+import Workflow from "./nested-navbar/NewPages/Workflow";
+import Pipelines from "./nested-navbar/workflow-nav/Pipelines";
+import ActiveJobs from "./nested-navbar/workflow-nav/ActiveJobs";
+import ArchivedJobs from "./nested-navbar/workflow-nav/ArchivedJobs";
+import Info from "./nested-navbar/NewPages/Info";
+import Proposals from "./nested-navbar/NewPages/Proposals";
+import DashDocs from "./nested-navbar/NewPages/Docs";
+import Communication from "./nested-navbar/NewPages/Commuication";
+import Organizers from "./nested-navbar/NewPages/Organizers";
+import dashInvoices from "./nested-navbar/NewPages/Invoices";
+import Email from "./nested-navbar/NewPages/Email";
+import Inbox from "./nested-navbar/email-nav/Inbox";
+import Sent from "./nested-navbar/email-nav/Sent";
+import Payments from "./nested-navbar/invoices-nav/Payments";
+import Invoice from "./nested-navbar/invoices-nav/Invoice";
+
+import Documents from "./nested-navbar/documents-nav/Documents";
+import Approvals from "./nested-navbar/documents-nav/Approvals";
+import Signatures from "./nested-navbar/documents-nav/Signatures";
+import FileRequest from "./nested-navbar/documents-nav/FileRequest";
+import Trash from "./nested-navbar/documents-nav/Trash";
+import IRS from "./nested-navbar/documents-nav/IRS";
+import InvoiceTempUpdate from './Templates/InvoicesTemp/InvoiceTempUpdate.js';
 const App = () => {
   return (
 
@@ -68,6 +94,7 @@ const App = () => {
             <Route path='chats' element={<ChatTemp />} />
             <Route path='sms' element={<SMSTemp />} />
             <Route path='invoices' element={<InvoiceTemp />} />
+            <Route path='invoices/invoiceTempUpdate/:id' element={<InvoiceTempUpdate />} />
             <Route path='organizers' element={<OrganizerTemp />} />
             <Route path='organizers/OrganizerTempUpdate/:id' element={<OrganizersTempUpdate/>}/>
             <Route path='recurring-invoices' element={<RecurringInvoiceTemp />} />
@@ -78,6 +105,36 @@ const App = () => {
           <Route path='/firmtemp/services' element={<Services/>}/>
           <Route path='/settings/myaccount' element={<MyAccount/>}/>
 
+          <Route path="/accountsdash" element={<AccountDash />}>
+            <Route path="overview/:data" element={<Overview />} />
+            <Route path="info/:data" element={<Info />} />
+            <Route path="docs/:data" element={<DashDocs />}>
+              <Route path="documents" element={<Documents />} />
+              <Route path="approvals" element={<Approvals />} />
+              <Route path="signatures" element={<Signatures />} />
+              <Route path="filerequests" element={<FileRequest />} />
+              <Route path="trash" element={<Trash />} />
+              <Route path="irs" element={<IRS />} />
+            </Route>
+            <Route path="communication/:data" element={<Communication />} />
+            <Route path="organizers/:data" element={<Organizers />} />
+            <Route path="invoices/:data" element={<dashInvoices />}>
+              <Route path="invoice" element={<Invoice />} />
+              <Route path="payments" element={<Payments />} />
+            </Route>
+            <Route path="email/:data" element={<Email />}>
+              <Route path="inbox" element={<Inbox />} />
+              <Route path="sent" element={<Sent />} />
+            </Route>
+            <Route path="proposals/:data" element={<Proposals />} />
+            <Route path="notes/:data" element={<Notes />} />
+
+            <Route path="workflow/:data" element={<Workflow />}>
+              <Route path="pipelines" element={<Pipelines />} />
+              <Route path="activejobs" element={<ActiveJobs />} />
+              <Route path="archivedjobs" element={<ArchivedJobs />} />
+            </Route>
+          </Route>
           <Route path='*' element={<ErrorPage />} />
         </Route>
       

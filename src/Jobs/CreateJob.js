@@ -6,6 +6,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
+import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import axios from 'axios';
@@ -13,7 +14,7 @@ import axios from 'axios';
 dayjs.extend(customParseFormat);
 const CreateJob = () => {
   // State to keep track of selected values
-
+  const navigate = useNavigate();
   const [description, setDescription] = useState('');
   const [jobName, setJobName] = useState('');
   const [priority, setPriority] = useState('');
@@ -253,7 +254,7 @@ const CreateJob = () => {
       .then((response) => {
         console.log("Job created successfully");
        toast.success('Job created successfully')
-
+       navigate('/workflow/jobs')
         // Handle success, e.g., toast or redirect
       })
       .catch((error) => {

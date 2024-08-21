@@ -1,32 +1,25 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Button,
   Typography,
   Container,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
   Paper,
   Autocomplete,
   TextField,
-  MenuItem, Menu,
   Switch, FormControlLabel,
   Divider, IconButton,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Grid from '@mui/material/Unstable_Grid2';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { LuPlusCircle, LuPenLine } from "react-icons/lu";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate } from 'react-router-dom';
 const PipelineTemp = () => {
   const theme = useTheme();
@@ -286,20 +279,6 @@ const PipelineTemp = () => {
     navigate('PipelineTemplateUpdate/' + _id)
   };
 
-  
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [activePipelineId, setActivePipelineId] = useState(null);
-
-  const handleClick = (event, pipelineId) => {
-    setAnchorEl(event.currentTarget);
-    setActivePipelineId(pipelineId);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-    setActivePipelineId(null);
-  };
 
   //delete template
   const handleDelete = async (_id) => {
@@ -321,55 +300,71 @@ const PipelineTemp = () => {
     }
   };
 
+  const [tempIdget, setTempIdGet] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const toggleMenu = (_id) => {
+    setOpenMenuId(openMenuId === _id ? null : _id);
+    setTempIdGet(_id);
+  };
+  // console.log(tempIdget)
+  const columns = useMemo(() => [
+    {
+      accessorKey: 'pipelineName',
+      header: 'Name',
+
+    },
+    {
+      accessorKey: 'Setting', header: 'Setting',
+      Cell: ({ row }) => (
+        <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+          <CiMenuKebab style={{ fontSize: "25px" }} />
+          {openMenuId === row.original._id && (
+            <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+              <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
+                handleEdit(row.original._id);
+
+              }} >Edit</Typography>
+              <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
+            </Box>
+          )}
+        </IconButton>
+
+      ),
+
+    },
+
+  ], [openMenuId]);
+
+  const table = useMaterialReactTable({
+    columns,
+    data: pipelineData,
+    enableBottomToolbar: true,
+    enableStickyHeader: true,
+    columnFilterDisplayMode: "custom", // Render own filtering UI
+    enableRowSelection: true, // Enable row selection
+    enablePagination: true,
+    muiTableContainerProps: { sx: { maxHeight: "400px" } },
+    initialState: {
+      columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+    },
+    muiTableBodyCellProps: {
+      sx: (theme) => ({
+        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+      }),
+    },
+  });
+
   return (
     <Container>
       {!showForm ? (
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={handleCreatePipeline}>
+          <Button variant="contained" color="primary" onClick={handleCreatePipeline} sx={{ mb: 3 }}>
             Create Pipeline
           </Button>
-          <TableContainer component={Paper} sx={{ mt: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Settings</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {pipelineData.map((pipeline) => (
-                  <TableRow key={pipeline._id}>
 
-                    <TableCell>{pipeline.pipelineName}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-controls={activePipelineId === pipeline._id ? 'pipeline-menu' : undefined}
-                        aria-haspopup="true"
-                        onClick={(event) => handleClick(event, pipeline._id)}
-                      >
-                        <MoreVertIcon fontSize="small" />
-                      </IconButton>
-                      <Menu
-                        id="pipeline-menu"
-                        anchorEl={anchorEl}
-                        open={activePipelineId === pipeline._id}
-                        onClose={handleClose}
-                        sx={{ ml: 3 }}
-                      >
-                        <MenuItem onClick={() => { handleEdit(pipeline._id); handleClose(); }}>
-                          Edit
-                        </MenuItem>
-                        <MenuItem onClick={() => { handleDelete(pipeline._id); handleClose(); }}>
-                          Delete
-                        </MenuItem>
-                      </Menu>
-                    </TableCell>
+          <MaterialReactTable columns={columns} table={table} />
+         
 
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
         </Box>
       ) : (
         <Box

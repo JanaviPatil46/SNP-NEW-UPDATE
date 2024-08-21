@@ -2,8 +2,13 @@ import React, { useEffect, useState } from 'react';
 import './pipeline.css'
 import { useDrag, DndProvider, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { RiDeleteBin5Line } from 'react-icons/ri';
 import axios from 'axios';
-import { Box, Button, CircularProgress, TextField, Autocomplete, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import { IoClose } from "react-icons/io5";
+import { toast } from 'react-toastify';
+import { Box, Button, CircularProgress,Drawer, TextField, Autocomplete, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 // import Select from 'react-select';
 import { differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns';
 const Pipeline = () => {
@@ -14,6 +19,15 @@ const Pipeline = () => {
   const [pipelineId, setPipelineId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const handleDrawerOpen = () => {
+    setIsDrawerOpen(true);
+  };
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+  };
 
   useEffect(() => {
     fetchPipelineData();
@@ -83,9 +97,7 @@ const Pipeline = () => {
         handleBoardsList(pipeline);
       }
     }
-    // else {
-    //   handleBackToPipelineList();
-    // }
+
   };
 
 
@@ -178,7 +190,7 @@ const Pipeline = () => {
       return doc.body.textContent || "";
     };
 
-    const truncateDescription = (description, maxLength = 50) => {
+    const truncateDescription = (description, maxLength = 30) => {
       if (description.length > maxLength) {
         return description.slice(0, maxLength) + '...';
       }
@@ -201,7 +213,7 @@ const Pipeline = () => {
     };
 
     const truncateName = (name) => {
-      const maxLength = 15;
+      const maxLength = 12;
       if (name.length > maxLength) {
         return name.substring(0, maxLength) + '...';
       }
@@ -218,17 +230,52 @@ const Pipeline = () => {
     const startDateFormatted = formatDate(job.StartDate);
     const dueDateFormatted = formatDate(job.DueDate);
 
+
+    const [isHovered, setIsHovered] = useState(false);
+    const handleDelete = (_id) => {
+
+
+
+      const requestOptions = {
+        method: "DELETE",
+        redirect: "follow"
+      };
+
+      fetch('http://127.0.0.1:7550/workflow/jobs/job/' + _id, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to delete item');
+          }
+          return response.json();
+        })
+        .then((result) => {
+          // console.log(result);
+          toast.success('Job deleted successfully');
+          fetchJobData();
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error('Failed to delete item');
+        })
+
+    };
     return (
       <Box className={`job-card ${isDragging ? 'dragging' : ''}`}
         ref={drag}
-
+        onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
         onDrop={updateLastUpdatedTime}
       >
-        <Typography color={'black'}>{job.Account.join(', ')}</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '10px' }}> <Typography color={'black'}>{job.Account.join(', ')}</Typography>
+          {isHovered ? (
+            <RiDeleteBin5Line onClick={() => handleDelete(job.id)} style={{ cursor: 'pointer' }} />
+          ) : (
+            <span className='automation-batch'>1</span>
+          )}</Box>
+
         <Typography sx={{ fontWeight: 'bold', marginBottom: '8px' }} color={'black'}>
           {truncateName(job.Name)}
         </Typography>
-        <Typography color={'black'}  variant="body2" sx={{ marginBottom: '8px' }}>{job.JobAssignee.join(', ')}</Typography>
+        <Typography color={'black'} variant="body2" sx={{ marginBottom: '8px' }}>{job.JobAssignee.join(', ')}</Typography>
         <Typography color={'black'} variant="body2" sx={{ marginBottom: '8px' }}>
           {truncateDescription(stripHtmlTags(job.Description))}
         </Typography>
@@ -276,7 +323,7 @@ const Pipeline = () => {
         ref={drop} className={`stage ${isOver ? 'drag-over' : ''}`}
 
       >
-        <Typography sx={{ marginBottom: '12px',  }} className='stage-name'>
+        <Typography sx={{ marginBottom: '12px', }} className='stage-name'>
           {stage.name}
           {/*    {truncatedStageName} */}
         </Typography>
@@ -344,9 +391,15 @@ const Pipeline = () => {
                 // isClearable
                 className="pipeline-select"
               />
-              <Button variant="outlined" color="primary" onClick={handleBackToPipelineList} sx={{ mt: 2 }}>
-                Back to Pipeline List
-              </Button>
+              <Box display={'flex'} justifyContent={'space-between'} alignItems={'center'}>
+                <Button variant="outlined" color="primary" onClick={handleBackToPipelineList} sx={{ mt: 2 }}>
+                  Back to Pipeline List
+                </Button>
+                <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleDrawerOpen}>
+                  Add Jobs
+                </Button>
+              </Box>
+
             </Box>
             <Box>
 
@@ -356,6 +409,39 @@ const Pipeline = () => {
                 ))}
               </Box>
             </Box>
+            <Drawer
+        anchor='right'
+        open={isDrawerOpen}
+        onClose={handleDrawerClose}
+        PaperProps={{
+          id:'tag-drawer',
+          sx: {
+            borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
+            width: isSmallScreen ? '100%' : 500,
+            maxWidth: '100%',
+            [theme.breakpoints.down('sm')]: {
+              width: '100%',
+            },
+            
+          }
+        }}
+      >
+        <Box sx={{ borderRadius: isSmallScreen ? '0' : '15px' }} role="presentation">
+          <Box>
+            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: "#EEEEEE" }}>
+              <Typography variant="h6" >
+                Create Tag
+              </Typography>
+              <IoClose onClick={handleDrawerClose} style={{ cursor: 'pointer' }} />
+            </Box>
+            <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
+              
+              
+              
+            </Box>
+          </Box>
+        </Box>
+      </Drawer>
           </>
         ) : (
           <>
