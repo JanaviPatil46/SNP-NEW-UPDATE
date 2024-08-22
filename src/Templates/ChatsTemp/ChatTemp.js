@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
@@ -14,30 +14,31 @@ import {
   Paper,
   Grid,
   TextField,
-
-  Select,
-
+  InputLabel,
+  Autocomplete,
   Switch,
   FormControlLabel,
- 
+  Divider,
   List,
   ListItem,
   ListItemText,
   Popover,
+  IconButton
 } from '@mui/material';
 
 import Editor from '../Texteditor/Editor';
-
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { toast } from "react-toastify";
 const ChatTemp = () => {
 
   const [showForm, setShowForm] = useState(false);
-
+  const [selectedShortcut, setSelectedShortcut] = useState('');
   const [isAbsoluteDate, setIsAbsoluteDate] = useState(false);
-
-  const handleDateSwitchChange = (event) => {
-    setIsAbsoluteDate(event.target.checked);
-  };
-
+  // const handleDateSwitchChange = (event) => {
+  //   setIsAbsoluteDate(event.target.checked);
+  //   console.log(event.target.checked)
+  // };
 
   const handleCreateChat = () => {
     setShowForm(true);
@@ -45,6 +46,7 @@ const ChatTemp = () => {
   const handleCloseChatTemp = () => {
     setShowForm(false);
   };
+  const navigate = useNavigate();
   //  for shortcodes
   const [showDropdown, setShowDropdown] = useState(false);
   const [shortcuts, setShortcuts] = useState([]);
@@ -57,10 +59,12 @@ const ChatTemp = () => {
     setShowDropdown(!showDropdown);
   };
 
+ 
+  
   const handleAddShortcut = (shortcut) => {
-    setSubject((prevText) => prevText + `[${shortcut}]`);
+    setInputText((prevText) => prevText + `[${shortcut}]`);
     setShowDropdown(false);
-  };
+};
 
   useEffect(() => {
     // Simulate filtered shortcuts based on some logic (e.g., search)
@@ -148,10 +152,172 @@ const ChatTemp = () => {
       setShortcuts(accountShortcuts);
     }
   }, [selectedOption]);
+console.log(selectedOption)
   const handleCloseDropdown = () => {
     setAnchorEl(null);
   };
+  //Integration 
+  const [chatTemplates, setChatTemplates] = useState([]);
+  const [templateName, setTemplateName] = useState('');
+  const [selecteduser, setSelectedUser] = useState('');
+  const [inputText, setInputText] = useState('');
+  const [userData, setUserData] = useState([]);
+  const [isSendReminders, setIsSendReminders] = useState(false)
+  // const [emailBody, setEmailBody] = useState('');
+  const [daysuntilNextReminder, setDaysuntilNextReminder] = useState();
+  const [noOfReminder, setNoOfReminder] = useState();
+  const [description, setDescription] = useState('');
+  const handlechatsubject = (e) => {
+    const { value } = e.target;
+    setInputText(value);
+};
 
+  const options = userData.map((user) => ({
+    value: user._id,
+    label: user.username,
+  }));
+
+  const handleuserChange = (event, selectedOptions) => {
+    setSelectedUser(selectedOptions);
+
+  };
+  const [sendreminderstoclient, setsendreminderstoclient] = useState(false);
+  const handleDateSwitchChange = (checked) => {
+      setsendreminderstoclient(checked);
+  };
+
+
+  const handleEditorChange = (content) => {
+    setDescription(content);
+  };
+
+
+  const fetchData = async () => {
+    try {
+      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const response = await fetch(url);
+      const data = await response.json();
+      setUserData(data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchChatTemplates = async () => {
+    try {
+      const url = "http://127.0.0.1:7500/Workflow/chats/chattemplate";
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch Chat templates');
+      }
+      const data = await response.json();
+      setChatTemplates(data.chatTemplate);
+
+
+    } catch (error) {
+      console.error('Error fetching Chat templates:', error);
+    }
+
+  };
+  useEffect(() => {
+    fetchChatTemplates();
+  }, []);
+
+  const handleClearTemplate = () => {
+    setTemplateName('');
+    setSelectedUser('');
+    setInputText('');
+    setNoOfReminder('');
+    setIsSendReminders('');
+    setDescription('');
+    setDaysuntilNextReminder('');
+  }
+  //**  save chat code */
+  const savechat = async () => {
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      templatename: templateName,
+      from: selecteduser.value,
+      chatsubject: inputText,
+      description: description,
+      sendreminderstoclient: isAbsoluteDate,
+      daysuntilnextreminder: daysuntilNextReminder,
+      numberofreminders: noOfReminder,
+      clienttasks: ["ghghghghj"],
+      active: "true"
+    });
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+    };
+
+    const url = "http://127.0.0.1:7500/Workflow/chats/chattemplate";
+    fetch(url, requestOptions)
+      .then((response) => {
+        console.log(response)
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log(result.message)
+        // toast.success("Invoice created successfully");
+        if (result && result.message === "ChatTemplate created successfully") {
+          handleClearTemplate();
+          fetchChatTemplates();
+          toast.success("ChatTemplate created successfully");
+          handleCloseChatTemp()
+        } else {
+          toast.error(result.message || "Failed to create Chat Template");
+        }
+      })
+      .catch((error) => console.error(error));
+  }
+
+  //Edit
+  const handleEdit = (_id) => {
+    navigate("chatTemplateUpdate/" + _id);
+  };
+
+  //delete template
+  const handleDelete = (_id) => {
+    const requestOptions = {
+      method: "DELETE",
+      redirect: "follow"
+    };
+
+    // Ensure the URL is correct, with _id appended correctly
+    const url = `http://127.0.0.1:7500/Workflow/chats/chattemplate/${_id}`;
+
+    fetch(url, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to delete item');
+        }
+        return response.text();
+      })
+      .then((result) => {
+        console.log(result);
+        toast.success('Item deleted successfully');
+        fetchChatTemplates();
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error('Failed to delete item');
+      })
+
+  };
+  ;
   return (
     <Container>
       {!showForm ? (
@@ -164,14 +330,31 @@ const ChatTemp = () => {
               <TableHead>
                 <TableRow>
                   <TableCell>Name</TableCell>
+
                   <TableCell>Settings</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
+                {chatTemplates.map((template) => (
+                  <TableRow key={template._id}>
+                    <TableCell>{template.templatename}</TableCell>
+                    <TableCell>
+                      <IconButton
+                        aria-label="edit"
+
+                      >
+                        <EditIcon onClick={() => handleEdit(template._id)} />
+                      </IconButton>
+                      <IconButton
+
+                        aria-label="delete"
+
+                      >
+                        <DeleteIcon onClick={() => handleDelete(template._id)} />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </TableContainer>
@@ -188,37 +371,56 @@ const ChatTemp = () => {
                     <Box>
 
                       <Box>
-                        <label className='chat-input-label'> Name</label>
+                        <InputLabel sx={{ color: 'black' }}> Name</InputLabel>
                         <TextField
+                          value={templateName}
+                          onChange={(e) => setTemplateName(e.target.value)}
 
                           fullWidth
                           name="TemplateName"
                           placeholder="Template Name"
                           size="small"
-                          sx={{ mt: 2 , backgroundColor:'#fff',mb:1}}
+                          sx={{ mt: 2 }}
                         />
                       </Box>
 
                       <Box>
-                      <label className='chat-input-label' >From</label>
-                        <Select
+
+
+                        <InputLabel sx={{ color: 'black' }}>From</InputLabel>
+
+
+                        <Autocomplete
+
+                          options={options}
+                          sx={{ mt: 2, mb: 2 }}
                           size='small'
-                          sx={{ width: '100%', mt: 2 ,backgroundColor:'#fff',mb:1}}
+                          value={selecteduser}
+                          onChange={handleuserChange}
+                          isOptionEqualToValue={(option, value) => option.value === value.value}
+                          getOptionLabel={(option) => option.label || ""}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+
+                              placeholder="Form"
+                            />
+                          )}
+                          isClearable={true}
+
                         />
+
                       </Box>
-
-                      <Box>
-                        <label sx={{ color: 'black' }}>Subject</label>
+                      {/* <Box>
+                        <InputLabel sx={{ color: 'black' }}>Subject</InputLabel>
                         <TextField
-
-                          fullWidth
-                          name="Subject"
-                          value={subject}
-                          onChange={(e) => setSubject(e.target.value)}
-                          placeholder="Subject"
-                          size="small"
-                          sx={{ mt: 2 ,backgroundColor:'#fff',mb:1}}
-                        />
+                                margin="normal"
+                                fullWidth
+                                name="subject"
+                                value={inputText + selectedShortcut} onChange={handlechatsubject}
+                                placeholder="Subject"
+                                size="small"
+                            />
                       </Box>
 
                       <Box>
@@ -226,7 +428,64 @@ const ChatTemp = () => {
                           variant="contained"
                           color="primary"
                           onClick={toggleDropdown}
-                          sx={{ mt: 2 ,}}
+                          sx={{ mt: 2 }}
+                        >
+                          Add Shortcode
+                        </Button>
+
+                        <Popover
+                          open={showDropdown}
+                          anchorEl={anchorEl}
+                          onClose={handleCloseDropdown}
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          }}
+                          transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'left',
+                          }}
+                        >
+                          <Box >
+                            <List className="dropdown-list" sx={{ width: '300px', height: '300px', cursor: 'pointer' }}>
+                              {filteredShortcuts.map((shortcut, index) => (
+                                <ListItem
+                                  key={index}
+                                  onClick={() => handleAddShortcut(shortcut.value)}
+                                >
+                                  <ListItemText
+                                    primary={shortcut.title}
+                                    primaryTypographyProps={{
+                                      style: {
+                                        fontWeight: shortcut.isBold ? 'bold' : 'normal',
+                                      },
+                                    }}
+                                  />
+                                </ListItem>
+                              ))}
+                            </List>
+                          </Box>
+                        </Popover>
+                      </Box> */}
+                      <Box>
+
+                        <InputLabel sx={{ color: 'black' }}>Subject</InputLabel>
+
+                        <TextField
+                          margin="normal"
+                          fullWidth
+                          name="subject"
+                          value={inputText + selectedShortcut} onChange={handlechatsubject}
+                          placeholder="Subject"
+                          size="small"
+                        />
+                      </Box>
+                      <Box>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={toggleDropdown}
+                          sx={{ mt: 2 }}
                         >
                           Add Shortcode
                         </Button>
@@ -267,7 +526,7 @@ const ChatTemp = () => {
                       </Box>
 
                       <Box sx={{ mt: 3, width: '100%' }}>
-                        <Editor />
+                        <Editor onChange={handleEditorChange} />
                       </Box>
 
                       <Box mt={2}>
@@ -276,8 +535,8 @@ const ChatTemp = () => {
                             <FormControlLabel
                               control={
                                 <Switch
-                                  checked={isAbsoluteDate}
-                                  onChange={handleDateSwitchChange}
+                                checked={sendreminderstoclient}
+                                onChange={(event)=>handleDateSwitchChange(event.target.checked)}
                                   color="primary"
                                 />
                               }
@@ -287,33 +546,36 @@ const ChatTemp = () => {
                           <Typography variant='h6'>Send reminders to clients</Typography>
 
                         </Box>
-                        {isAbsoluteDate && (
+                        {sendreminderstoclient && (
                           <Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center',gap:3 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
 
                               <Box>
-                                <label sx={{ color: 'black' }}>Days until next reminder</label>
+                                <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>
                                 <TextField
                                   // margin="normal"
                                   fullWidth
                                   name="Daysuntilnextreminder"
-
+                                  value={daysuntilNextReminder}
+                                  onChange={(e) => setDaysuntilNextReminder(e.target.value)}
                                   placeholder="Days until next reminder"
                                   size="small"
-                                  sx={{ mt: 2 ,backgroundColor:'#fff'}}
+                                  sx={{ mt: 2 }}
                                 />
                               </Box>
 
                               <Box>
-                                <label sx={{ color: 'black' }}>No Of reminders</label>
+                                <InputLabel sx={{ color: 'black' }}>No Of reminders</InputLabel>
                                 <TextField
 
                                   fullWidth
                                   name="No Of reminders"
+                                  // value={noOfReminder}
+                                  onChange={(e) => setNoOfReminder(e.target.value)}
 
                                   placeholder="NoOfreminders"
                                   size="small"
-                                  sx={{ mt: 2 ,backgroundColor:'#fff'}}
+                                  sx={{ mt: 2 }}
                                 />
                               </Box>
 
@@ -325,9 +587,8 @@ const ChatTemp = () => {
                   </Grid>
                   <Grid item xs={12} sm={1} sx={{ display: { xs: 'none', sm: 'block' } }}>
                     <Box
-                    className='vertical-line'
                       sx={{
-                        // borderLeft: '1px solid black',
+                        borderLeft: '1px solid black',
                         height: '100%',
                         margin: '0 20px'
                       }}
@@ -337,9 +598,9 @@ const ChatTemp = () => {
 
                   </Grid>
                 </Grid>
-                <Box mt={2} mb={2}><hr /></Box>
+                <Divider mt={2} />
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Button variant="contained" color="primary">Save</Button>
+                  <Button variant="contained" color="primary" onClick={savechat}>Save</Button>
                   <Button variant="outlined" onClick={handleCloseChatTemp}>Cancel</Button>
                 </Box>
               </Box>

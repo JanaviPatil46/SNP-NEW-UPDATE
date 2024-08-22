@@ -5,12 +5,15 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import axios from 'axios';
 import { useTheme } from '@mui/material/styles';
+import updateJobCard from './updateJobCard'
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { IoClose } from "react-icons/io5";
 import { toast } from 'react-toastify';
-import { Box, Button, CircularProgress,Drawer, TextField, Autocomplete, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Box, Button, CircularProgress, Drawer, TextField, Autocomplete, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 // import Select from 'react-select';
 import { differenceInMinutes, differenceInHours, differenceInDays } from 'date-fns';
+
+import AddJobs from './AddJobs';
 const Pipeline = () => {
   const [pipelineData, setPipelineData] = useState([]);
   const [selectedPipeline, setSelectedPipeline] = useState(null);
@@ -20,6 +23,7 @@ const Pipeline = () => {
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const handleDrawerOpen = () => {
@@ -27,6 +31,12 @@ const Pipeline = () => {
   };
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
+  };
+  const handleEditDrawerOpen = () => {
+    setIsEditDrawerOpen(true);
+  };
+  const handleEditDrawerClose = () => {
+    setIsEditDrawerOpen(false);
   };
 
   useEffect(() => {
@@ -259,20 +269,25 @@ const Pipeline = () => {
         })
 
     };
+    const handleEditJobCard = async (jobid) => {
+      handleEditDrawerOpen();
+    }
+
     return (
       <Box className={`job-card ${isDragging ? 'dragging' : ''}`}
         ref={drag}
         onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}
         onDrop={updateLastUpdatedTime}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '10px' }}> <Typography color={'black'}>{job.Account.join(', ')}</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '10px' }}>
+          <Typography color={'black'}>{job.Account.join(', ')}</Typography>
           {isHovered ? (
             <RiDeleteBin5Line onClick={() => handleDelete(job.id)} style={{ cursor: 'pointer' }} />
           ) : (
             <span className='automation-batch'>1</span>
           )}</Box>
 
-        <Typography sx={{ fontWeight: 'bold', marginBottom: '8px' }} color={'black'}>
+        <Typography sx={{ fontWeight: 'bold', marginBottom: '8px', cursor: 'pointer' }} color={'black'} onClick={() => handleEditJobCard(job.id)}>
           {truncateName(job.Name)}
         </Typography>
         <Typography color={'black'} variant="body2" sx={{ marginBottom: '8px' }}>{job.JobAssignee.join(', ')}</Typography>
@@ -410,38 +425,71 @@ const Pipeline = () => {
               </Box>
             </Box>
             <Drawer
-        anchor='right'
-        open={isDrawerOpen}
-        onClose={handleDrawerClose}
-        PaperProps={{
-          id:'tag-drawer',
-          sx: {
-            borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
-            width: isSmallScreen ? '100%' : 500,
-            maxWidth: '100%',
-            [theme.breakpoints.down('sm')]: {
-              width: '100%',
-            },
-            
-          }
-        }}
-      >
-        <Box sx={{ borderRadius: isSmallScreen ? '0' : '15px' }} role="presentation">
-          <Box>
-            <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: "#EEEEEE" }}>
-              <Typography variant="h6" >
-                Create Tag
-              </Typography>
-              <IoClose onClick={handleDrawerClose} style={{ cursor: 'pointer' }} />
-            </Box>
-            <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
-              
-              
-              
-            </Box>
-          </Box>
-        </Box>
-      </Drawer>
+              anchor='right'
+              open={isDrawerOpen}
+              onClose={handleDrawerClose}
+              PaperProps={{
+                id: 'tag-drawer',
+                sx: {
+                  borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
+                  width: isSmallScreen ? '100%' : 600,
+                  maxWidth: '100%',
+                  [theme.breakpoints.down('sm')]: {
+                    width: '100%',
+                  },
+
+                }
+              }}
+            >
+              <Box sx={{ borderRadius: isSmallScreen ? '0' : '15px' }} role="presentation">
+                <Box>
+                  <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: "#EEEEEE" }}>
+                    <Typography variant="h6" >
+                      Add Job to {selectedPipeline ? selectedPipeline.pipelineName : ''}
+                    </Typography>
+                    <IoClose onClick={handleDrawerClose} style={{ cursor: 'pointer' }} />
+                  </Box>
+                  <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
+
+                    <AddJobs stages={stages} pipelineId={pipelineId} handleDrawerClose={handleDrawerClose} fetchJobData={fetchJobData} />
+
+                  </Box>
+                </Box>
+              </Box>
+            </Drawer>
+            <Drawer
+              anchor='right'
+              open={isEditDrawerOpen}
+              onClose={handleEditDrawerClose}
+              PaperProps={{
+                id: 'tag-drawer',
+                sx: {
+                  borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
+                  width: isSmallScreen ? '100%' : 600,
+                  maxWidth: '100%',
+                  [theme.breakpoints.down('sm')]: {
+                    width: '100%',
+                  },
+
+                }
+              }}
+            >
+              <Box sx={{ borderRadius: isSmallScreen ? '0' : '15px' }} role="presentation">
+                <Box>
+                  <Box style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '15px', background: "#EEEEEE" }}>
+                    <Typography variant="h6" >
+                     Edit job card
+                    </Typography>
+                    <IoClose onClick={handleEditDrawerClose} style={{ cursor: 'pointer' }} />
+                  </Box>
+                  <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
+
+                    <updateJobCard />
+
+                  </Box>
+                </Box>
+              </Box>
+            </Drawer>
           </>
         ) : (
           <>

@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Typography, TextField, label,  Switch, FormControlLabel, Autocomplete } from '@mui/material';
+import { Box, Button, Grid, Typography, TextField, label, Switch, FormControlLabel, Autocomplete } from '@mui/material';
 import React, { useState, useEffect } from 'react';
 import Priority from '../Templates/Priority/Priority';
 import Editor from '../Templates/Texteditor/Editor';
@@ -25,8 +25,8 @@ const CreateJob = () => {
   const [startsInDuration, setStartsInDuration] = useState(null);
   const [dueinduration, setdueinduration] = useState("");
   const [duein, setduein] = useState('');
- 
- 
+
+
   const dayOptions = [
     { label: "Days", value: "Days" },
     { label: "Months", value: "Months" },
@@ -64,7 +64,7 @@ const CreateJob = () => {
   const handleDueDateChange = (date) => {
     setDueDate(date);
   };
-  
+
   //****************Accounts */
   const [accountdata, setaccountdata] = useState([]);
   const [selectedaccount, setSelectedaccount] = useState();
@@ -73,7 +73,7 @@ const CreateJob = () => {
   const handleAccountChange = (event, newValue) => {
     setSelectedaccount(newValue.map((option) => option.value));
     // Map selected options to their values and send as an array
-      console.log("Selected Values:", newValue.map((option) => option.value));
+    console.log("Selected Values:", newValue.map((option) => option.value));
     setCombinedaccountValues(newValue.map((option) => option.value));
   }
 
@@ -99,7 +99,7 @@ const CreateJob = () => {
     label: account.accountName
   }));
   // user
- 
+
   const [userData, setUserData] = useState([]);
   useEffect(() => {
     fetchData();
@@ -133,7 +133,7 @@ const CreateJob = () => {
   //Default Jobt template get 
   const [jobTemp, setJobTemp] = useState([]);
   const [selectedtemp, setselectedTemp] = useState();
- 
+
   const handletemp = async (event, newValue) => {
     setselectedTemp(newValue);
     if (newValue && newValue.value) {
@@ -149,10 +149,10 @@ const CreateJob = () => {
         const jobAssignees = template.jobassignees.map((assignee) => ({
           value: assignee._id,
           label: assignee.username,
-      }));
-      setSelectedUser(jobAssignees);
-      const selectedValues = jobAssignees.map((option) => option.value);
-      setCombinedAssigneesValues(selectedValues);
+        }));
+        setSelectedUser(jobAssignees);
+        const selectedValues = jobAssignees.map((option) => option.value);
+        setCombinedAssigneesValues(selectedValues);
         // setSelecteAssigneesdUser(template.jobassignees.map(assignee => assignee._id));
         setPriority(template.priority);
         console.log(template.priority)
@@ -217,7 +217,7 @@ const CreateJob = () => {
 
   }));
   // console.log("Job Assignees Values:", selectedAssigneesUser);
-  
+
   const createjob = () => {
 
     const myHeaders = {
@@ -253,8 +253,8 @@ const CreateJob = () => {
     axios.request(config)
       .then((response) => {
         console.log("Job created successfully");
-       toast.success('Job created successfully')
-       navigate('/workflow/jobs')
+        toast.success('Job created successfully')
+        navigate('/workflow/jobs')
         // Handle success, e.g., toast or redirect
       })
       .catch((error) => {
@@ -275,7 +275,7 @@ const CreateJob = () => {
               <Grid item xs={12} sm={5} ml={2} className='left-side-container' mt={2}>
                 <Box >
                   <label className='job-input-label'>Accounts</label>
-                 
+
                   <Autocomplete
                     multiple
                     options={accountoptions}
@@ -290,14 +290,14 @@ const CreateJob = () => {
                         {option.label}
                       </Box>
                     )}
-                    renderInput={(params) => <TextField {...params} placeholder="Select Accounts" 
-                    variant="outlined"
-                    size="small" sx={{backgroundColor:'#fff'}}/>}
+                    renderInput={(params) => <TextField {...params} placeholder="Select Accounts"
+                      variant="outlined"
+                      size="small" sx={{ backgroundColor: '#fff' }} />}
                     sx={{ width: '100%', marginTop: '8px' }}
                   />
                 </Box>
                 <Box mt={2}>
-                <label className='job-input-label'>Pipeline</label>
+                  <label className='job-input-label'>Pipeline</label>
 
                   <Autocomplete
                     options={optionpipeline}
@@ -317,7 +317,7 @@ const CreateJob = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        sx={{backgroundColor:'#fff'}}
+                        sx={{ backgroundColor: '#fff' }}
                         placeholder="Pipeline"
                         variant="outlined"
                         size="small"
@@ -328,12 +328,12 @@ const CreateJob = () => {
                   />
                 </Box>
                 <Box mt={2}>
-                <label className='job-input-label'>Template</label>
+                  <label className='job-input-label'>Template</label>
                   <Autocomplete
                     options={optiontemp}
                     getOptionLabel={(option) => option.label}
                     value={selectedtemp}
-                    
+
                     onChange={handletemp}
 
                     isOptionEqualToValue={(option, value) => option.value === value.value}
@@ -349,7 +349,7 @@ const CreateJob = () => {
                     renderInput={(params) => (
                       <TextField
                         {...params}
-                        sx={{backgroundColor:'#fff'}}
+                        sx={{ backgroundColor: '#fff' }}
                         placeholder="Job Template"
                         variant="outlined"
                         size="small"
@@ -360,7 +360,7 @@ const CreateJob = () => {
                   />
                 </Box>
                 <Box mt={2}>
-                <label className='job-input-label'>Name</label>
+                  <label className='job-input-label'>Name</label>
                   <TextField
                     fullWidth
                     value={jobName}
@@ -368,11 +368,11 @@ const CreateJob = () => {
                     margin="normal"
                     size="small"
                     placeholder='Job Name'
-                    sx={{backgroundColor:'#fff'}}
+                    sx={{ backgroundColor: '#fff' }}
                   />
                 </Box>
                 <Box mt={2}>
-                <label className='job-input-label'>Job Assignees</label>
+                  <label className='job-input-label'>Job Assignees</label>
                   <Autocomplete
                     multiple
                     sx={{ marginTop: '8px' }}
@@ -381,7 +381,7 @@ const CreateJob = () => {
                     getOptionLabel={(option) => option.label}
                     value={selectedUser}
                     onChange={handleUserChange}
-                    
+
                     renderOption={(props, option) => (
                       <Box
                         component="li"
@@ -392,18 +392,18 @@ const CreateJob = () => {
                       </Box>
                     )}
                     renderInput={(params) => (
-                      <TextField {...params} variant="outlined" placeholder="Job Assignees" sx={{backgroundColor:'#fff'}} />
+                      <TextField {...params} variant="outlined" placeholder="Job Assignees" sx={{ backgroundColor: '#fff' }} />
                     )}
                     isOptionEqualToValue={(option, value) => option.value === value.value}
                   />
                 </Box>
                 <Box mt={2}>
-                <Priority onPriorityChange={handlePriorityChange}  selectedPriority={priority}/>
+                  <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
 
                 </Box>
                 <Box mt={2}>
-                  
-                  <Editor initialContent={description} onChange={handleEditorChange}/>
+
+                  <Editor initialContent={description} onChange={handleEditorChange} />
                 </Box>
                 <Box mt={2}>
                   <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
@@ -429,7 +429,7 @@ const CreateJob = () => {
                       <Typography>Start Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
-                        sx={{ width: '100%',backgroundColor:'#fff' }}
+                        sx={{ width: '100%', backgroundColor: '#fff' }}
                         // value={startDate}
                         // onChange={handleStartDateChange}
                         value={startDate}
@@ -441,7 +441,7 @@ const CreateJob = () => {
                       <Typography>Due Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
-                        sx={{ width: '100%', backgroundColor:'#fff'}}
+                        sx={{ width: '100%', backgroundColor: '#fff' }}
                         // value={dueDate}
                         // onChange={handleDueDateChange}
                         value={dueDate}
@@ -460,7 +460,7 @@ const CreateJob = () => {
                         margin='normal'
                         fullWidth
                         defaultValue={0}
-                        sx={{ ml: 1 ,backgroundColor:'#fff'}}
+                        sx={{ ml: 1, backgroundColor: '#fff' }}
                         value={startsin}
                         onChange={(e) => setstartsin(e.target.value)}
                       />
@@ -471,14 +471,14 @@ const CreateJob = () => {
                         value={startsInDuration ? dayOptions.find(option => option.value === startsInDuration) : null}
                         onChange={handleStartInDateChange}
                         renderInput={(params) => (
-                          <TextField {...params} variant="outlined" sx={{backgroundColor:'#fff'}}/>
+                          <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} />
                         )}
-                         isOptionEqualToValue={(option, value) => option.value === value.value}
-                            renderOption={(props, option) => (
-                              <Box component="li" {...props} sx={{ cursor: 'pointer', margin: '5px 10px' }}>
-                                {option.label}
-                              </Box>
-                            )}
+                        isOptionEqualToValue={(option, value) => option.value === value.value}
+                        renderOption={(props, option) => (
+                          <Box component="li" {...props} sx={{ cursor: 'pointer', margin: '5px 10px' }}>
+                            {option.label}
+                          </Box>
+                        )}
 
                         // value={dayOptions.find((option) => option.value === startsInDuration) || null}
                         className="job-template-select-dropdown"
@@ -491,10 +491,10 @@ const CreateJob = () => {
                         margin='normal'
                         fullWidth
                         defaultValue={0}
-                        sx={{ ml: 1.5,backgroundColor:'#fff' }}
+                        sx={{ ml: 1.5, backgroundColor: '#fff' }}
                         value={duein}
-                            onChange={(e) => setduein(e.target.value)}
-                        // onChange={(e) => setduein(e.target.value)}
+                        onChange={(e) => setduein(e.target.value)}
+                      // onChange={(e) => setduein(e.target.value)}
                       />
 
                       <Autocomplete
@@ -505,14 +505,14 @@ const CreateJob = () => {
                         onChange={handleDueInDateChange}
                         size='small'
                         renderInput={(params) => (
-                          <TextField {...params} variant="outlined" sx={{backgroundColor:'#fff'}} />
+                          <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} />
                         )}
                         isOptionEqualToValue={(option, value) => option.value === value.value}
-                            renderOption={(props, option) => (
-                              <Box component="li" {...props} sx={{ cursor: 'pointer', margin: '5px 10px' }}>
-                                {option.label}
-                              </Box>
-                            )}
+                        renderOption={(props, option) => (
+                          <Box component="li" {...props} sx={{ cursor: 'pointer', margin: '5px 10px' }}>
+                            {option.label}
+                          </Box>
+                        )}
 
                         // value={dayOptions.find((option) => option.value === dueinduration) || null}
                         className="job-template-select-dropdown"
@@ -524,7 +524,7 @@ const CreateJob = () => {
               </Grid>
               <Grid item xs={12} sm={1} sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <Box
-                className='vertical-line'
+                  className='vertical-line'
                   sx={{
                     // borderLeft: '1px solid black',
                     height: '100%',

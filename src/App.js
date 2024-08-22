@@ -47,7 +47,7 @@ import Proposals from "./nested-navbar/NewPages/Proposals";
 import DashDocs from "./nested-navbar/NewPages/Docs";
 import Communication from "./nested-navbar/NewPages/Commuication";
 import Organizers from "./nested-navbar/NewPages/Organizers";
-import dashInvoices from "./nested-navbar/NewPages/Invoices";
+import AccountInvoice from './nested-navbar/NewPages/Invoices.js'
 import Email from "./nested-navbar/NewPages/Email";
 import Inbox from "./nested-navbar/email-nav/Inbox";
 import Sent from "./nested-navbar/email-nav/Sent";
@@ -61,6 +61,7 @@ import FileRequest from "./nested-navbar/documents-nav/FileRequest";
 import Trash from "./nested-navbar/documents-nav/Trash";
 import IRS from "./nested-navbar/documents-nav/IRS";
 import InvoiceTempUpdate from './Templates/InvoicesTemp/InvoiceTempUpdate.js';
+import ChatTempUpdate from './Templates/ChatsTemp/ChatTempUpdate.js';
 const App = () => {
   return (
 
@@ -92,6 +93,7 @@ const App = () => {
             <Route path='pipelines/PipelineTemplateUpdate/:id' element={<PipelineTempUpdate/>}/>
             <Route path='folders' element={<FolderTemp />} />
             <Route path='chats' element={<ChatTemp />} />
+            <Route path='chats/chatTemplateUpdate/:id' element={<ChatTempUpdate/>}/>
             <Route path='sms' element={<SMSTemp />} />
             <Route path='invoices' element={<InvoiceTemp />} />
             <Route path='invoices/invoiceTempUpdate/:id' element={<InvoiceTempUpdate />} />
@@ -118,7 +120,7 @@ const App = () => {
             </Route>
             <Route path="communication/:data" element={<Communication />} />
             <Route path="organizers/:data" element={<Organizers />} />
-            <Route path="invoices/:data" element={<dashInvoices />}>
+            <Route path="invoices/:data" element={<AccountInvoice/>}>
               <Route path="invoice" element={<Invoice />} />
               <Route path="payments" element={<Payments />} />
             </Route>
