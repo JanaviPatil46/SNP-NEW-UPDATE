@@ -33,6 +33,9 @@ import EditCalendarRoundedIcon from '@mui/icons-material/EditCalendarRounded';
 dayjs.extend(customParseFormat);
 
 const JobTemp = () => {
+  const JOBS_API = process.env.REACT_APP_JOBS_TEMP_URL;
+  const USER_API = process.env.REACT_APP_USER_URL;
+
   const navigate = useNavigate();
   const [templatename, settemplatename] = useState("");
   const [priority, setPriority] = useState('');
@@ -208,7 +211,7 @@ const JobTemp = () => {
 
   const fetchData = async () => {
     try {
-      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const url = `${USER_API}/api/auth/users`;
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
@@ -236,7 +239,7 @@ const JobTemp = () => {
   }, []);
   const fetchJobTemplatesData = async () => {
     try {
-      const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate';
+      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
 
       const response = await fetch(url);
       if (!response.ok) {
@@ -286,7 +289,7 @@ const JobTemp = () => {
         body: raw,
         redirect: "follow",
       };
-      const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate';
+      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
       fetch(url, requestOptions)
         .then((response) => {
           if (!response.ok) {
@@ -332,7 +335,7 @@ const JobTemp = () => {
         body: raw,
         redirect: "follow",
       };
-      const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate';
+      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
       fetch(url, requestOptions)
         .then((response) => {
           if (!response.ok) {
@@ -368,7 +371,7 @@ const JobTemp = () => {
       method: "DELETE",
       redirect: "follow",
     };
-    const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate/';
+    const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate/`;
     fetch(url + _id, requestOptions)
       .then((response) => {
         if (!response.ok) {
@@ -389,32 +392,8 @@ const JobTemp = () => {
 
   };
 
-  // const [anchorEl, setAnchorEl] = useState(null);
-  // const open = Boolean(anchorEl);
-
-
-
-  // const handleClose = () => {
-  //   setAnchorEl(null);
-  // };
-  // const [currentTemplateId, setCurrentTemplateId] = useState(null);
-
-  // const handleClick = (event, templateId) => {
-  //   setAnchorEl(event.currentTarget);
-  //   setCurrentTemplateId(templateId);
-  // };
-  const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-  const [selectedTemplateId, setSelectedTemplateId] = useState(null);
-  const openMenu = Boolean(menuAnchorEl);
-  const handleClickMenu = (event, templateId) => {
-    setSelectedTemplateId(templateId);
-    setMenuAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setMenuAnchorEl(null);
-    setSelectedTemplateId(null);
-  };
+  
+ 
 
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -616,8 +595,7 @@ const JobTemp = () => {
                       <DatePicker
                         format="DD/MM/YYYY"
                         sx={{ width: '100%', backgroundColor: '#fff' }}
-                        // value={startDate}
-                        // onChange={handleStartDateChange}
+                       
                         selected={startDate} onChange={handleStartDateChange}
                         renderInput={(params) => <TextField {...params} size="small" />}
                       />

@@ -5,7 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import axios from 'axios';
 import { useTheme } from '@mui/material/styles';
-import updateJobCard from './updateJobCard'
+import EditJobCard from './updateJobCard'
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { IoClose } from "react-icons/io5";
 import { toast } from 'react-toastify';
@@ -15,6 +15,11 @@ import { differenceInMinutes, differenceInHours, differenceInDays } from 'date-f
 
 import AddJobs from './AddJobs';
 const Pipeline = () => {
+
+  const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
+  const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
+
+
   const [pipelineData, setPipelineData] = useState([]);
   const [selectedPipeline, setSelectedPipeline] = useState(null);
   const [selectedPipelineOption, setSelectedPipelineOption] = useState(null);
@@ -47,7 +52,7 @@ const Pipeline = () => {
   const fetchPipelineData = async () => {
     setLoading(true);
     try {
-      const url = 'http://127.0.0.1:7500/workflow/pipeline/pipelines';
+      const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
       const response = await fetch(url);
       const data = await response.json();
       setPipelineData(data.pipeline);
@@ -61,7 +66,7 @@ const Pipeline = () => {
 
   const fetchJobData = async () => {
     try {
-      const url = 'http://127.0.0.1:7550/workflow/jobs/job/joblist/list';
+      const url = `${JOBS_API}/workflow/jobs/job/joblist/list`;
       const response = await fetch(url);
       const data = await response.json();
       console.log('Job Data:', data); // Log the response to inspect it
@@ -74,7 +79,7 @@ const Pipeline = () => {
 
   const fetchStages = async (pipelineId) => {
     try {
-      const url = `http://127.0.0.1:7500/workflow/pipeline/pipeline/${pipelineId}`;
+      const url = `${PIPELINE_API}/workflow/pipeline/pipeline/${pipelineId}`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch stages');
@@ -133,7 +138,7 @@ const Pipeline = () => {
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: `http://127.0.0.1:7550/workflow/jobs/job/jobpipeline/updatestageid/${item.id}`,
+      url: `${JOBS_API}/workflow/jobs/job/jobpipeline/updatestageid/${item.id}`,
       headers: { 'Content-Type': 'application/json' },
       data: data
     };
@@ -251,7 +256,7 @@ const Pipeline = () => {
         redirect: "follow"
       };
 
-      fetch('http://127.0.0.1:7550/workflow/jobs/job/' + _id, requestOptions)
+      fetch(`${JOBS_API}/workflow/jobs/job/` + _id, requestOptions)
         .then((response) => {
           if (!response.ok) {
             throw new Error('Failed to delete item');
@@ -332,15 +337,15 @@ const Pipeline = () => {
     const stageJobs = jobs.filter(job => job.Pipeline === selectedPipeline.pipelineName && job.Stage.includes(stage.name));
     const [displayCount, setDisplayCount] = useState(3);
     const displayedJobs = stageJobs.slice(0, displayCount);
-    // const truncatedStageName = stage.name.length > 10 ? `${stage.name.slice(0, 10)}...` : stage.name;
+    const truncatedStageName = stage.name.length > 20 ? `${stage.name.slice(0, 20)}...` : stage.name;
     return (
       <Box
         ref={drop} className={`stage ${isOver ? 'drag-over' : ''}`}
 
       >
         <Typography sx={{ marginBottom: '12px', }} className='stage-name'>
-          {stage.name}
-          {/*    {truncatedStageName} */}
+          {/* {stage.name} */}
+             {truncatedStageName}
         </Typography>
         <Typography variant="body2" sx={{ marginBottom: '12px' }} >
           {stageJobs.length > 0 && <span>({stageJobs.length})</span>}
@@ -449,7 +454,7 @@ const Pipeline = () => {
                     </Typography>
                     <IoClose onClick={handleDrawerClose} style={{ cursor: 'pointer' }} />
                   </Box>
-                  <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
+                  <Box >
 
                     <AddJobs stages={stages} pipelineId={pipelineId} handleDrawerClose={handleDrawerClose} fetchJobData={fetchJobData} />
 
@@ -484,7 +489,7 @@ const Pipeline = () => {
                   </Box>
                   <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
 
-                    <updateJobCard />
+                    <EditJobCard />
 
                   </Box>
                 </Box>

@@ -25,12 +25,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 const ChatTempUpdate = () => {
 
+    const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
+  const USER_API = process.env.REACT_APP_USER_URL;
    
     const [selectedShortcut, setSelectedShortcut] = useState('');
-    const [sendreminderstoclient, setsendreminderstoclient] = useState(false);
-    const handleDateSwitchChange = (checked) => {
-        setsendreminderstoclient(checked);
-    };
+    // const [sendreminderstoclient, setsendreminderstoclient] = useState(false);
+    // const handleDateSwitchChange = (checked) => {
+    //     setsendreminderstoclient(checked);
+    // };
+    const [absoluteDate, setAbsoluteDates] = useState(false);
+  const handleAbsolutesDates = (checked) => {
+    setAbsoluteDates(checked);
+  };
 
  
     const handleCloseChatTemp = () => {
@@ -145,16 +151,16 @@ const ChatTempUpdate = () => {
     };
     //Integration 
     const { id } = useParams();
-    const [chatTemplates, setChatTemplates] = useState([]);
+    // const [chatTemplates, setChatTemplates] = useState([]);
     const [templateName, setTemplateName] = useState('');
     const [selecteduser, setSelectedUser] = useState('');
     const [inputText, setInputText] = useState('');
     const [userData, setUserData] = useState([]);
-    const [isSendReminders, setIsSendReminders] = useState(false)
+
     const [daysuntilNextReminder, setDaysuntilNextReminder] = useState();
     const [noOfReminder, setNoOfReminder] = useState();
     const [description, setDescription] = useState('');
-    // const [sendreminderstoclient,setSendreminderstoclient]=useState('');
+    
     const handlechatsubject = (e) => {
         const { value } = e.target;
         setInputText(value);
@@ -172,9 +178,6 @@ const ChatTempUpdate = () => {
     
 
 
-    // const handleEditorChange = (content) => {
-    //     setDescription(content);
-    // };
 
     const handleEditorChange = (content) => {
         setDescription(content);
@@ -182,7 +185,7 @@ const ChatTempUpdate = () => {
    
     const fetchData = async () => {
         try {
-            const url = 'http://127.0.0.1:8080/api/auth/users';
+            const url = `${USER_API}/api/auth/users`;
             const response = await fetch(url);
             const data = await response.json();
             setUserData(data);
@@ -191,11 +194,13 @@ const ChatTempUpdate = () => {
         }
     };
 
-    
+    useEffect(() => {
+        fetchData();
+      }, []);
   
     const fetchChatTemplate = async () => {
         try {
-            const url = `http://127.0.0.1:7500/workflow/chats/chattemplate/chattemplateList/${id}`;
+            const url = `${CHAT_API}/workflow/chats/chattemplate/chattemplateList/${id}`;
             const response = await fetch(url);
             const result = await response.json();
     
@@ -207,12 +212,12 @@ const ChatTempUpdate = () => {
                     value: chatTemplate.from._id
                 });
             }
-            setIsSendReminders(chatTemplate.sendreminderstoclient)
+            setAbsoluteDates(chatTemplate.sendreminderstoclient)
             console.log(chatTemplate.sendreminderstoclient)
             setTemplateName(chatTemplate.templatename) ;
             setInputText(chatTemplate.chatsubject);
             setDescription(chatTemplate.description);
-            // setIsSendReminders(chatTemplate.sendreminderstoclient);
+            
             setDaysuntilNextReminder(chatTemplate.daysuntilnextreminder);
             setNoOfReminder(chatTemplate.numberofreminders);
         } catch (error) {
@@ -225,61 +230,6 @@ const ChatTempUpdate = () => {
     }, [id]);
 
 
-     //**  save chat code */
-    //  const savechat = async () => {
-      
-    //     const myHeaders = new Headers();
-    //     myHeaders.append("Content-Type", "application/json");
-
-    //     const raw = JSON.stringify({
-    //         templatename:  templateName,
-    //         from: selecteduser.value,
-    //         chatsubject: inputText,
-    //         description: description,
-    //         sendreminderstoclient: isSendReminders,
-    //         daysuntilnextreminder: daysuntilNextReminder,
-    //         numberofreminders: noOfReminder,
-    //         clienttasks: ["ghghghghj"],
-    //         active: "true"
-    //     });
-
-    //     const requestOptions = {
-    //         method: "PATCH",
-    //         headers: myHeaders,
-    //         body: raw,
-    //         redirect: "follow"
-    //     };
-
-    //     const url = "http://127.0.0.1:7500/Workflow/chats/chattemplate";
-    //     fetch(url + _id, requestOptions)
-        
-
-    //     fetch(url, requestOptions)
-    //         .then((response) => {
-    //             console.log(response)
-    //             if (!response.ok) {
-    //                 throw new Error(response.statusText);
-    //             }
-    //             return response.json();
-    //         })
-    //         .then((result) => {
-    //             console.log(result.message)
-               
-                
-    //             if (result && result.message === "ChatTemplate Updated successfully") {
-    //                 toast.success("ChatTemplate updated successfully");
-    //                 navigate("/firmtemp/templates/chats")
-    //                 setTimeout(() => {
-    //                     window.location.reload();
-                      
-    //                 }, 1000);
-                    
-    //             } else {
-    //                 toast.error(result.message || "Failed to create Chat Template");
-    //             }
-    //         })
-    //         .catch((error) => console.error(error));
-    // }
 
     const savechat = async () => {
         const myHeaders = new Headers();
@@ -290,7 +240,7 @@ const ChatTempUpdate = () => {
             from: selecteduser.value,
             chatsubject: inputText,
             description: description,
-            sendreminderstoclient: isSendReminders,
+            sendreminderstoclient: absoluteDate,
             daysuntilnextreminder: daysuntilNextReminder,
             numberofreminders: noOfReminder,
             clienttasks: ["ghghghghj"],
@@ -304,7 +254,7 @@ const ChatTempUpdate = () => {
             redirect: "follow"
         };
     
-        const url = "http://127.0.0.1:7500/Workflow/chats/chattemplate/" + id;
+        const url = `${CHAT_API}/Workflow/chats/chattemplate/` + id;
         
         fetch(url, requestOptions)
             .then((response) => {
@@ -357,7 +307,7 @@ const ChatTempUpdate = () => {
                                             />
                                         </Box>
 
-                                        <Box>
+                                        <Box mt={2}>
 
 
                                             <InputLabel sx={{ color: 'black' }}>From</InputLabel>
@@ -456,9 +406,10 @@ const ChatTempUpdate = () => {
                                                     <FormControlLabel
                                                         control={
                                                             <Switch
-                                                            checked={sendreminderstoclient}
-                                                            onChange={(event) => handleDateSwitchChange(event.target.checked)}
-                                                            value={sendreminderstoclient}
+                                                            // checked={sendreminderstoclient}
+                                                            // onChange={(event) => handleDateSwitchChange(event.target.checked)}
+                                                            checked={absoluteDate}
+                                                            onChange={(event) => handleAbsolutesDates(event.target.checked)}
                                                             color="primary"
                                                         />
                                                         }
@@ -468,9 +419,9 @@ const ChatTempUpdate = () => {
                                                 <Typography variant='h6'>Send reminders to clients</Typography>
 
                                             </Box>
-                                            {sendreminderstoclient && (
-                                                <Box>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                            {absoluteDate && (
+                                                <Box mb={3} >
+                                                    <Box sx={{mt:2, display: 'flex', alignItems: 'center', gap: 3 }}>
 
                                                         <Box>
                                                             <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>

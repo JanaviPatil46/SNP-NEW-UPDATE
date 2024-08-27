@@ -24,6 +24,9 @@ import { toast } from 'react-toastify';
 import { RxCross2 } from "react-icons/rx";
 const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
+    const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
+    const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+
     const navigate = useNavigate();
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -132,7 +135,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
             body: raw,
             redirect: "follow",
         };
-        const url = 'http://127.0.0.1:7000/contacts/';
+        const url =`${CONTACT_API}/contacts/`;
         fetch(url, requestOptions)
             .then((response) => {
                 if (!response.ok) {
@@ -196,7 +199,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     const fetchData = async () => {
         try {
 
-            const url = 'http://127.0.0.1:7500/tags/';
+            const url = `${TAGS_API}/tags/`;
 
             const response = await fetch(url);
             const data = await response.json();
@@ -239,7 +242,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
             alignItems: "center",
             textAlign: "center",
             padding: "2px,8px",
-            fontSize: '10px',
+            fontSize: '15px',
             cursor: 'pointer',
         },
     }));

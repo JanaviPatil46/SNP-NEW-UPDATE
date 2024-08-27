@@ -9,6 +9,10 @@ import {  toast } from 'react-toastify';
 import { useNavigate, useParams } from "react-router-dom";
 import Section from './organizertempSection';
 const OrganizersTempUpdate = () => {
+
+  const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
+
+
   const { id  } = useParams();
   const navigate = useNavigate();
 
@@ -24,7 +28,7 @@ const OrganizersTempUpdate = () => {
 
   const fetchidwiseData = async () => {
       try {
-        const url = `http://127.0.0.1:7600/workflow/organizers/organizertemplate/${id}`;
+        const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${id}`;
           const response = await fetch(url);
           if (!response.ok) {
               throw new Error("Failed to fetch data");
@@ -107,7 +111,7 @@ const OrganizersTempUpdate = () => {
     };
 
     console.log(raw)
-    const url = `http://127.0.0.1:7600/workflow/organizers/organizertemplate/${id}`;
+    const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${id}`;
     fetch(url, requestOptions)
         .then((response) => response.json())
         .then((result) => {
@@ -123,6 +127,9 @@ const OrganizersTempUpdate = () => {
         .catch((error) => console.error(error));
 };
 
+const handleBackButton = ()=>{
+  navigate('/firmtemp/templates/organizers');
+}
   return (
     <>
       <Box>
@@ -209,7 +216,7 @@ const OrganizersTempUpdate = () => {
           type="button"
           variant="outlined"
           color="primary"
-
+onClick={handleBackButton}
         >
           Cancel
         </Button>

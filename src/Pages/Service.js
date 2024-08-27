@@ -1,5 +1,5 @@
 
-import { Box, FormControlLabel, Button, Autocomplete, InputLabel, TextField, Divider,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
+import { Box, FormControlLabel, Button, Autocomplete, InputLabel, TextField,IconButton, Divider,Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material'
 import React, { useState, useEffect } from 'react';
 import Drawer from '@mui/material/Drawer';
 import { useTheme, useMediaQuery, Typography } from '@mui/material';
@@ -8,10 +8,14 @@ import Grid from '@mui/material/Unstable_Grid2';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { RxCross2 } from "react-icons/rx";
 import { toast } from 'react-toastify';
-
-
+import { useNavigate } from "react-router-dom";
+import {MaterialReactTable,useMaterialReactTable} from 'material-react-table';
+import { CiMenuKebab } from "react-icons/ci";
 const Service = () => {
 
+    const SERVICE_API = process.env.REACT_APP_SERVICES_URL;
+    const CATEGORY_API = process.env.REACT_APP_CATEGORY_URL;
+    const navigate = useNavigate();
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
     const [isNewDrawerOpen, setIsNewDrawerOpen] = useState(false);
@@ -63,7 +67,7 @@ const Service = () => {
     const fetchData = async () => {
         try {
             // const url = `${API_KEY}/common/user/`;
-            const url = 'http://127.0.0.1:7500/workflow/category/categorys';
+            const url = `${CATEGORY_API}/workflow/category/categorys`;
             const response = await fetch(url);
             const data = await response.json();
             console.log(data)
@@ -91,7 +95,7 @@ const Service = () => {
             body: raw,
             redirect: "follow"
         };
-        const url = 'http://127.0.0.1:7500/workflow/category/newcategory';
+        const url = `${CATEGORY_API}/workflow/category/newcategory`;
         fetch(url, requestOptions)
             .then((response) => response.json())
             .then((result) => {
@@ -132,7 +136,7 @@ const Service = () => {
           body: raw,
           redirect: "follow"
         };
-        const url ='http://127.0.0.1:7500/workflow/services/servicetemplate';
+        const url =`${SERVICE_API}/workflow/services/servicetemplate`;
         fetch(url, requestOptions)
           .then((response) => response.json())
           .then((result) => {
@@ -170,7 +174,7 @@ const Service = () => {
     
       const fetchServicesData = async () => {
         try {
-          const url = 'http://127.0.0.1:7500/workflow/services/servicetemplate' ;
+          const url = `${SERVICE_API}/workflow/services/servicetemplate` ;
     
           const response = await fetch(url);
           if (!response.ok) {
@@ -178,38 +182,101 @@ const Service = () => {
           }
           const data = await response.json();
           setServiceTemplates(data.serviceTemplate);
-          console.log(data);
+         
         } catch (error) {
           console.error("Error fetching service templates:", error);
         }
       };
+      const [tempIdget, setTempIdGet] = useState("");
+      const [openMenuId, setOpenMenuId] = useState(null);
+      const toggleMenu = (_id) => {
+        setOpenMenuId(openMenuId === _id ? null : _id);
+        setTempIdGet(_id);
+      };
+      const handleEdit = (_id) => {
+
+        navigate("/servicesUpdate/" + _id);
+      };
+      //delete template
+      const handleDelete = (_id) => {
+        const requestOptions = {
+            method: "DELETE",
+            redirect: "follow",
+          };
+          const url = `${SERVICE_API}/workflow/services/servicetemplate/` ;
+          fetch(url + _id, requestOptions)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Failed to delete item");
+              }
+              return response.json();
+            })
+            .then((result) => {
+              console.log(result);
+              toast.success("Item deleted successfully");
+              fetchServicesData()
+            })
+            .catch((error) => {
+              console.error(error);
+              toast.error("Failed to delete item");
+            })
+    
+      };
+      const columns = [
+        {
+          accessorKey: 'serviceName', // Access the template name
+          header: 'Name',
+        },
+        {
+          accessorKey: 'settings', // Add settings column
+          header: 'Settings',
+          Cell: ({ row }) => (
+            <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+              <CiMenuKebab style={{ fontSize: "25px" }} />
+              {openMenuId === row.original._id && (
+                <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+                  <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
+                    handleEdit(row.original._id);
+                   
+                  }} >Edit</Typography>
+                  <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
+                </Box>
+              )}
+            </IconButton>
+    
+          ),
+        },
+      ];
+      const table = useMaterialReactTable({
+        columns,
+        data:ServiceTemplates,
+        enableBottomToolbar: true,
+        enableStickyHeader: true,
+        columnFilterDisplayMode: "custom", // Render own filtering UI
+        enableRowSelection: true, // Enable row selection
+        enablePagination: true,
+        muiTableContainerProps: { sx: { maxHeight: "400px" } },
+        initialState: {
+          columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+        },
+        muiTableBodyCellProps: {
+          sx: (theme) => ({
+            backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+          }),
+        },
+      });
     return (
         <Box>
-            <Button onClick={setIsNewDrawerOpen} variant="contained" color="primary" >
+            <Button onClick={setIsNewDrawerOpen} variant="contained" color="primary" sx={{ mb: 3 }}>
                 Create Service
             </Button>
             <Box>
-            <TableContainer component={Paper} sx={{ mt: 2 }}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Service Name</TableCell>
-                           
-                            <TableCell >Settings</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                    {ServiceTemplates.map((template) => (
-                    <TableRow key={template._id}>
-                      <TableCell>{template.serviceName}</TableCell>
-                      <TableCell>
-                       
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
+           
+            <MaterialReactTable
+            columns={columns}
+            
+            table={table}
+          />
             </Box>
             <Drawer
                 anchor="right"

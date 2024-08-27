@@ -24,6 +24,10 @@ import { useNavigate, useParams } from "react-router-dom";
 
 
 const PipelineTempUpdate = () => {
+  const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
+  const JOBS_API = process.env.REACT_APP_JOBS_TEMP_URL;
+  const USER_API = process.env.REACT_APP_USER_URL;
+  const SORTJOBS_API = process.env.REACT_APP_SORTJOBS_URL;
   const { id } = useParams();
   const theme = useTheme();
   const navigate = useNavigate();
@@ -43,7 +47,7 @@ const PipelineTempUpdate = () => {
 
   const fetchSortByJob = async () => {
     try {
-      const url = 'http://127.0.0.1:7500/sortjobs/sortjobby';
+      const url = `${SORTJOBS_API}/sortjobs/sortjobby`;
       const response = await fetch(url);
       const data = await response.json();
       setSortbyJobs(data.sortJobsBy);
@@ -128,7 +132,7 @@ const PipelineTempUpdate = () => {
 
   const fetchData = async () => {
     try {
-      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const url = `${USER_API}/api/auth/users`;
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
@@ -164,7 +168,7 @@ const PipelineTempUpdate = () => {
 
   const fetchtemp = async () => {
     try {
-      const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate';
+      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
       const response = await fetch(url);
       const data = await response.json();
       setDefaultTemp(data.JobTemplates);
@@ -188,7 +192,7 @@ const PipelineTempUpdate = () => {
   const fetchPipelineData = async () => {
     try {
 
-      const url = 'http://127.0.0.1:7500/workflow/pipeline/pipelines';
+      const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch pipeline data');
@@ -231,7 +235,7 @@ const PipelineTempUpdate = () => {
       body: raw,
       redirect: "follow",
     };
-    const url = `http://127.0.0.1:7500/workflow/pipeline/pipeline/${id}`;
+    const url = `${PIPELINE_API}/workflow/pipeline/pipeline/${id}`;
     fetch(url, requestOptions)
       .then((response) => {
         if (!response.ok) {
@@ -253,7 +257,7 @@ const PipelineTempUpdate = () => {
   useEffect(() => {
     const fetchPipelineData = async () => {
       try {
-        const url = `http://127.0.0.1:7500/workflow/pipeline/pipeline/pipelinelist/${id}`;
+        const url = `${PIPELINE_API}/workflow/pipeline/pipeline/pipelinelist/${id}`;
         const response = await fetch(url);
         if (!response.ok) {
           throw new Error("Failed to fetch pipeline data");

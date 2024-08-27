@@ -14,6 +14,9 @@ import { useNavigate } from "react-router-dom";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { CiMenuKebab } from "react-icons/ci";
 const OrganizersTemp = () => {
+
+const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
+
   const navigate = useNavigate();
 
   const [templateName, setTemplateName] = useState('');
@@ -105,7 +108,7 @@ const OrganizersTemp = () => {
       redirect: "follow"
     };
 
-    const url = 'http://127.0.0.1:7600/workflow/organizers/organizertemplate';
+    const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
@@ -125,7 +128,7 @@ const OrganizersTemp = () => {
   const [organizerTemplatesData, setOrganizerTemplatesData] = useState([]);
   const fetchOrganizerTemplates = async () => {
     try {
-      const url = 'http://127.0.0.1:7600/workflow/organizers/organizertemplate';
+      const url =`${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch email templates');
@@ -152,7 +155,7 @@ const OrganizersTemp = () => {
       method: "DELETE",
       redirect: "follow"
     };
-    const url = 'http://127.0.0.1:7600/workflow/organizers/organizertemplate/';
+    const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/`;
     fetch(url + _id, requestOptions)
       .then((response) => {
         if (!response.ok) {
@@ -271,9 +274,9 @@ const OrganizersTemp = () => {
             </Box>
 
           </Box>
-          <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%" }}>
-            <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "315px" }}>
-              <Box className="smooth-dnd-container vertical">
+          <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%",gap:3 }}>
+            <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "315px" ,overflowY:'auto',p:2}}>
+              <Box className="smooth-dnd-container vertical" >
                 {sections.map((section) => (
                   <Box key={section.id} sx={{ display: "flex", alignItems: "center" }}>
                     <TextField
@@ -311,7 +314,7 @@ const OrganizersTemp = () => {
               )}
             </Box>
           </Box>
-          <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px" }}>
+          <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px",marginTop:'20px' }}>
             <Button
               type="submit"
               variant="contained"

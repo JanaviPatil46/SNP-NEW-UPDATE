@@ -27,6 +27,11 @@ import Status from '../Status/Status';
 import dayjs from 'dayjs';
 
 const Tasks = () => {
+
+    const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
+    const USER_API = process.env.REACT_APP_USER_URL;
+    const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+
       const navigate = useNavigate();
     const { _id } = useParams();
     const [tempNameNew, setTempNameNew] = useState("");
@@ -35,7 +40,7 @@ const Tasks = () => {
     const [AssigneesNew, setAssigneesNew] = useState([]);
     const [absoluteDate, setAbsoluteDates] = useState(false);
     const [priority, setPriority] = useState('');
-    const [statusNew, setStatusNew] = useState('');
+    const [status, setStatus] = useState('');
     const [StartsDateNew, setStartsDateNew] = useState(null);
     const [DueDateNew, setDueDateNew] = useState(null);
     const [StartsInDurationNew, setStartsInDurationNew] = useState();
@@ -65,9 +70,9 @@ const Tasks = () => {
     const handlePriorityChange = (priority) => {
         setPriority(priority);
     };
-    const handleStatusChange = (statusNew) => {
-        setStatusNew(statusNew);
-        console.log(statusNew)
+    const handleStatusChange = (status) => {
+        setStatus(status);
+        console.log(status)
     };
     // const [description, setDescription] = useState('');
     const handleEditorChange = (content) => {
@@ -85,7 +90,7 @@ const Tasks = () => {
 
     const fetchData = async () => {
         try {
-            const url = 'http://127.0.0.1:8080/api/auth/users';
+            const url = `${USER_API}/api/auth/users`;
             const response = await fetch(url);
             const data = await response.json();
             setUserData(data);
@@ -119,7 +124,7 @@ const Tasks = () => {
   const fetchTagData = async () => {
     try {
 
-      const url = 'http://127.0.0.1:7500/tags/';
+      const url = `${TAGS_API}/tags/`;
 
       const response = await fetch(url);
       const data = await response.json();
@@ -184,7 +189,7 @@ const handleTagChange = (event, newValue) => {
     //get id wise template Record
     const fetchidwiseData = async () => {
         try {
-            const url = 'http://127.0.0.1:7500/workflow/tasks/tasktemplate/tasktemplatebyid/';
+            const url = `${TASK_API}/workflow/tasks/tasktemplate/tasktemplatebyid/`;
             const response = await fetch(url + _id);
             if (!response.ok) {
                 throw new Error("Failed to fetch data");
@@ -265,8 +270,8 @@ const handleTagChange = (event, newValue) => {
     const tempallvalue = () => {
         if (tempvalues) {
             setTempNameNew(tempvalues.templatename || '');
-            setStatusNew(tempvalues.status || '');
-            console.log(tempvalues.status)
+            setStatus(tempvalues.status || '');
+         
             setTaskDescription(tempvalues.description || '');
             setPriority(tempvalues.priority || '');
             setStartsInNew(tempvalues.startsin || '');
@@ -287,7 +292,7 @@ const handleTagChange = (event, newValue) => {
     
         const raw = JSON.stringify({
           templatename: tempNameNew,
-          status: statusNew,
+          status: status.value,
        
           tasktags: combinedTagsValues,
           taskassignees: combinedValues,
@@ -312,7 +317,7 @@ const handleTagChange = (event, newValue) => {
           body: raw,
           redirect: "follow",
         };
-        const url = 'http://127.0.0.1:7500/workflow/tasks/tasktemplate/';
+        const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
         fetch(url + _id, requestOptions)
           .then((response) => {
             if (!response.ok) {
@@ -321,7 +326,7 @@ const handleTagChange = (event, newValue) => {
             return response.text();
           })
           .then((result) => {
-            toast.success("Job Template updated successfully");
+            toast.success("Task Template updated successfully");
             navigate("/firmtemp/templates/tasks")
             
           })
@@ -367,7 +372,7 @@ const handleTagChange = (event, newValue) => {
                                                 </Grid>
                                                 <Grid item xs={12} sm={6}>
                                                     <Box>
-                                                        <Status onStatusChange={handleStatusChange} selectedStatus={statusNew} />
+                                                        <Status onStatusChange={handleStatusChange} selectedStatus={status} />
                                                     </Box>
                                                 </Grid>
                                             </Grid>

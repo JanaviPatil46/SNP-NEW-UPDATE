@@ -62,6 +62,7 @@ import Trash from "./nested-navbar/documents-nav/Trash";
 import IRS from "./nested-navbar/documents-nav/IRS";
 import InvoiceTempUpdate from './Templates/InvoicesTemp/InvoiceTempUpdate.js';
 import ChatTempUpdate from './Templates/ChatsTemp/ChatTempUpdate.js';
+import ServicesUpdate from './Pages/ServiceUpdate.js';
 const App = () => {
   return (
 
@@ -105,6 +106,8 @@ const App = () => {
           </Route>
           <Route path='/firmtemp/teammember' element={<TeamMember/>}/>
           <Route path='/firmtemp/services' element={<Services/>}/>
+          {/* <Route path='/firmtemp/services/ServicesUpdate/:id' element={ServicesUpdate}/> */}
+          <Route path='/servicesUpdate/:id' element={<ServicesUpdate/>}/>
           <Route path='/settings/myaccount' element={<MyAccount/>}/>
 
           <Route path="/accountsdash" element={<AccountDash />}>

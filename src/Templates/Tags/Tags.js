@@ -11,6 +11,9 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { toast } from 'react-toastify';
 
 const Tags = () => {
+  
+  const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+
   const [tags, setTags] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isUpdateDrawerOpen, setIsUpdateDrawerOpen] = useState(false);
@@ -32,7 +35,7 @@ const Tags = () => {
 
   const fetchData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:7500/tags/');
+      const response = await fetch(`${TAGS_API}/tags/`);
       const data = await response.json();
       setTags(data.tags);
     } catch (error) {
@@ -79,7 +82,7 @@ const Tags = () => {
   const handleEdit = async (_id) => {
     setGetId(_id);
     setOpenMenuId(false);
-    const response = await fetch('http://127.0.0.1:7500/tags/' + _id);
+    const response = await fetch(`${TAGS_API}/tags/` + _id);
     if (!response.ok) {
       throw new Error('Failed to fetch job data');
     }
@@ -98,6 +101,7 @@ const Tags = () => {
 
   const handleInputChange = (inputValue) => {
     setInputValue(inputValue);
+    console.log(inputValue)
     const newOptions = generateOptions(inputValue);
     setOptions(newOptions);
 
@@ -109,8 +113,9 @@ const Tags = () => {
       }
     }
   };
+  
 
-  console.log(tagid);
+
   console.log(tagidget);
   const handleDelete = (_id) => {
     setGetId(_id);
@@ -119,7 +124,7 @@ const Tags = () => {
       method: "DELETE",
       redirect: "follow"
     };
-    fetch('http://127.0.0.1:7500/tags/' + _id, requestOptions)
+    fetch(`${TAGS_API}/tags/` + _id, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to delete tagdata');
@@ -171,7 +176,7 @@ const Tags = () => {
       body: raw,
       redirect: "follow",
     };
-    fetch('http://127.0.0.1:7500/tags/', requestOptions)
+    fetch(`${TAGS_API}/tags/`, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         if (result && result.message === "Tag with this TagName already exists") {
@@ -189,8 +194,8 @@ const Tags = () => {
 
   const handleUpdatesumbit = () => {
     if (selectedOption) {
-      const { tagName, tagColour } = selectedOption;
-      UpdatedTag(tagName, tagColour);
+      const {  tagColour } = selectedOption;
+      UpdatedTag(inputValue, tagColour);
     }
   };
 
@@ -207,7 +212,7 @@ const Tags = () => {
       body: raw,
       redirect: "follow"
     };
-    fetch('http://127.0.0.1:7500/tags/' + getId, requestOptions)
+    fetch(`${TAGS_API}/tags/` + getId, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

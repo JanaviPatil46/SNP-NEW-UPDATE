@@ -27,18 +27,19 @@ import {
 } from '@mui/material';
 
 import Editor from '../Texteditor/Editor';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { CiMenuKebab } from "react-icons/ci";
 import { toast } from "react-toastify";
+import {MaterialReactTable,useMaterialReactTable} from 'material-react-table';
 const ChatTemp = () => {
+
+  const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
+  const USER_API = process.env.REACT_APP_USER_URL;
+ 
 
   const [showForm, setShowForm] = useState(false);
   const [selectedShortcut, setSelectedShortcut] = useState('');
-  const [isAbsoluteDate, setIsAbsoluteDate] = useState(false);
-  // const handleDateSwitchChange = (event) => {
-  //   setIsAbsoluteDate(event.target.checked);
-  //   console.log(event.target.checked)
-  // };
+ 
+ 
 
   const handleCreateChat = () => {
     setShowForm(true);
@@ -52,7 +53,7 @@ const ChatTemp = () => {
   const [shortcuts, setShortcuts] = useState([]);
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
   const [selectedOption, setSelectedOption] = useState('contacts');
-  const [subject, setSubject] = useState('');
+ 
   const [anchorEl, setAnchorEl] = useState(null);
   const toggleDropdown = (event) => {
     setAnchorEl(event.currentTarget);
@@ -162,7 +163,7 @@ console.log(selectedOption)
   const [selecteduser, setSelectedUser] = useState('');
   const [inputText, setInputText] = useState('');
   const [userData, setUserData] = useState([]);
-  const [isSendReminders, setIsSendReminders] = useState(false)
+  
   // const [emailBody, setEmailBody] = useState('');
   const [daysuntilNextReminder, setDaysuntilNextReminder] = useState();
   const [noOfReminder, setNoOfReminder] = useState();
@@ -181,11 +182,15 @@ console.log(selectedOption)
     setSelectedUser(selectedOptions);
 
   };
-  const [sendreminderstoclient, setsendreminderstoclient] = useState(false);
-  const handleDateSwitchChange = (checked) => {
-      setsendreminderstoclient(checked);
-  };
+  // const [sendreminderstoclient, setsendreminderstoclient] = useState(false);
+  // const handleDateSwitchChange = (checked) => {
+  //     setsendreminderstoclient(checked);
+  // };
 
+  const [absoluteDate, setAbsoluteDates] = useState(false);
+  const handleAbsolutesDates = (checked) => {
+    setAbsoluteDates(checked);
+  };
 
   const handleEditorChange = (content) => {
     setDescription(content);
@@ -194,7 +199,7 @@ console.log(selectedOption)
 
   const fetchData = async () => {
     try {
-      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const url =  `${USER_API}/api/auth/users`;
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
@@ -208,7 +213,7 @@ console.log(selectedOption)
 
   const fetchChatTemplates = async () => {
     try {
-      const url = "http://127.0.0.1:7500/Workflow/chats/chattemplate";
+      const url = `${CHAT_API}/Workflow/chats/chattemplate`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch Chat templates');
@@ -231,7 +236,7 @@ console.log(selectedOption)
     setSelectedUser('');
     setInputText('');
     setNoOfReminder('');
-    setIsSendReminders('');
+ 
     setDescription('');
     setDaysuntilNextReminder('');
   }
@@ -246,7 +251,7 @@ console.log(selectedOption)
       from: selecteduser.value,
       chatsubject: inputText,
       description: description,
-      sendreminderstoclient: isAbsoluteDate,
+      sendreminderstoclient: absoluteDate,
       daysuntilnextreminder: daysuntilNextReminder,
       numberofreminders: noOfReminder,
       clienttasks: ["ghghghghj"],
@@ -260,7 +265,7 @@ console.log(selectedOption)
       redirect: "follow"
     };
 
-    const url = "http://127.0.0.1:7500/Workflow/chats/chattemplate";
+    const url = `${CHAT_API}/Workflow/chats/chattemplate`;
     fetch(url, requestOptions)
       .then((response) => {
         console.log(response)
@@ -297,14 +302,14 @@ console.log(selectedOption)
     };
 
     // Ensure the URL is correct, with _id appended correctly
-    const url = `http://127.0.0.1:7500/Workflow/chats/chattemplate/${_id}`;
+    const url = `${CHAT_API}/Workflow/chats/chattemplate/${_id}`;
 
     fetch(url, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to delete item');
         }
-        return response.text();
+        return response.json();
       })
       .then((result) => {
         console.log(result);
@@ -317,15 +322,73 @@ console.log(selectedOption)
       })
 
   };
-  ;
+  const [tempIdget, setTempIdGet] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const toggleMenu = (_id) => {
+    setOpenMenuId(openMenuId === _id ? null : _id);
+    setTempIdGet(_id);
+  };
+
+  const columns = [
+    {
+      accessorKey: 'templatename', // Access the template name
+      header: 'Name',
+    },
+    {
+      accessorKey: 'settings', // Add settings column
+      header: 'Settings',
+      Cell: ({ row }) => (
+        // <>
+        //   <IconButton aria-label="edit" onClick={() => handleEdit(row.original._id)}>
+        //     <EditIcon />
+        //   </IconButton>
+        //   <IconButton aria-label="delete" onClick={() => handleDelete(row.original._id)}>
+        //     <DeleteIcon />
+        //   </IconButton>
+        // </>
+        <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+          <CiMenuKebab style={{ fontSize: "25px" }} />
+          {openMenuId === row.original._id && (
+            <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+              <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
+                handleEdit(row.original._id);
+               
+              }} >Edit</Typography>
+              <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
+            </Box>
+          )}
+        </IconButton>
+
+      ),
+    },
+  ];
+
+  const table = useMaterialReactTable({
+    columns,
+    data:chatTemplates,
+    enableBottomToolbar: true,
+    enableStickyHeader: true,
+    columnFilterDisplayMode: "custom", // Render own filtering UI
+    enableRowSelection: true, // Enable row selection
+    enablePagination: true,
+    muiTableContainerProps: { sx: { maxHeight: "400px" } },
+    initialState: {
+      columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+    },
+    muiTableBodyCellProps: {
+      sx: (theme) => ({
+        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+      }),
+    },
+  });
   return (
     <Container>
       {!showForm ? (
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={handleCreateChat}>
+          <Button variant="contained" color="primary" onClick={handleCreateChat} sx={{ mb: 3 }}>
             Create Chat Template
           </Button>
-          <TableContainer component={Paper} sx={{ mt: 2 }}>
+          {/* <TableContainer component={Paper} sx={{ mt: 2 }}>
             <Table>
               <TableHead>
                 <TableRow>
@@ -357,7 +420,12 @@ console.log(selectedOption)
                 ))}
               </TableBody>
             </Table>
-          </TableContainer>
+          </TableContainer> */}
+          <MaterialReactTable
+            columns={columns}
+            
+            table={table}
+          />
         </Box>
       ) : (
         <Box sx={{ mt: 2 }}>
@@ -384,7 +452,7 @@ console.log(selectedOption)
                         />
                       </Box>
 
-                      <Box>
+                      <Box mt={2}>
 
 
                         <InputLabel sx={{ color: 'black' }}>From</InputLabel>
@@ -411,62 +479,7 @@ console.log(selectedOption)
                         />
 
                       </Box>
-                      {/* <Box>
-                        <InputLabel sx={{ color: 'black' }}>Subject</InputLabel>
-                        <TextField
-                                margin="normal"
-                                fullWidth
-                                name="subject"
-                                value={inputText + selectedShortcut} onChange={handlechatsubject}
-                                placeholder="Subject"
-                                size="small"
-                            />
-                      </Box>
-
-                      <Box>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={toggleDropdown}
-                          sx={{ mt: 2 }}
-                        >
-                          Add Shortcode
-                        </Button>
-
-                        <Popover
-                          open={showDropdown}
-                          anchorEl={anchorEl}
-                          onClose={handleCloseDropdown}
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          }}
-                          transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                          }}
-                        >
-                          <Box >
-                            <List className="dropdown-list" sx={{ width: '300px', height: '300px', cursor: 'pointer' }}>
-                              {filteredShortcuts.map((shortcut, index) => (
-                                <ListItem
-                                  key={index}
-                                  onClick={() => handleAddShortcut(shortcut.value)}
-                                >
-                                  <ListItemText
-                                    primary={shortcut.title}
-                                    primaryTypographyProps={{
-                                      style: {
-                                        fontWeight: shortcut.isBold ? 'bold' : 'normal',
-                                      },
-                                    }}
-                                  />
-                                </ListItem>
-                              ))}
-                            </List>
-                          </Box>
-                        </Popover>
-                      </Box> */}
+                     
                       <Box>
 
                         <InputLabel sx={{ color: 'black' }}>Subject</InputLabel>
@@ -535,8 +548,10 @@ console.log(selectedOption)
                             <FormControlLabel
                               control={
                                 <Switch
-                                checked={sendreminderstoclient}
-                                onChange={(event)=>handleDateSwitchChange(event.target.checked)}
+                                checked={absoluteDate}
+                                onChange={(event) => handleAbsolutesDates(event.target.checked)}
+                                // checked={sendreminderstoclient}
+                                // onChange={(event)=>handleDateSwitchChange(event.target.checked)}
                                   color="primary"
                                 />
                               }
@@ -546,9 +561,9 @@ console.log(selectedOption)
                           <Typography variant='h6'>Send reminders to clients</Typography>
 
                         </Box>
-                        {sendreminderstoclient && (
-                          <Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        {absoluteDate && (
+                          <Box mb={3}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 ,mt:2}}>
 
                               <Box>
                                 <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>

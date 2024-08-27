@@ -1062,6 +1062,11 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from "react-toastify";
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
+
+  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+  const USER_API = process.env.REACT_APP_USER_URL;
+  const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+
   const theme = useTheme();
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -1099,7 +1104,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
   const fetchUserData = async () => {
     try {
-      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const url = `${USER_API}/api/auth/users`;
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
@@ -1157,7 +1162,7 @@ useEffect(() => {
 const fetchData = async () => {
     try {
 
-        const url = 'http://127.0.0.1:7500/tags/';
+        const url = `${TAGS_API}/tags/`;
 
         const response = await fetch(url);
         const data = await response.json();
@@ -1228,7 +1233,7 @@ const tagsOptions = tags.map((tag) => ({
         body: raw,
         redirect: "follow",
       };
-      const url = 'http://127.0.0.1:7000/accounts/accountdetails';
+      const url = `${ACCOUNT_API}/accounts/accountdetails`;
       fetch(url, requestOptions)
         .then((response) => response.json())
 
@@ -1266,7 +1271,7 @@ const tagsOptions = tags.map((tag) => ({
         body: raw,
         redirect: "follow",
       };
-      const url = 'http://127.0.0.1:7000/accounts/accountdetails';
+      const url = `${ACCOUNT_API}/accounts/accountdetails`;
       fetch(url, requestOptions)
         .then((response) => response.json())
         .then((result) => {
@@ -1275,6 +1280,7 @@ const tagsOptions = tags.map((tag) => ({
           // window.location.reload();
           handleDrawerClose();
           handleNewDrawerClose();
+          navigate('/clients/accounts');
         })
         .catch((error) => {
           console.error(error); // Log the error
@@ -1458,7 +1464,7 @@ const tagsOptions = tags.map((tag) => ({
 
                         <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>
 
-                        <Autocomplete
+                        {/* <Autocomplete
                           multiple
                           options={tagsOptions}
                           getOptionLabel={(option) => option.label}
@@ -1484,7 +1490,40 @@ const tagsOptions = tags.map((tag) => ({
                             <TextField {...params} variant="outlined" size="small" />
                           )}
                           sx={{ width: '100%', marginTop: '8px' }}
-                        />
+                        /> */}
+                          <Autocomplete
+                        multiple
+                        size='small'
+                        id="tags-outlined"
+                        options={tagsOptions}
+                        getOptionLabel={(option) => option.label}
+                        value={tagsOptions.filter(option => selectedTags.includes(option.value))}
+                        onChange={handleTagChange}
+                        renderTags={(selected, getTagProps) =>
+                            selected.map((option, index) => (
+                                <Chip
+                                    key={option.value}
+                                    label={option.label}
+                                    style={option.customTagStyle}
+                                    {...getTagProps({ index })}
+                                />
+                            ))
+                        }
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                variant="outlined"
+
+                                placeholder="Tags"
+                                sx={{ width: '100%', marginTop: '8px' }}
+                            />
+                        )}
+                        renderOption={(props, option) => (
+                            <Box component="li" {...props} style={option.customStyle}>
+                                {option.label}
+                            </Box>
+                        )}
+                    />
 
                       </Box>
 
@@ -1604,7 +1643,7 @@ const tagsOptions = tags.map((tag) => ({
             </Box>
           )}
         </Box>
-
+{/* 
         <Box sx={{ p: 2 }}>
           {selectedOption === 'Contact Info' && (
             <Box>
@@ -1614,7 +1653,7 @@ const tagsOptions = tags.map((tag) => ({
              
             </Box>
           )}
-        </Box>
+        </Box> */}
 
 
       </Box>

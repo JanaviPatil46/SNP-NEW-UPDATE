@@ -24,6 +24,12 @@ import { CiMenuKebab } from "react-icons/ci";
 import EditorShortcodes from '../Texteditor/EditorShortcodes';
 
 const EmailTemp = () => {
+   
+
+    const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
+  const USER_API = process.env.REACT_APP_USER_URL;
+
+
     const navigate = useNavigate();
     const [showForm, setShowForm] = useState(false);
     const [inputText, setInputText] = useState('');
@@ -35,9 +41,7 @@ const EmailTemp = () => {
     const [selectedOption, setSelectedOption] = useState('contacts');
 
     const [anchorEl, setAnchorEl] = useState(null);
-    const [menuAnchorEl, setMenuAnchorEl] = useState(null);
-    const [selectedTemplateId, setSelectedTemplateId] = useState(null);
-    const openMenu = Boolean(menuAnchorEl);
+   
     const handleCreateTemplate = () => {
         setShowForm(true); // Show the form when button is clicked
     };
@@ -162,7 +166,7 @@ const EmailTemp = () => {
 
     const fetchData = async () => {
         try {
-            const url = 'http://127.0.0.1:8080/api/auth/users';
+            const url = `${USER_API}/api/auth/users`;
             const response = await fetch(url);
             const data = await response.json();
             setUserData(data);
@@ -199,7 +203,7 @@ const EmailTemp = () => {
             body: raw,
             redirect: "follow"
         };
-        const url = 'http://127.0.0.1:7500/workflow/emailtemplate';
+        const url = `${EMAIL_API}/workflow/emailtemplate`;
         fetch(url, requestOptions)
             .then((response) => {
                 if (!response.ok) {
@@ -219,7 +223,7 @@ const EmailTemp = () => {
             });
     }
     const [emailBody, setEmailBody] = useState('');
-
+  
     const handleEditorChange = (content) => {
         setEmailBody(content);
     };
@@ -233,7 +237,7 @@ const EmailTemp = () => {
     const [emailTemplates, setEmailTemplates] = useState([]);
     const fetchEmailTemplates = async () => {
         try {
-            const url = 'http://127.0.0.1:7500/workflow/emailtemplate';
+            const url = `${EMAIL_API}/workflow/emailtemplate/`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error('Failed to fetch email templates');
@@ -266,13 +270,13 @@ const EmailTemp = () => {
             method: 'DELETE',
             redirect: 'follow',
         };
-        const url = 'http://127.0.0.1:7500/workflow/emailtemplate/';
+        const url = `${EMAIL_API}/workflow/emailtemplate/`;
         fetch(url + _id, requestOptions)
             .then((response) => {
                 if (!response.ok) {
                     throw new Error('Failed to delete item');
                 }
-                return response.text();
+                return response.json();
             })
             .then((result) => {
                 toast.success('Data deleted successfully');
@@ -349,45 +353,14 @@ const EmailTemp = () => {
     });
     return (
         <Container>
+      
             {!showForm ? (
                 <Box sx={{ mt: 2 }}>
                     <Button variant="contained" color="primary" onClick={handleCreateTemplate} sx={{mb:3}}>
                         Create Template
                     </Button>
                     <MaterialReactTable columns={columns} table={table} />
-                    {/* <TableContainer component={Paper} sx={{ mt: 2 }}>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Name</TableCell>
-                                    <TableCell>Subject</TableCell>
-                                    <TableCell>Used in Pipelines</TableCell>
-                                    <TableCell>Settings</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-
-                                {emailTemplates.map((template) => (
-                                    <TableRow key={template._id}>
-                                        <TableCell>{template.templatename}</TableCell>
-                                        <TableCell>{template.emailsubject}</TableCell>
-                                        <TableCell></TableCell>
-                                        <TableCell>
-                                            <PiDotsThreeOutlineVerticalLight onClick={(e) => handleClickMenu(e, template._id)} />
-                                            <Menu
-                                                anchorEl={menuAnchorEl}
-                                                open={openMenu}
-                                                onClose={handleCloseMenu}
-                                            >
-                                                <MenuItem onClick={handleEdit}>Edit</MenuItem>
-                                                <MenuItem onClick={handleDelete}>Delete</MenuItem>
-                                            </Menu>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer> */}
+                    
                 </Box>
             ) : (
                 <Box

@@ -46,7 +46,7 @@ function Sidebar() {
   useEffect(() => {
     const fetchSidebarData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:9000/api/");
+        const response = await axios.get("http://68.251.138.236:9000/api/");
         setSidebarItems(response.data);
       } catch (error) {
         console.error("Error fetching sidebar data:", error);
@@ -60,7 +60,7 @@ function Sidebar() {
     if (isDrawerOpen) {
       const fetchNewSidebarData = async () => {
         try {
-          const response = await axios.get("http://127.0.0.1:9000/newsidebar/");
+          const response = await axios.get("http://68.251.138.236:9000/newsidebar/");
           setNewSidebarItems(response.data);
         } catch (error) {
           console.error("Error fetching new sidebar data:", error);

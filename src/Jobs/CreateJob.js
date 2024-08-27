@@ -13,6 +13,13 @@ import axios from 'axios';
 // Initialize the plugin
 dayjs.extend(customParseFormat);
 const CreateJob = () => {
+
+  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+const JOBS_API = process.env.REACT_APP_ADD_JOBS_URL;
+const JOBS_TEMP_API = process.env.REACT_APP_JOBS_TEMP_URL;
+const USER_API = process.env.REACT_APP_USER_URL;
+const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
+
   // State to keep track of selected values
   const navigate = useNavigate();
   const [description, setDescription] = useState('');
@@ -85,7 +92,7 @@ const CreateJob = () => {
 
   const fetchAccountData = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:7000/accounts/accountdetails');
+      const response = await fetch(`${ACCOUNT_API}/accounts/accountdetails`);
       const data = await response.json();
       setaccountdata(data.accounts);
     } catch (error) {
@@ -107,7 +114,7 @@ const CreateJob = () => {
 
   const fetchData = async () => {
     try {
-      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const url = `${USER_API}/api/auth/users`;
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
@@ -139,7 +146,7 @@ const CreateJob = () => {
     if (newValue && newValue.value) {
       const templateId = newValue.value;
       try {
-        const response = await fetch(`http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate/jobtemplatelist/${templateId}`);
+        const response = await fetch(`${JOBS_TEMP_API}/workflow/jobtemplate/jobtemplate/jobtemplatelist/${templateId}`);
         const data = await response.json();
         const template = data.jobTemplate;
 
@@ -176,7 +183,7 @@ const CreateJob = () => {
 
   const fetchtemp = async () => {
     try {
-      const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate';
+      const url = `${JOBS_TEMP_API}/workflow/jobtemplate/jobtemplate`;
       const response = await fetch(url);
       const data = await response.json();
       setJobTemp(data.JobTemplates);
@@ -203,7 +210,7 @@ const CreateJob = () => {
   }, []);
   const fetchPipelineData = async () => {
     try {
-      const url = 'http://127.0.0.1:7500/workflow/pipeline/pipelines';
+      const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
       const response = await fetch(url);
       const data = await response.json();
       setPipelineData(data.pipeline);
@@ -245,7 +252,7 @@ const CreateJob = () => {
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'http://127.0.0.1:7550/workflow/jobs/newjob',
+      url: `${JOBS_API}/workflow/jobs/newjob`,
       headers: myHeaders,
       data: JSON.stringify(data)
     };

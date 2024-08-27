@@ -4,8 +4,7 @@ import { AiOutlinePlusCircle } from 'react-icons/ai';
 import { CiDiscount1 } from 'react-icons/ci';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { RiCloseLine } from 'react-icons/ri';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+
 import { toast } from "react-toastify";
 import Select from 'react-select'
 import {
@@ -14,17 +13,17 @@ import {
   Typography,
   Container,
   Table,
-  TableContainer,
+
   TableHead,
   TableBody,
   TableRow,
   TableCell,
   IconButton,
-  Paper,
+
   Grid,
   TextField,
   InputLabel,
- 
+  Autocomplete,
   Switch,
   FormControlLabel,
   Divider,
@@ -37,8 +36,13 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import { CiMenuKebab } from "react-icons/ci";
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import CreatableSelect from 'react-select/creatable';
 const InvoiceTemp = () => {
+
+  const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL
+  const SERVICE_API = process.env.REACT_APP_SERVICES_URL
   const navigate = useNavigate();
 
   const theme = useTheme();
@@ -57,22 +61,22 @@ const InvoiceTemp = () => {
     { value: 'Credit Card or Bank Debits', label: 'Credit Card or Bank Debits' }
   ];
 
- 
-// add row
-const [rows, setRows] = useState([
-  { productName: '', description: '', rate: '$0.00', qty: '1', amount: '$0.00', tax: false, isDiscount: false }
-]);
-const addRow = (isDiscountRow = false) => {
-  const newRow = isDiscountRow
-    ? { productName: '', description: '', rate: '$-10.00', qty: '1', amount: '$-10.00', tax: false, isDiscount: true }
-    : { productName: '', description: '', rate: '$0.00', qty: '1', amount: '$0.00', tax: false, isDiscount: false };
-  setRows([...rows, newRow]);
-};
-const deleteRow = (index) => {
-  const newRows = [...rows];
-  newRows.splice(index, 1);
-  setRows(newRows);
-};
+
+  // add row
+  const [rows, setRows] = useState([
+    { productName: '', description: '', rate: '$0.00', qty: '1', amount: '$0.00', tax: false, isDiscount: false }
+  ]);
+  const addRow = (isDiscountRow = false) => {
+    const newRow = isDiscountRow
+      ? { productName: '', description: '', rate: '$-10.00', qty: '1', amount: '$-10.00', tax: false, isDiscount: true }
+      : { productName: '', description: '', rate: '$0.00', qty: '1', amount: '$0.00', tax: false, isDiscount: false };
+    setRows([...rows, newRow]);
+  };
+  const deleteRow = (index) => {
+    const newRows = [...rows];
+    newRows.splice(index, 1);
+    setRows(newRows);
+  };
 
 
   //  for shortcodes
@@ -202,41 +206,41 @@ const deleteRow = (index) => {
     };
   };
 
-  
- 
 
-   //Integration
 
-   const handleEdit = (_id) => {
+
+  //Integration
+
+  const handleEdit = (_id) => {
     navigate("invoiceTempUpdate/" + _id);
   };
-    //get all templateName Record 
+  //get all templateName Record 
   const [invoiceTemplates, setInvoiceTemplates] = useState([]);
 
 
 
   const fetchInvoiceTemplates = async () => {
-          try {
+    try {
 
-        const url = 'http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate';
+      const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate`;
 
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Failed to fetch InvoiceTemplate');
-        }
-        const data = await response.json();
-        setInvoiceTemplates(data.invoiceTemplate);
-        console.log(data);
-      } catch (error) {
-        console.error('Error fetching Invoice Templates:', error);
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch InvoiceTemplate');
       }
-};
+      const data = await response.json();
+      setInvoiceTemplates(data.invoiceTemplate);
+      console.log(data);
+    } catch (error) {
+      console.error('Error fetching Invoice Templates:', error);
+    }
+  };
 
-useEffect(() => {
-  fetchInvoiceTemplates();
-}, []);
+  useEffect(() => {
+    fetchInvoiceTemplates();
+  }, []);
 
-  
+
 
   console.log(invoiceTemplates);
 
@@ -274,7 +278,7 @@ useEffect(() => {
       redirect: "follow"
     };
 
-    const url = "http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate";
+    const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate`;
     fetch(url, requestOptions)
       .then((response) => {
         console.log(response)
@@ -303,15 +307,12 @@ useEffect(() => {
       });
   }
   const [templatename, setTemplatename] = useState();
-  
+
   const [paymentMode, setPaymentMode] = useState('');
-  // const handlePaymentOptionChange = (event) => {
-  //   setPaymentMode(event.target.value);
-  //   console.log(event.target.value)
-  // };
-  const handlePaymentOptionChange = (selectedOption) => {
+
+  const handlePaymentOptionChange = (event, selectedOption) => {
     setPaymentMode(selectedOption);
-};
+  };
   const [emailToClient, setEmailToClient] = useState(false)
   const handleEmailToClient = (event) => {
     setEmailToClient(event.target.checked);
@@ -336,8 +337,8 @@ useEffect(() => {
   const [totalAmount, setTotalAmount] = useState(0);
 
   const [servicedata, setServiceData] = useState([]);
-const[daysNextReminder,setDaysNextReminder]=useState();
-const[numOfReminder,setnumOfReminder]=useState();
+  const [daysNextReminder, setDaysNextReminder] = useState();
+  const [numOfReminder, setnumOfReminder] = useState();
 
   useEffect(() => {
     const calculateSubtotal = () => {
@@ -360,7 +361,7 @@ const[numOfReminder,setnumOfReminder]=useState();
       redirect: "follow",
     };
 
-    const url = `http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate/${_id}`;
+    const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/${_id}`;
 
     fetch(url, requestOptions)
       .then((response) => {
@@ -389,7 +390,7 @@ const[numOfReminder,setnumOfReminder]=useState();
   }, []);
   const fetchServiceData = async () => {
     try {
-      const url = 'http://127.0.0.1:7500/workflow/services/servicetemplate';
+      const url = `${SERVICE_API}/workflow/services/servicetemplate`;
       const response = await fetch(url);
       const data = await response.json();
       console.log(data.serviceTemplate)
@@ -408,7 +409,7 @@ const[numOfReminder,setnumOfReminder]=useState();
       method: "GET",
       redirect: "follow"
     };
-    const url = `http://127.0.0.1:7500/workflow/services/servicetemplate/${id}`;
+    const url = `${SERVICE_API}/workflow/services/servicetemplate/${id}`;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
@@ -538,46 +539,75 @@ const[numOfReminder,setnumOfReminder]=useState();
     setClientmsg('');
     setselectedService('');
   }
+  const [tempIdget, setTempIdGet] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const toggleMenu = (_id) => {
+    setOpenMenuId(openMenuId === _id ? null : _id);
+    setTempIdGet(_id);
+  };
+  const columns = [
+    {
+      accessorKey: 'templatename', // Access the template name
+      header: 'Name',
+    },
+    {
+      accessorKey: 'settings', // Add settings column
+      header: 'Settings',
+      Cell: ({ row }) => (
+        // <>
+        //   <IconButton aria-label="edit" onClick={() => handleEdit(row.original._id)}>
+        //     <EditIcon />
+        //   </IconButton>
+        //   <IconButton aria-label="delete" onClick={() => handleDelete(row.original._id)}>
+        //     <DeleteIcon />
+        //   </IconButton>
+        // </>
+        <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+          <CiMenuKebab style={{ fontSize: "25px" }} />
+          {openMenuId === row.original._id && (
+            <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+              <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
+                handleEdit(row.original._id);
+
+              }} >Edit</Typography>
+              <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
+            </Box>
+          )}
+        </IconButton>
+      ),
+    },
+  ];
+  const table = useMaterialReactTable({
+    columns,
+    data: invoiceTemplates,
+    enableBottomToolbar: true,
+    enableStickyHeader: true,
+    columnFilterDisplayMode: "custom", // Render own filtering UI
+    enableRowSelection: true, // Enable row selection
+    enablePagination: true,
+    muiTableContainerProps: { sx: { maxHeight: "400px" } },
+    initialState: {
+      columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+    },
+    muiTableBodyCellProps: {
+      sx: (theme) => ({
+        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+      }),
+    },
+  });
   return (
     <Container>
       {!showForm ? (
         <Box sx={{ mt: 2 }}>
-          <Button variant="contained" color="primary" onClick={handleCreateInvoiceTemp}>
+          <Button variant="contained" color="primary" onClick={handleCreateInvoiceTemp} sx={{ mb: 3 }}>
             Create Invoice Template
           </Button>
-          <TableContainer component={Paper} sx={{ mt: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
 
-                  <TableCell>Settings</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {invoiceTemplates.map((template) => (
-                  <TableRow key={template._id}>
-                    <TableCell>{template.templatename}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="edit"
+          <MaterialReactTable
+            columns={columns}
 
-                      >
-                        <EditIcon onClick={() => handleEdit(template._id)} />
-                      </IconButton>
-                      <IconButton
-
-                        aria-label="delete"
-
-                      >
-                        <DeleteIcon onClick={() => handleDelete(template._id)} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+            table={table}
+          />
         </Box>
       ) : (
         <Box sx={{ mt: 2 }}>
@@ -587,7 +617,7 @@ const[numOfReminder,setnumOfReminder]=useState();
                 <Typography variant='h5' gutterBottom>Create Invoice Template</Typography>
                 <Box mt={2} mb={2}><hr /></Box>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={3}>
+                  <Grid item xs={12} sm={5.8} mt={2}>
                     <Box>
 
                       <Box>
@@ -668,101 +698,99 @@ const[numOfReminder,setnumOfReminder]=useState();
 
                       <Box>
                         <InputLabel sx={{ color: 'black', mt: 2 }}>Choose payment method</InputLabel>
-                        {/* <Select
-                          size='small'
-                          sx={{ width: '100%', mt: 2 }}
-                          value={paymentMode}
+
+                        <Autocomplete
+                        size='small'
+                        fullWidth
+                        sx={{mt:2}}
+                          options={paymentsOptions}
+                          getOptionLabel={(option) => option?.label || ''}
                           onChange={handlePaymentOptionChange}
-                        >
-                          {paymentsOptions.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                              {option.label}
-                            </MenuItem>
-                          ))}
-                        </Select> */}
-                        <Select options={paymentsOptions}
-                            onChange={handlePaymentOptionChange}
-                            value={paymentMode}
+                          value={paymentMode}
+                          renderInput={(params) => (
+                            <TextField {...params} placeholder="Select Payment Mode" variant="outlined" />
+                          )}
+                          isOptionEqualToValue={(option, value) => option.value === value?.value}
+                          clearOnEscape
                         />
-                        
                       </Box>
 
 
-                        <Box mt={2}>
-                          <FormControlLabel
-                            control={
-                              <Switch
-                                onChange={handleEmailToClient}
-                                checked={emailToClient}
-                                color="primary"
-                              />
-                            }
-                            label={"Send email to client when invioce created"}
-                          />
-                          {emailToClient && (
-                            <> 
+                      <Box mt={2}>
+                        <FormControlLabel
+                          control={
+                            <Switch
+                              onChange={handleEmailToClient}
+                              checked={emailToClient}
+                              color="primary"
+                            />
+                          }
+                          label={"Send email to client when invioce created"}
+                        />
+                        {emailToClient && (
+                          <>
                             <Box mt={2}>
                               <TextField
-                               
+
                                 variant="outlined"
                                 fullWidth
                                 value={clientmsg}
                                 onChange={(e) => setClientmsg(e.target.value)}
-                                // setClientmsg
+                              // setClientmsg
                               />
                             </Box>
 
-                            
-                      <Box>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={toggleSwitchDropdown}
-                          sx={{ mt: 2 }}
-                        >
-                          Add Shortcode
-                        </Button>
 
-                        <Popover
-                          open={showSwitchDropdown}
-                          anchorEl={switchanchorEl}
-                          onClose={handleCloseDropdown}
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
-                          }}
-                          transformOrigin={{
-                            vertical: 'top',
-                            horizontal: 'left',
-                          }}
-                        >
-                          <Box >
-                            <List className="dropdown-list" sx={{ width: '300px', height: '300px', cursor: 'pointer' }}>
-                              {switchfilteredShortcuts.map((shortcut, index) => (
-                                <ListItem
-                                  key={index}
-                                  onClick={() => handleSwitchAddShortcut(shortcut.value)}
-                                >
-                                  <ListItemText
-                                    primary={shortcut.title}
-                                    primaryTypographyProps={{
-                                      style: {
-                                        fontWeight: shortcut.isBold ? 'bold' : 'normal',
-                                      },
-                                    }}
-                                  />
-                                </ListItem>
-                              ))}
-                            </List>
-                          </Box>
-                        </Popover>
-                      </Box>
-                            
-                            </>
-                          )}
+                            <Box>
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={toggleSwitchDropdown}
+                                sx={{ mt: 2 }}
+                              >
+                                Add Shortcode
+                              </Button>
+
+                              <Popover
+                                open={showSwitchDropdown}
+                                anchorEl={switchanchorEl}
+                                onClose={handleCloseDropdown}
+                                anchorOrigin={{
+                                  vertical: 'bottom',
+                                  horizontal: 'left',
+                                }}
+                                transformOrigin={{
+                                  vertical: 'top',
+                                  horizontal: 'left',
+                                }}
+                              >
+                                <Box >
+                                  <List className="dropdown-list" sx={{ width: '300px', height: '300px', cursor: 'pointer' }}>
+                                    {switchfilteredShortcuts.map((shortcut, index) => (
+                                      <ListItem
+                                        key={index}
+                                        onClick={() => handleSwitchAddShortcut(shortcut.value)}
+                                      >
+                                        <ListItemText
+                                          primary={shortcut.title}
+                                          primaryTypographyProps={{
+                                            style: {
+                                              fontWeight: shortcut.isBold ? 'bold' : 'normal',
+                                            },
+                                          }}
+                                        />
+                                      </ListItem>
+                                    ))}
+                                  </List>
+                                </Box>
+                              </Popover>
+                            </Box>
+
+                          </>
+                        )}
                       </Box>
 
-                      
+
 
                       <Box mt={2}>
                         <FormControlLabel
@@ -790,42 +818,42 @@ const[numOfReminder,setnumOfReminder]=useState();
                           }
                           label={"Send Reminders to clients"}
                         />
-                       {invoiceReminders &&(
-                        <>
-                        <Box sx={{display:'flex',gap:'20px',flexDirection:'column'}}>
-                          
-                      <Box>
-                        <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>
-                        <TextField
-                          // margin="normal"
-                          fullWidth
-                          name="Days until next reminder"
-                          placeholder="Days until next reminder"
-                          size="small"
-                          sx={{ mt: 2 }}
-                           value={daysNextReminder}
-                           onChange={(e) => setDaysNextReminder(e.target.value)}
-                        />
-                      </Box>
+                        {invoiceReminders && (
+                          <>
+                            <Box sx={{ display: 'flex', gap: '20px', flexDirection: 'column' }}>
+
+                              <Box>
+                                <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>
+                                <TextField
+                                  // margin="normal"
+                                  fullWidth
+                                  name="Days until next reminder"
+                                  placeholder="Days until next reminder"
+                                  size="small"
+                                  sx={{ mt: 2 }}
+                                  value={daysNextReminder}
+                                  onChange={(e) => setDaysNextReminder(e.target.value)}
+                                />
+                              </Box>
 
 
-                      <Box>
-                        <InputLabel sx={{ color: 'black' }}>Number of reminders</InputLabel>
-                        <TextField
-                          // margin="normal"
-                          fullWidth
-                          name="Number of reminders"
-                          placeholder="Number of reminders"
-                          size="small"
-                          sx={{ mt: 2 }}
-                           value={numOfReminder}
-                           onChange={(e) => setnumOfReminder(e.target.value)}
-                        />
-                      </Box>
+                              <Box>
+                                <InputLabel sx={{ color: 'black' }}>Number of reminders</InputLabel>
+                                <TextField
+                                  // margin="normal"
+                                  fullWidth
+                                  name="Number of reminders"
+                                  placeholder="Number of reminders"
+                                  size="small"
+                                  sx={{ mt: 2 }}
+                                  value={numOfReminder}
+                                  onChange={(e) => setnumOfReminder(e.target.value)}
+                                />
+                              </Box>
 
-                        </Box>
-                        </>
-                       )}
+                            </Box>
+                          </>
+                        )}
 
 
 
@@ -834,19 +862,20 @@ const[numOfReminder,setnumOfReminder]=useState();
 
                     </Box>
                   </Grid>
-                  <Grid item xs={12} sm={1} sx={{ display: { xs: 'none', sm: 'block' } }}>
+                  <Grid item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
 
 
                     <Box
+                      className='vertical-line'
                       sx={{
-                        borderLeft: '1px solid black',
+                        // borderLeft: '1px solid black',
                         height: '100%',
-                        margin: '0 20px',
+                        ml: 1.5
 
                       }}
                     ></Box>
                   </Grid>
-                  <Grid item xs={26} sm={8} >
+                  <Grid item xs={26} sm={5.8} >
                     <Box className='invoice-section-three'>
 
                       <div className='invoice-section-three'>
@@ -874,16 +903,7 @@ const[numOfReminder,setnumOfReminder]=useState();
                             <TableBody>
                               {rows.map((row, index) => (
                                 <TableRow key={index}>
-                                  {/* <TableCell>
-                            <CreatableSelect 
-                              placeholder='Product or Service'
-                              options={serviceoptions}
-                              value={serviceoptions.find(option => option.label === row.productName) || { label: row.productName, value: row.productName }}
-                              onChange={(selectedOption) => handleServiceChange(index, selectedOption)}
-                              onInputChange={(inputValue, actionMeta) => handleServiceInputChange(inputValue, actionMeta, index)}
-                              isClearable
-                            />
-                          </TableCell> */}
+                                  
                                   <TableCell>
                                     <CreatableSelect
                                       placeholder="Product or Service"
@@ -981,14 +1001,14 @@ const[numOfReminder,setnumOfReminder]=useState();
                           </Table>
                         </div>
                       </div>
-                      <Box style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '20px' }}>
+                      {/* <Box style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '20px' }}>
                         <Box onClick={() => addRow()} style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'blue', fontSize: '18px' }}>
                           <AiOutlinePlusCircle /> Line item
                         </Box>
                         <Box onClick={() => addRow(true)} style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', color: 'blue', fontSize: '18px' }}>
                           <CiDiscount1 /> Discount
                         </Box>
-                      </Box>
+                      </Box> */}
 
 
 

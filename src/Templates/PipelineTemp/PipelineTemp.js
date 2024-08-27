@@ -22,6 +22,12 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { CiMenuKebab } from "react-icons/ci";
 import { useNavigate } from 'react-router-dom';
 const PipelineTemp = () => {
+
+  const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
+  const JOBS_API = process.env.REACT_APP_JOBS_TEMP_URL;
+  const USER_API = process.env.REACT_APP_USER_URL;
+  const SORTJOBS_API = process.env.REACT_APP_SORTJOBS_URL;
+
   const theme = useTheme();
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -52,7 +58,7 @@ const PipelineTemp = () => {
 
   const fetchSortByJob = async () => {
     try {
-      const url = 'http://127.0.0.1:7500/sortjobs/sortjobby';
+      const url = `${SORTJOBS_API}/sortjobs/sortjobby`;
       const response = await fetch(url);
       const data = await response.json();
       setSortbyJobs(data.sortJobsBy);
@@ -138,7 +144,7 @@ const PipelineTemp = () => {
 
   const fetchData = async () => {
     try {
-      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const url = `${USER_API}/api/auth/users`;
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
@@ -170,7 +176,7 @@ const PipelineTemp = () => {
 
   const fetchtemp = async () => {
     try {
-      const url = 'http://127.0.0.1:7500/workflow/jobtemplate/jobtemplate';
+      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
       const response = await fetch(url);
       const data = await response.json();
       setDefaultTemp(data.JobTemplates);
@@ -206,7 +212,7 @@ const PipelineTemp = () => {
     const config = {
       method: 'post',
       maxBodyLength: Infinity,
-      url: 'http://127.0.0.1:7500/workflow/pipeline/createpipeline',
+      url: `${PIPELINE_API}/workflow/pipeline/createpipeline`,
       headers: {
         'Content-Type': 'application/json'
       },
@@ -262,7 +268,7 @@ const PipelineTemp = () => {
   const fetchPipelineData = async () => {
     try {
 
-      const url = 'http://127.0.0.1:7500/workflow/pipeline/pipelines';
+      const url = `${PIPELINE_API}/workflow/pipeline/pipelines`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch pipeline data');
@@ -285,7 +291,7 @@ const PipelineTemp = () => {
     const config = {
       method: 'delete',
       maxBodyLength: Infinity,
-      url: `http://127.0.0.1:7500/workflow/pipeline/pipeline/${_id}`,
+      url: `${PIPELINE_API}/workflow/pipeline/pipeline/${_id}`,
       headers: {}
     };
 
@@ -363,7 +369,7 @@ const PipelineTemp = () => {
           </Button>
 
           <MaterialReactTable columns={columns} table={table} />
-         
+
 
         </Box>
       ) : (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect ,useMemo} from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import {
@@ -22,6 +22,12 @@ import { toast } from "react-toastify";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { CiMenuKebab } from "react-icons/ci";
 const Tasks = () => {
+
+
+  const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
+  const USER_API = process.env.REACT_APP_USER_URL;
+  const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
+
   const navigate = useNavigate();
 
   const [templatename, settemplatename] = useState("");
@@ -87,7 +93,7 @@ const Tasks = () => {
 
   const fetchData = async () => {
     try {
-      const url = 'http://127.0.0.1:8080/api/auth/users';
+      const url = `${USER_API}/api/auth/users`;
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
@@ -116,7 +122,7 @@ const Tasks = () => {
   const fetchTagData = async () => {
     try {
 
-      const url = 'http://127.0.0.1:7500/tags/';
+      const url = `${TAGS_API}/tags/`;
 
       const response = await fetch(url);
       const data = await response.json();
@@ -173,14 +179,14 @@ const Tasks = () => {
 
   // task temp
   const [TaskTemplates, setTaskTemplates] = useState([]);
- 
-  useEffect(() =>{
+
+  useEffect(() => {
     fetchTaskData();
   })
   const fetchTaskData = async () => {
     try {
 
-      const url = 'http://127.0.0.1:7500/workflow/tasks/tasktemplate/';
+      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
 
       const response = await fetch(url);
       if (!response.ok) {
@@ -193,7 +199,7 @@ const Tasks = () => {
     } catch (error) {
       console.error("Error fetching task templates:", error);
     }
-};
+  };
   const createTaskTemp = () => {
     if (absoluteDate === true) {
 
@@ -219,7 +225,7 @@ const Tasks = () => {
         body: raw,
         redirect: "follow",
       };
-      const url = 'http://127.0.0.1:7500/workflow/tasks/tasktemplate/';
+      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
       fetch(url, requestOptions)
         .then((response) => {
           if (!response.ok) {
@@ -256,7 +262,7 @@ const Tasks = () => {
         startsinduration: startsInDuration,
         duein: duein,
         dueinduration: dueinduration,
-       
+
       });
 
       const requestOptions = {
@@ -265,7 +271,7 @@ const Tasks = () => {
         body: raw,
         redirect: "follow",
       };
-      const url = 'http://127.0.0.1:7500/workflow/tasks/tasktemplate/';
+      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
       fetch(url, requestOptions)
         .then((response) => {
           if (!response.ok) {
@@ -287,7 +293,7 @@ const Tasks = () => {
         });
     }
   };
-   const resetFields = () => {
+  const resetFields = () => {
     setDescription('');
     setSelectedTags([]);
     setAbsoluteDates(false);
@@ -301,94 +307,94 @@ const Tasks = () => {
 
   const handleEdit = (_id) => {
 
-    navigate("taskTempUpdate/" + _id);
-  };
-
-
-//delete template
-const handleDelete = (_id) => {
-  const requestOptions = {
-    method: "DELETE",
-    redirect: "follow"
+    navigate("taskTempUpdate/" + _id);
   };
-  const url = 'http://127.0.0.1:7500/workflow/tasks/tasktemplate/';
-  fetch(url + _id, requestOptions)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to delete item');
-      }
-      return response.text();
-    })
-    .then((result) => {
-      console.log(result);
-      toast.success('Item deleted successfully');
-      fetchTaskData();
-      // setshowOrganizerTemplateForm(false);
-    })
-    .catch((error) => {
-      console.error(error);
-      toast.error('Failed to delete item');
-    })
-};
-const [tempIdget, setTempIdGet] = useState("");
-const [openMenuId, setOpenMenuId] = useState(null);
-const toggleMenu = (_id) => {
-  setOpenMenuId(openMenuId === _id ? null : _id);
-  setTempIdGet(_id);
-};
-// console.log(tempIdget)
-const columns = useMemo(() => [
-  {
-    accessorKey: 'templatename',
-    header: 'Name',
 
-  },
-  {
-    accessorKey: 'Setting', header: 'Setting',
-    Cell: ({ row }) => (
-      <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
-        <CiMenuKebab style={{ fontSize: "25px" }} />
-        {openMenuId === row.original._id && (
-          <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
-            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
-              handleEdit(row.original._id);
-             
-            }} >Edit</Typography>
-            <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)} >Delete</Typography>
-          </Box>
-        )}
-      </IconButton>
 
-    ),
+  //delete template
+  const handleDelete = (_id) => {
+    const requestOptions = {
+      method: "DELETE",
+      redirect: "follow"
+    };
+    const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
+    fetch(url + _id, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to delete item');
+        }
+        return response.text();
+      })
+      .then((result) => {
+        console.log(result);
+        toast.success('Item deleted successfully');
+        fetchTaskData();
+        // setshowOrganizerTemplateForm(false);
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error('Failed to delete item');
+      })
+  };
+  const [tempIdget, setTempIdGet] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const toggleMenu = (_id) => {
+    setOpenMenuId(openMenuId === _id ? null : _id);
+    setTempIdGet(_id);
+  };
+  // console.log(tempIdget)
+  const columns = useMemo(() => [
+    {
+      accessorKey: 'templatename',
+      header: 'Name',
 
-  },
+    },
+    {
+      accessorKey: 'Setting', header: 'Setting',
+      Cell: ({ row }) => (
+        <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+          <CiMenuKebab style={{ fontSize: "25px" }} />
+          {openMenuId === row.original._id && (
+            <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+              <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
+                handleEdit(row.original._id);
 
-], [openMenuId]);
+              }} >Edit</Typography>
+              <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)} >Delete</Typography>
+            </Box>
+          )}
+        </IconButton>
 
-const table = useMaterialReactTable({
-  columns,
-  data: TaskTemplates,
-  enableBottomToolbar: true,
-  enableStickyHeader: true,
-  columnFilterDisplayMode: "custom", // Render own filtering UI
-  enableRowSelection: true, // Enable row selection
-  enablePagination: true,
-  muiTableContainerProps: { sx: { maxHeight: "400px" } },
-  initialState: {
-    columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
-  },
-  muiTableBodyCellProps: {
-    sx: (theme) => ({
-      backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
-    }),
-  },
-});
+      ),
+
+    },
+
+  ], [openMenuId]);
+
+  const table = useMaterialReactTable({
+    columns,
+    data: TaskTemplates,
+    enableBottomToolbar: true,
+    enableStickyHeader: true,
+    columnFilterDisplayMode: "custom", // Render own filtering UI
+    enableRowSelection: true, // Enable row selection
+    enablePagination: true,
+    muiTableContainerProps: { sx: { maxHeight: "400px" } },
+    initialState: {
+      columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+    },
+    muiTableBodyCellProps: {
+      sx: (theme) => ({
+        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+      }),
+    },
+  });
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
         {!showForm ? (
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleCreateTask} sx={{mb:3}}>
+            <Button variant="contained" color="primary" onClick={handleCreateTask} sx={{ mb: 3 }}>
               Create Task Template
             </Button>
             {/* <TableContainer component={Paper} sx={{ mt: 2 }}>
@@ -423,7 +429,7 @@ const table = useMaterialReactTable({
                 </TableBody>
               </Table>
             </TableContainer> */}
-             <MaterialReactTable columns={columns} table={table} />
+            <MaterialReactTable columns={columns} table={table} />
           </Box>
         ) : (
           <Box sx={{ mt: 2 }}>
@@ -439,14 +445,14 @@ const table = useMaterialReactTable({
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
                             <Box>
-                              <label  className='task-input-label' >Template Name</label>
+                              <label className='task-input-label' >Template Name</label>
                               <TextField
                                 fullWidth
                                 name="TemplateName"
                                 placeholder="Template Name"
                                 size="small"
-                                sx={{background:'#fff',mt: 1}}
-                                
+                                sx={{ background: '#fff', mt: 1 }}
+
                                 onChange={(e) => settemplatename(e.target.value)}
                               />
                             </Box>
@@ -465,10 +471,10 @@ const table = useMaterialReactTable({
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
                             <Box>
-                              <label  className='task-input-label'>Task Assignee</label>
+                              <label className='task-input-label'>Task Assignee</label>
                               <Autocomplete
                                 multiple
-                                sx={{background:'#fff',mt: 1,}}
+                                sx={{ background: '#fff', mt: 1, }}
                                 options={options}
                                 size='small'
                                 getOptionLabel={(option) => option.label}
@@ -503,7 +509,7 @@ const table = useMaterialReactTable({
                       </Box>
                       <Box mt={2}>
 
-                        <label  className='task-input-label'>Tags</label>
+                        <label className='task-input-label'>Tags</label>
 
                         <Autocomplete
                           multiple
@@ -529,7 +535,7 @@ const table = useMaterialReactTable({
                               variant="outlined"
 
                               placeholder="Tags"
-                              sx={{ width: '100%', marginTop: '8px', backgroundColor:'#fff' }}
+                              sx={{ width: '100%', marginTop: '8px', backgroundColor: '#fff' }}
                             />
                           )}
                           renderOption={(props, option) => (
@@ -551,7 +557,7 @@ const table = useMaterialReactTable({
                                   // onChange={handleAbsolutesDates}
                                   onChange={(event) => handleAbsolutesDates(event.target.checked)}
                                   color="primary"
-                                  
+
                                 />
                               }
                               label={"Absolute Date"}
@@ -565,7 +571,7 @@ const table = useMaterialReactTable({
                             <Typography className='task-input-label'>Start Date</Typography>
                             <DatePicker
                               format="DD/MM/YYYY"
-                              sx={{ width: '100%',backgroundColor:'#fff' }}
+                              sx={{ width: '100%', backgroundColor: '#fff' }}
                               // value={startDate}
                               // onChange={handleStartDateChange}
                               selected={startDate} onChange={handleStartDateChange}
@@ -576,7 +582,7 @@ const table = useMaterialReactTable({
                             <Typography className='task-input-label'>Due Date</Typography>
                             <DatePicker
                               format="DD/MM/YYYY"
-                              sx={{ width: '100%', backgroundColor:'#fff'}}
+                              sx={{ width: '100%', backgroundColor: '#fff' }}
                               // value={dueDate}
                               // onChange={handleDueDateChange}
                               selected={dueDate} onChange={handleDueDateChange}
@@ -595,7 +601,7 @@ const table = useMaterialReactTable({
                               fullWidth
                               defaultValue={0}
                               value={startsin}
-                              sx={{background:'#fff',ml: 1.5}}
+                              sx={{ background: '#fff', ml: 1.5 }}
                               onChange={(e) => setstartsin(e.target.value)}
                             />
                             <Autocomplete
@@ -604,7 +610,7 @@ const table = useMaterialReactTable({
                               getOptionLabel={(option) => option.label}
                               onChange={handleStartInDateChange}
                               renderInput={(params) => (
-                                <TextField {...params} variant="outlined" sx={{backgroundColor:'#fff'}} />
+                                <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} />
                               )}
                               value={dayOptions.find((option) => option.value === startsInDuration) || null}
                               className="job-template-select-dropdown"
@@ -618,8 +624,8 @@ const table = useMaterialReactTable({
                               value={duein}
                               fullWidth
                               defaultValue={0}
-                              
-                              sx={{background:'#fff',ml: 1.8,}}
+
+                              sx={{ background: '#fff', ml: 1.8, }}
                               onChange={(e) => setduein(e.target.value)}
                             />
 
@@ -630,7 +636,7 @@ const table = useMaterialReactTable({
 
                               size='small'
                               renderInput={(params) => (
-                                <TextField {...params} variant="outlined" sx={{backgroundColor:'#fff'}}/>
+                                <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} />
                               )}
                               value={dayOptions.find((option) => option.value === dueinduration) || null}
                               className="job-template-select-dropdown"

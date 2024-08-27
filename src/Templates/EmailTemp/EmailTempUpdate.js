@@ -21,6 +21,8 @@ import {
 import EditorShortcodes from '../Texteditor/EditorShortcodes';
 import Select from 'react-select';
 const EmailTempUpdate = () => {
+    const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
+    const USER_API = process.env.REACT_APP_USER_URL;
     const { _id } = useParams();
     const navigate = useNavigate();
     // const [showForm, setShowForm] = useState(false);
@@ -33,7 +35,7 @@ const EmailTempUpdate = () => {
     const [selectedOption, setSelectedOption] = useState('contacts');
     const [anchorEl, setAnchorEl] = useState(null);
     const [emailBody, setEmailBody] = useState('');
-    const [selecteduser, setSelectedUser] = useState('');
+    // const [selecteduser, setSelectedUser] = useState('');
     const [userData, setUserData] = useState([]);
 
     // const handleCreateTemplate = () => {
@@ -91,7 +93,7 @@ const EmailTempUpdate = () => {
 
     const fetchData = async () => {
         try {
-            const url = 'http://127.0.0.1:8080/api/auth/users';
+            const url = `${USER_API}/api/auth/users`;
             const response = await fetch(url);
             const data = await response.json();
             setUserData(data);
@@ -109,17 +111,12 @@ const EmailTempUpdate = () => {
         setEmailBody(content);
     };
 
-    const handleClearTemplate = () => {
-        setTemplateName('');
-        setSelectedUser('');
-        setInputText('');
-        setEmailBody('');
-    };
+   
 
     const [emailTemplates, setEmailTemplates] = useState([]);
     const fetchEmailTemplates = async () => {
         try {
-            const url = 'http://127.0.0.1:7500/workflow/emailtemplate';
+            const url = `${EMAIL_API}/workflow/emailtemplate`;
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error('Failed to fetch email templates');
@@ -162,7 +159,7 @@ const EmailTempUpdate = () => {
             body: raw,
             redirect: "follow"
         };
-        const url = "http://127.0.0.1:7500/workflow/emailtemplate/";
+        const url = `${EMAIL_API}/workflow/emailtemplate/`;
         fetch(url + _id, requestOptions)
         .then((response) => {
             if (!response.ok) {
@@ -189,7 +186,7 @@ const EmailTempUpdate = () => {
                     method: "GET",
                     redirect: "follow"
                 };
-                const url ="http://127.0.0.1:7500/workflow/emailtemplate/emailtemplateList/";
+                const url =`${EMAIL_API}/workflow/emailtemplate/emailtemplateList/`;
                 const response = await fetch(url + _id, requestOptions);
 
 

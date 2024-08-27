@@ -36,6 +36,10 @@ import {
 import { useNavigate, useParams } from 'react-router-dom'
 import CreatableSelect from 'react-select/creatable';
 const InvoiceTempUpdate = () => {
+
+  const INVOICE_API = process.env.REACT_APP_INVOICE_TEMP_URL;
+  const SERVICE_API = process.env.REACT_APP_SERVICES_URL
+
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -194,7 +198,7 @@ const InvoiceTempUpdate = () => {
       method: "GET",
       redirect: "follow"
     };
-    const url = 'http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate/';;
+    const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/`;
 
     fetch(url + id, requestOptions)
       .then((response) => response.text())
@@ -268,7 +272,7 @@ const InvoiceTempUpdate = () => {
       redirect: "follow"
     };
 
-    const url = "http://127.0.0.1:7500/workflow/invoicetemp/invoicetemplate/";
+    const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/`;
     fetch(url + id, requestOptions)
       .then((response) => {
         console.log(response)
@@ -356,7 +360,7 @@ const[numOfReminder,setnumOfReminder]=useState();
   }, []);
   const fetchServiceData = async () => {
     try {
-      const url = 'http://127.0.0.1:7500/workflow/services/servicetemplate';
+      const url = `${SERVICE_API}/workflow/services/servicetemplate`;
       const response = await fetch(url);
       const data = await response.json();
       console.log(data.serviceTemplate)
@@ -378,7 +382,7 @@ const[numOfReminder,setnumOfReminder]=useState();
       method: "GET",
       redirect: "follow"
     };
-    const url = `http://127.0.0.1:7500/workflow/services/servicetemplate/${id}`;
+    const url = `${SERVICE_API}/workflow/services/servicetemplate/${id}`;
     fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
@@ -507,7 +511,7 @@ const[numOfReminder,setnumOfReminder]=useState();
                 <Typography variant='h5' gutterBottom>Edit Invoice Template</Typography>
                 <Box mt={2} mb={2}><hr /></Box>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} sm={3}>
+                  <Grid item xs={12} sm={3} mt={2}>
                     <Box>
 
                       <Box>
