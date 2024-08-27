@@ -7,7 +7,7 @@ import { useParams } from "react-router-dom";
 import { Box, Typography } from '@mui/material'
 
 const AccountsDash = () => {
-
+    const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
    const { data } = useParams();
     console.log(data);
 
@@ -22,7 +22,7 @@ const AccountsDash = () => {
 
         // Fetch URL with environment variable
 
-        const url = 'http://127.0.0.1:7000/accounts/accountdetails/accountdetailslist/listbyid/';
+        const url = `${ACCOUNT_API}/accounts/accountdetails/accountdetailslist/listbyid/`;
         fetch(url + data, requestOptions)
             .then((response) => response.json())
             .then((result) => {

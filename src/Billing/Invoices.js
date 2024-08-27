@@ -12,9 +12,12 @@ import { BsThreeDotsVertical } from 'react-icons/bs';
 import { RiCloseLine } from 'react-icons/ri';
 import './invoices.css'
 import {  toast } from 'react-toastify';
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+import { CiMenuKebab } from "react-icons/ci";
 import CreatableSelect from 'react-select/creatable';
 const Invoices = ({ charLimit = 4000 }) => {
     const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
+    const SERVICE_API = process.env.REACT_APP_SERVICES_URL
     const [open, setOpen] = useState(false);
     const [description, setDescription] = useState('');
     const [payInvoice, setIsPayInvoice] = useState(false);
@@ -170,10 +173,26 @@ const Invoices = ({ charLimit = 4000 }) => {
 
 
 
-    const serviceoptions = servicedata.map((service) => ({
+    useEffect(() => {
+
+
+        fetchServiceData();
+      }, []);
+      const fetchServiceData = async () => {
+        try {
+          const url = `${SERVICE_API}/workflow/services/servicetemplate`;
+          const response = await fetch(url);
+          const data = await response.json();
+          console.log(data.serviceTemplate)
+          setServiceData(data.serviceTemplate);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+      const serviceoptions = servicedata.map((service) => ({
         value: service._id,
         label: service.serviceName,
-    }));
+      }));
 
     const handleServiceChange = (index, selectedOptions) => {
         const newRows = [...rows];
@@ -467,8 +486,8 @@ const Invoices = ({ charLimit = 4000 }) => {
         console.log(result)
         if (result && result.message === "Invoice created successfully") {
           toast.success("Invoice created successfully");
-          
-         
+          handleClose();
+          fetchInvoiceData();
 
         } else {
           toast.error(result.message || "Failed to create InvoiceTemplate");
@@ -476,12 +495,113 @@ const Invoices = ({ charLimit = 4000 }) => {
       })
       .catch((error) => console.error(error));
   }
+
+
+  const [billingInvoice, setBillingInvoice] = useState([]);
+  const fetchInvoiceData = async () => {
+      try {
+          const url = `${INVOICE_NEW}/workflow/invoices/invoice`;
+          const response = await fetch(url);
+          if (!response.ok) {
+              throw new Error('Failed to fetch email templates');
+          }
+          const data = await response.json();
+
+          setBillingInvoice(data.invoice);
+
+      } catch (error) {
+          console.error('Error fetching email templates:', error);
+
+      }
+  };
+
+  useEffect(() => {
+    fetchInvoiceData();
+  }, []);
+
+  const [tempIdget, setTempIdGet] = useState("");
+    const [openMenuId, setOpenMenuId] = useState(null);
+    const toggleMenu = (_id) => {
+      setOpenMenuId(openMenuId === _id ? null : _id);
+      setTempIdGet(_id);
+    };
+
+  const columns = useMemo(() => [
+    {
+      accessorKey: 'invoicenumber',
+      header: 'Invoice Number',
+
+    },
+    
+    {
+      accessorKey: 'Setting', header: 'Setting',
+      Cell: ({ row }) => (
+        <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+          <CiMenuKebab style={{ fontSize: "25px" }} />
+          {openMenuId === row.original._id && (
+            <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+              <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}  >Edit</Typography>
+              <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}
+              >Delete</Typography>
+            </Box>
+          )}
+        </IconButton>
+
+      ),
+
+    },
+
+  ], [openMenuId]);
+
+  const table = useMaterialReactTable({
+    columns,
+    data: billingInvoice,
+    enableBottomToolbar: true,
+    enableStickyHeader: true,
+    columnFilterDisplayMode: "custom", // Render own filtering UI
+    enableRowSelection: true, // Enable row selection
+    enablePagination: true,
+    muiTableContainerProps: { sx: { maxHeight: "400px" } },
+    initialState: {
+      columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+    },
+    muiTableBodyCellProps: {
+      sx: (theme) => ({
+        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+      }),
+    },
+  });
+
+  const handleDelete = (_id) => {
+    const requestOptions = {
+        method: 'DELETE',
+        redirect: 'follow',
+    };
+    const url = `${INVOICE_NEW}/workflow/invoices/invoice/`;
+    fetch(url + _id, requestOptions)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Failed to delete item');
+            }
+            return response.json();
+        })
+        .then((result) => {
+            toast.success('Data deleted successfully');
+            fetchInvoiceData();
+          
+        })
+        .catch((error) => {
+            console.error(error);
+        });
+};
     return (
         <Box>
-            <Button type='button' variant="contained" onClick={handleOpen}>
+            <Button type='button' variant="contained" onClick={handleOpen} >
                 Create Invoice
             </Button>
-
+<Box sx={{marginTop:3}}>
+            <MaterialReactTable columns={columns} table={table} />
+            </Box>
             <Drawer
                 anchor='right'
                 open={open}
