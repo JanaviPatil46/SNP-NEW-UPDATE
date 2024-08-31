@@ -15,7 +15,7 @@ import JobTemplateUpdate from './Templates/JobsTemp/JobTemplateUpdate'
 import PipelineTemp from './Templates/PipelineTemp/PipelineTemp';
 import FolderTemp from './Templates/FoldersTemp/FolderTemp';
 import ChatTemp from './Templates/ChatsTemp/ChatTemp';
-import SMSTemp from './Templates/SMSTemp/SmsTemp';
+
 import InvoiceTemp from './Templates/InvoicesTemp/InvoiceTemp';
 import OrganizerTemp from './Templates/OrganizersTemp/OrganizerTemp';
 import OrganizersTempUpdate from './Templates/OrganizersTemp/OrganizersTempUpdate.js'
@@ -95,7 +95,7 @@ const App = () => {
             <Route path='folders' element={<FolderTemp />} />
             <Route path='chats' element={<ChatTemp />} />
             <Route path='chats/chatTemplateUpdate/:id' element={<ChatTempUpdate/>}/>
-            <Route path='sms' element={<SMSTemp />} />
+           
             <Route path='invoices' element={<InvoiceTemp />} />
             <Route path='invoices/invoiceTempUpdate/:id' element={<InvoiceTempUpdate />} />
             <Route path='organizers' element={<OrganizerTemp />} />

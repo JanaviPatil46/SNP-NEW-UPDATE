@@ -84,7 +84,7 @@ const Tags = () => {
     setOpenMenuId(false);
     const response = await fetch(`${TAGS_API}/tags/` + _id);
     if (!response.ok) {
-      throw new Error('Failed to fetch job data');
+      throw new Error('Failed to fetch tag data');
     }
     const data = await response.json();
     const tag = data.tag;
@@ -181,8 +181,11 @@ const Tags = () => {
       .then((result) => {
         if (result && result.message === "Tag with this TagName already exists") {
           toast.success('Tag with this TagName already exists');
+          // fetchData();
         } else {
           toast.success("Tag data sent successfully!");
+          fetchData();
+          
           setTags([...tags, { tagName, tagColour }]);
         }
       })

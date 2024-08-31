@@ -11,9 +11,10 @@ import {
   IconButton,
   Switch,
   FormControlLabel,
-  Chip
+  Chip,
+  Alert
 } from '@mui/material';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, } from "react-router-dom";
 import Editor from '../Texteditor/Editor';
 import Grid from '@mui/material/Unstable_Grid2';
 import Priority from '../Priority/Priority';
@@ -22,8 +23,6 @@ import { toast } from "react-toastify";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { CiMenuKebab } from "react-icons/ci";
 const Tasks = () => {
-
-
   const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
@@ -69,8 +68,15 @@ const Tasks = () => {
   const handleCreateTask = () => {
     setShowForm(true);
   };
-  const handleCloseTaskTemp = () => {
-    setShowForm(false);
+  const handleTaskCancel = () => {
+
+    
+    const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+    if (confirmCancel) {
+        // If user confirms, clear the form and hide it
+        setShowForm(false);
+      
+    }
   };
   const handlePriorityChange = (priority) => {
     setPriority(priority);
@@ -123,7 +129,6 @@ const Tasks = () => {
     try {
 
       const url = `${TAGS_API}/tags/`;
-
       const response = await fetch(url);
       const data = await response.json();
       setTags(data.tags);
@@ -133,19 +138,15 @@ const Tasks = () => {
   };
   //  for tags
   const calculateWidth = (tagName) => {
-
     const baseWidth = 10; // base width for each tag
     const charWidth = 8; // approximate width of each character
     const padding = 10; // padding on either side
     return baseWidth + (charWidth * tagName.length) + padding;
   };
-
-
   const tagsoptions = tags.map((tag) => ({
     value: tag._id,
     label: tag.tagName,
     colour: tag.tagColour,
-
     customStyle: {
       backgroundColor: tag.tagColour,
       color: "#fff",
@@ -170,24 +171,19 @@ const Tasks = () => {
   }));
   const handleTagChange = (event, newValue) => {
     setSelectedTags(newValue.map((option) => option.value));
-
     // Send selectedValues array to your backend
     console.log("Selected Values:", newValue.map((option) => option.value));
     // Assuming setCombinedValues is a function to send the values to your backend
     setCombinedTagsValues(newValue.map((option) => option.value));
   };
-
   // task temp
   const [TaskTemplates, setTaskTemplates] = useState([]);
-
   useEffect(() => {
     fetchTaskData();
   })
   const fetchTaskData = async () => {
     try {
-
       const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
-
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch task templates");
@@ -201,11 +197,12 @@ const Tasks = () => {
     }
   };
   const createTaskTemp = () => {
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
     if (absoluteDate === true) {
-
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-
       const raw = JSON.stringify({
         templatename: templatename,
         status: status.value,
@@ -218,7 +215,6 @@ const Tasks = () => {
         startdate: startDate,
         enddate: dueDate,
       });
-
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
@@ -238,7 +234,7 @@ const Tasks = () => {
           toast.success("Task Template created successfully");
           resetFields();
           fetchTaskData();
-          handleCloseTaskTemp();
+          setShowForm(false)
         })
         .catch((error) => {
           // Handle errors
@@ -247,9 +243,11 @@ const Tasks = () => {
         });
     } else if (absoluteDate === false) {
 
+      if (!validateForm()) {
+        return; // Prevent form submission if validation fails
+      }
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
-
       const raw = JSON.stringify({
         templatename: templatename,
         status: status.value,
@@ -264,7 +262,6 @@ const Tasks = () => {
         dueinduration: dueinduration,
 
       });
-
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
@@ -284,7 +281,7 @@ const Tasks = () => {
           toast.success("Task Template created successfully");
           resetFields();
           fetchTaskData();
-          handleCloseTaskTemp();
+          setShowForm(false)
         })
         .catch((error) => {
           // Handle errors
@@ -299,18 +296,18 @@ const Tasks = () => {
     setAbsoluteDates(false);
     setStartDate(null);
     setDueDate(null);
+    setstartsin('');
+    setduein('');
     setPriority("");
     setSelectedUser([]);
+    setStartsInDuration('');
     settemplatename("");
+    setdueinduration('');
     setStatus("");
   };
-
   const handleEdit = (_id) => {
-
     navigate("taskTempUpdate/" + _id);
   };
-
-
   //delete template
   const handleDelete = (_id) => {
     const requestOptions = {
@@ -347,7 +344,14 @@ const Tasks = () => {
     {
       accessorKey: 'templatename',
       header: 'Name',
-
+      Cell: ({ row }) => (
+        <Typography
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
+          onClick={() => handleEdit(row.original._id)}
+        >
+          {row.original.templatename}
+        </Typography>
+      ),
     },
     {
       accessorKey: 'Setting', header: 'Setting',
@@ -364,13 +368,11 @@ const Tasks = () => {
             </Box>
           )}
         </IconButton>
-
       ),
 
     },
 
   ], [openMenuId]);
-
   const table = useMaterialReactTable({
     columns,
     data: TaskTemplates,
@@ -389,6 +391,76 @@ const Tasks = () => {
       }),
     },
   });
+  // Track changes in the form inputs
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value);
+    setHasUnsavedChanges(true); // Mark the form as having unsaved changes
+  };
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  // Prevent navigation if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = ''; // This will trigger a browser-specific dialog
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
+  const [templateNameError, setTemplateNameError] = useState('');
+  const [startDateError, setStartDateError] = useState('');
+  const [dueDateError, setDueDateError] = useState('');
+  const [startInError, setStartInError] = useState('');
+  const [dueInError, setDueInError] = useState('');
+  const [durationError, setDurationError] = useState('');
+  const validateForm = () => {
+    let isValid = true;
+    if (!templatename) {
+      setTemplateNameError("Name can't be blank");
+      toast.error("Name can't be blank");
+      isValid = false;
+    } else {
+      setTemplateNameError('');
+    }
+    if (absoluteDate) {
+      if (!startDate) {
+        setStartDateError('Start date is required');
+        isValid = false;
+      } else {
+        setStartDateError('');
+      }
+      if (!dueDate) {
+        setDueDateError('Due date is required');
+        isValid = false;
+      } else {
+        setDueDateError('');
+      }
+    } else {
+      if (!startsin) {
+        setStartInError('Start in value is required');
+        isValid = false;
+      } else {
+        setStartInError('');
+      }
+      if (!duein) {
+        setDueInError('Due in value is required');
+        isValid = false;
+      } else {
+        setDueInError('');
+      }
+      if (!startsInDuration || !dueinduration) {
+        setDurationError('Duration is required');
+        isValid = false;
+      } else {
+        setDurationError('');
+      }
+    }
+    return isValid;
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
@@ -397,38 +469,6 @@ const Tasks = () => {
             <Button variant="contained" color="primary" onClick={handleCreateTask} sx={{ mb: 3 }}>
               Create Task Template
             </Button>
-            {/* <TableContainer component={Paper} sx={{ mt: 2 }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Name</TableCell>
-
-                    <TableCell>Settings</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {TaskTemplates.map((template) => (
-                    <TableRow key={template._id}>
-                      <TableCell>{template.templatename}</TableCell>
-                      <TableCell>
-                        <IconButton
-                          aria-label="edit"
-                          onClick={() => handleEdit(template._id)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                        <IconButton
-                          aria-label="delete"
-
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer> */}
             <MaterialReactTable columns={columns} table={table} />
           </Box>
         ) : (
@@ -440,7 +480,6 @@ const Tasks = () => {
                   <Box mt={2} mb={2}><hr /></Box>
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={5.8}>
-
                       <Box sx={{ width: '100%' }}>
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
@@ -451,10 +490,29 @@ const Tasks = () => {
                                 name="TemplateName"
                                 placeholder="Template Name"
                                 size="small"
-                                sx={{ background: '#fff', mt: 1 }}
-
-                                onChange={(e) => settemplatename(e.target.value)}
+                                sx={{
+                                  background: '#fff', mt: 1,
+                                }}
+                                onChange={handleInputChange(settemplatename)}
+                                error={!!templateNameError}
                               />
+                              {(!!templateNameError) && <Alert sx={{
+                                width: '96%',
+                                p: '0', // Adjust padding to control the size
+                                pl: '4%', height: '23px',
+                                borderRadius: '10px',
+                                borderTopLeftRadius: '0',
+                                borderTopRightRadius: '0',
+                                fontSize: '15px',
+                                display: 'flex',
+                                alignItems: 'center', // Center content vertically
+                                '& .MuiAlert-icon': {
+                                  fontSize: '16px', // Adjust the size of the icon
+                                  mr: '8px', // Add margin to the right of the icon
+                                },
+                              }} variant="filled" severity="error" >
+                                Name can't be blank
+                              </Alert>}
                             </Box>
                           </Grid>
                           <Grid item xs={12} sm={6}>
@@ -464,9 +522,6 @@ const Tasks = () => {
                           </Grid>
                         </Grid>
                       </Box>
-
-
-
                       <Box sx={{ width: '100%' }}>
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={6}>
@@ -503,14 +558,11 @@ const Tasks = () => {
                           </Grid>
                         </Grid>
                       </Box>
-
                       <Box sx={{ mt: 3, }}>
                         <Editor onChange={handleEditorChange} content={description} />
                       </Box>
                       <Box mt={2}>
-
                         <label className='task-input-label'>Tags</label>
-
                         <Autocomplete
                           multiple
                           size='small'
@@ -533,7 +585,6 @@ const Tasks = () => {
                             <TextField
                               {...params}
                               variant="outlined"
-
                               placeholder="Tags"
                               sx={{ width: '100%', marginTop: '8px', backgroundColor: '#fff' }}
                             />
@@ -544,7 +595,6 @@ const Tasks = () => {
                             </Box>
                           )}
                         />
-
                       </Box>
                       <Box mt={2}>
                         <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
@@ -554,10 +604,8 @@ const Tasks = () => {
                               control={
                                 <Switch
                                   checked={absoluteDate}
-                                  // onChange={handleAbsolutesDates}
                                   onChange={(event) => handleAbsolutesDates(event.target.checked)}
                                   color="primary"
-
                                 />
                               }
                               label={"Absolute Date"}
@@ -572,10 +620,8 @@ const Tasks = () => {
                             <DatePicker
                               format="DD/MM/YYYY"
                               sx={{ width: '100%', backgroundColor: '#fff' }}
-                              // value={startDate}
-                              // onChange={handleStartDateChange}
                               selected={startDate} onChange={handleStartDateChange}
-                              renderInput={(params) => <TextField {...params} size="small" />}
+                              renderInput={(params) => <TextField {...params} size="small" error={!!startDateError} helperText={startDateError} />}
                             />
                           </Box>
                           <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
@@ -583,65 +629,177 @@ const Tasks = () => {
                             <DatePicker
                               format="DD/MM/YYYY"
                               sx={{ width: '100%', backgroundColor: '#fff' }}
-                              // value={dueDate}
-                              // onChange={handleDueDateChange}
                               selected={dueDate} onChange={handleDueDateChange}
-                              renderInput={(params) => <TextField {...params} size="small" />}
+                              renderInput={(params) => <TextField {...params} size="small" error={!!dueDateError} helperText={dueDateError} />}
                             />
                           </Box>
                         </>
                       )}
                       {!absoluteDate && (
                         <>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography className='task-input-label'>Start In</Typography>
-                            <TextField
-                              size='small'
-                              margin='normal'
-                              fullWidth
-                              defaultValue={0}
-                              value={startsin}
-                              sx={{ background: '#fff', ml: 1.5 }}
-                              onChange={(e) => setstartsin(e.target.value)}
-                            />
-                            <Autocomplete
-                              options={dayOptions}
-                              size='small'
-                              getOptionLabel={(option) => option.label}
-                              onChange={handleStartInDateChange}
-                              renderInput={(params) => (
-                                <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} />
+                          <Grid container spacing={3} alignItems="center">
+                            <Grid item xs={12} sm={2}>
+                              <Typography className="task-input-label">Start In</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={5}>
+                              <TextField
+                                size="small"
+                                placeholder='0'
+                                defaultValue={0}
+                                value={startsin}
+                                sx={{ background: "#fff", width: '100%' }}
+                                onChange={(e) => setstartsin(e.target.value)}
+                                error={!!startInError}
+                              />
+                              {(!!startInError) && (
+                                <Alert
+                                  sx={{
+                                    width: '96%',
+                                    p: '0',
+                                    pl: '4%',
+                                    height: '23px',
+                                    borderRadius: '10px',
+                                    borderTopLeftRadius: '0',
+                                    borderTopRightRadius: '0',
+                                    fontSize: '15px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    '& .MuiAlert-icon': {
+                                      fontSize: '16px',
+                                      mr: '8px',
+                                    },
+                                  }}
+                                  variant="filled"
+                                  severity="error"
+                                >
+                                  {startInError}
+                                </Alert>
                               )}
-                              value={dayOptions.find((option) => option.value === startsInDuration) || null}
-                              className="job-template-select-dropdown"
-                            />
-                          </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <Typography className='task-input-label'>Due In</Typography>
-                            <TextField
-                              size='small'
-                              margin='normal'
-                              value={duein}
-                              fullWidth
-                              defaultValue={0}
-
-                              sx={{ background: '#fff', ml: 1.8, }}
-                              onChange={(e) => setduein(e.target.value)}
-                            />
-
+                            </Grid>
+                            <Grid item xs={12} sm={5}>
+                              <Autocomplete
+                                options={dayOptions}
+                                size="small"
+                                getOptionLabel={(option) => option.label}
+                                onChange={handleStartInDateChange}
+                                renderInput={(params) => (
+                                  <>
+                                  <TextField
+                                    {...params}
+                                    variant="outlined"
+                                    sx={{ backgroundColor: "#fff" }}
+                                    error={!!durationError}
+                                  />
+                                  {!!durationError && (
+                                    <Alert
+                                      sx={{
+                                        width: '96%',
+                                        p: '0',
+                                        pl: '4%',
+                                        height: '23px',
+                                        borderRadius: '10px',
+                                        borderTopLeftRadius: '0',
+                                        borderTopRightRadius: '0',
+                                        fontSize: '13px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        '& .MuiAlert-icon': {
+                                          fontSize: '16px',
+                                          mr: '8px',
+                                        },
+                                      }}
+                                      variant="filled"
+                                      severity="error"
+                                    >
+                                      {durationError}
+                                    </Alert>
+                                  )}
+                                  </>
+                                )}
+                                value={dayOptions.find((option) => option.value === startsInDuration) || null}
+                                className="job-template-select-dropdown"
+                              />
+                            </Grid>
+                          </Grid>
+                          <Grid container spacing={3} alignItems="center">
+                            <Grid item xs={12} sm={2}>
+                              <Typography className="task-input-label">Due In</Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={5}>
+                              <TextField
+                                size="small"
+                                placeholder='0'
+                                value={duein}
+                                fullWidth
+                                error={!!dueInError} 
+                                sx={{ background: '#fff',  }}
+                                onChange={(e) => setduein(e.target.value)}
+                              />
+                              {(!!startInError) && (
+                                <Alert
+                                  sx={{
+                                    width: '96%',
+                                    p: '0',
+                                    pl: '4%',
+                                    height: '23px',
+                                    borderRadius: '10px',
+                                    borderTopLeftRadius: '0',
+                                    borderTopRightRadius: '0',
+                                    fontSize: '15px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    '& .MuiAlert-icon': {
+                                      fontSize: '16px',
+                                      mr: '8px',
+                                    },
+                                  }}
+                                  variant="filled"
+                                  severity="error"
+                                >
+                                  {dueInError}
+                                </Alert>
+                              )}
+                            </Grid>
+                            <Grid item xs={12} sm={5}>
                             <Autocomplete
                               options={dayOptions}
                               getOptionLabel={(option) => option.label}
                               onChange={handledueindateChange}
-
                               size='small'
                               renderInput={(params) => (
-                                <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} />
+                                <>
+                                <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} error={!!durationError}  />
+                                {!!durationError && (
+                                  <Alert
+                                    sx={{
+                                      width: '96%',
+                                      p: '0',
+                                      pl: '4%',
+                                      height: '23px',
+                                      borderRadius: '10px',
+                                      borderTopLeftRadius: '0',
+                                      borderTopRightRadius: '0',
+                                      fontSize: '13px',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      '& .MuiAlert-icon': {
+                                        fontSize: '16px',
+                                        mr: '8px',
+                                      },
+                                    }}
+                                    variant="filled"
+                                    severity="error"
+                                  >
+                                    {durationError}
+                                  </Alert>
+                                )}
+                                </>
                               )}
                               value={dayOptions.find((option) => option.value === dueinduration) || null}
                               className="job-template-select-dropdown"
                             />
-                          </Box>
+                            </Grid>
+                          </Grid>
                         </>
                       )}
                     </Grid>
@@ -655,13 +813,12 @@ const Tasks = () => {
                       ></Box>
                     </Grid>
                     <Grid item xs={12} sm={5.8} >
-
                     </Grid>
                   </Grid>
                   <Box mt={2} mb={2}><hr /></Box>
                   <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
                     <Button variant="contained" color="primary" onClick={createTaskTemp}>Save</Button>
-                    <Button variant="outlined" onClick={handleCloseTaskTemp}>Cancel</Button>
+                    <Button variant="outlined" onClick={handleTaskCancel}>Cancel</Button>
                   </Box>
                 </Box>
               </form>
@@ -672,5 +829,4 @@ const Tasks = () => {
     </LocalizationProvider>
   );
 };
-
 export default Tasks;

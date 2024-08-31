@@ -45,7 +45,17 @@ const EmailTemp = () => {
     const handleCreateTemplate = () => {
         setShowForm(true); // Show the form when button is clicked
     };
-
+  
+    const handleTempCancle = () => {
+        // Show confirmation dialog
+        const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+        if (confirmCancel) {
+            // If user confirms, clear the form and hide it
+            setShowForm(false);
+            
+        }
+    };
+    
     const handleChange = (event) => {
         setSelectedOption(event.target.value);
     };
@@ -299,6 +309,14 @@ const EmailTemp = () => {
       {
         accessorKey: 'templatename',
         header: 'Name',
+        Cell: ({ row }) => (
+            <Typography
+              sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
+              onClick={() => handleEdit(row.original._id)}
+            >
+              {row.original.templatename}
+            </Typography>
+          ),
   
       },
       {
@@ -306,11 +324,11 @@ const EmailTemp = () => {
         header: 'Subject',
   
       },
-    //   {
-    //     accessorKey: 'Used in pipeline',
-    //     header: 'Used in pipeline',
+      {
+        accessorKey: 'Used in pipeline',
+        header: 'Used in pipeline',
   
-    //   },
+      },
       {
         accessorKey: 'Setting', header: 'Setting',
         Cell: ({ row }) => (
@@ -503,10 +521,11 @@ const EmailTemp = () => {
 
                             <EditorShortcodes onChange={handleEditorChange} />
                         </Box>
-                        <Box sx={{ mt: 5 }}>
+                        <Box sx={{ mt: 5,display:'flex',gap:2 }}>
                             <Button variant="contained" color="primary" type="submit">
                                 Save Template
                             </Button>
+                            <Button variant="outlined" onClick={handleTempCancle}>Cancel</Button>
                         </Box>
                     </form>
                 </Box>

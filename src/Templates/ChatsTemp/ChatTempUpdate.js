@@ -29,19 +29,34 @@ const ChatTempUpdate = () => {
   const USER_API = process.env.REACT_APP_USER_URL;
    
     const [selectedShortcut, setSelectedShortcut] = useState('');
-    // const [sendreminderstoclient, setsendreminderstoclient] = useState(false);
-    // const handleDateSwitchChange = (checked) => {
-    //     setsendreminderstoclient(checked);
-    // };
+   
     const [absoluteDate, setAbsoluteDates] = useState(false);
   const handleAbsolutesDates = (checked) => {
     setAbsoluteDates(checked);
   };
-
- 
-    const handleCloseChatTemp = () => {
-        navigate("/firmtemp/templates/chats");
-    };
+  const [initialData, setInitialData] = useState({});
+  const hasUnsavedChanges = () => {
+    return (
+        templateName !== initialData.templateName ||
+        selecteduser.value !== initialData.selectedUser.value ||
+        inputText !== initialData.inputText ||
+        description !== initialData.description ||
+        absoluteDate !== initialData.absoluteDate ||
+        daysuntilNextReminder !== initialData.daysuntilNextReminder ||
+        noOfReminder !== initialData.noOfReminder
+    );
+};
+    // const handleCloseChatTemp = () => {
+    //     if (hasUnsavedChanges()) {
+    //         if (window.confirm("You have unsaved changes. Are you sure you want to cancel?")) {
+    //             navigate("/firmtemp/templates/chats");
+    //         }
+    //     } else {
+    //         navigate("/firmtemp/templates/chats");
+    //     }
+    //     // navigate("/firmtemp/templates/chats");
+    // };
+    
     const navigate = useNavigate();
     //  for shortcodes
     const [showDropdown, setShowDropdown] = useState(false);
@@ -220,6 +235,19 @@ const ChatTempUpdate = () => {
             
             setDaysuntilNextReminder(chatTemplate.daysuntilnextreminder);
             setNoOfReminder(chatTemplate.numberofreminders);
+
+            setInitialData({
+                templateName: chatTemplate.templatename,
+                selectedUser: {
+                    label: chatTemplate.from.username,
+                    value: chatTemplate.from._id
+                },
+                inputText: chatTemplate.chatsubject,
+                description: chatTemplate.description,
+                absoluteDate: chatTemplate.sendreminderstoclient,
+                daysuntilNextReminder: chatTemplate.daysuntilnextreminder,
+                noOfReminder: chatTemplate.numberofreminders
+            });
         } catch (error) {
             console.error("Error fetching chat template:", error);
         }
@@ -278,7 +306,30 @@ const ChatTempUpdate = () => {
     
   
  
-    
+    const [isFormFilled, setIsFormFilled] = useState(false);
+    const handleCloseChatTemp = () => {
+        if (isFormFilled) {
+            const confirmCancel = window.confirm("You have unsaved changes. Are you sure you want to cancel?");
+            if (confirmCancel) {
+                navigate("/firmtemp/templates/chats");
+            }
+        } else {
+            navigate("/firmtemp/templates/chats");
+        }
+    };
+
+    useEffect(() => {
+        // Check if form is filled
+        const checkIfFormFilled = () => {
+            if (templateName || inputText || description || selecteduser || daysuntilNextReminder || noOfReminder ||absoluteDate) {
+                setIsFormFilled(true);
+            } else {
+                setIsFormFilled(false);
+            }
+        };
+
+        checkIfFormFilled();
+    }, [templateName ,inputText ,description ,selecteduser,daysuntilNextReminder,noOfReminder,absoluteDate]); 
        
     return (
         <Container>

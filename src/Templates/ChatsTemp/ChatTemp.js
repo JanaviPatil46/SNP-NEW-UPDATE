@@ -34,19 +34,21 @@ const ChatTemp = () => {
 
   const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
- 
-
   const [showForm, setShowForm] = useState(false);
   const [selectedShortcut, setSelectedShortcut] = useState('');
- 
- 
-
   const handleCreateChat = () => {
     setShowForm(true);
   };
+ 
   const handleCloseChatTemp = () => {
-    setShowForm(false);
-  };
+    const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+    if (confirmCancel) {
+        // If user confirms, clear the form and hide it
+        setShowForm(false);
+      
+    }
+  
+}
   const navigate = useNavigate();
   //  for shortcodes
   const [showDropdown, setShowDropdown] = useState(false);
@@ -165,8 +167,8 @@ console.log(selectedOption)
   const [userData, setUserData] = useState([]);
   
   // const [emailBody, setEmailBody] = useState('');
-  const [daysuntilNextReminder, setDaysuntilNextReminder] = useState();
-  const [noOfReminder, setNoOfReminder] = useState();
+  const [daysuntilNextReminder, setDaysuntilNextReminder] = useState('3');
+  const [noOfReminder, setNoOfReminder] = useState(1);
   const [description, setDescription] = useState('');
   const handlechatsubject = (e) => {
     const { value } = e.target;
@@ -333,6 +335,14 @@ console.log(selectedOption)
     {
       accessorKey: 'templatename', // Access the template name
       header: 'Name',
+      Cell: ({ row }) => (
+        <Typography
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
+          onClick={() => handleEdit(row.original._id)}
+        >
+          {row.original.templatename}
+        </Typography>
+      ),
     },
     {
       accessorKey: 'settings', // Add settings column
@@ -388,39 +398,7 @@ console.log(selectedOption)
           <Button variant="contained" color="primary" onClick={handleCreateChat} sx={{ mb: 3 }}>
             Create Chat Template
           </Button>
-          {/* <TableContainer component={Paper} sx={{ mt: 2 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-
-                  <TableCell>Settings</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {chatTemplates.map((template) => (
-                  <TableRow key={template._id}>
-                    <TableCell>{template.templatename}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        aria-label="edit"
-
-                      >
-                        <EditIcon onClick={() => handleEdit(template._id)} />
-                      </IconButton>
-                      <IconButton
-
-                        aria-label="delete"
-
-                      >
-                        <DeleteIcon onClick={() => handleDelete(template._id)} />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer> */}
+          
           <MaterialReactTable
             columns={columns}
             
@@ -585,7 +563,7 @@ console.log(selectedOption)
 
                                   fullWidth
                                   name="No Of reminders"
-                                  // value={noOfReminder}
+                                  value={noOfReminder}
                                   onChange={(e) => setNoOfReminder(e.target.value)}
 
                                   placeholder="NoOfreminders"

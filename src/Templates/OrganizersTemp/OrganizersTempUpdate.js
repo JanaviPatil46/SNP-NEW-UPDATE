@@ -127,9 +127,33 @@ const OrganizersTempUpdate = () => {
         .catch((error) => console.error(error));
 };
 
-const handleBackButton = ()=>{
-  navigate('/firmtemp/templates/organizers');
-}
+// const handleBackButton = ()=>{
+//   navigate('/firmtemp/templates/organizers');
+// }
+const [isFormFilled, setIsFormFilled] = useState(false);
+const handleBackButton = () => {
+    if (isFormFilled) {
+        const confirmCancel = window.confirm("You have unsaved changes. Are you sure you want to cancel?");
+        if (confirmCancel) {
+          navigate('/firmtemp/templates/organizers');
+        }
+    } else {
+      navigate('/firmtemp/templates/organizers');
+    }
+};
+
+useEffect(() => {
+    // Check if form is filled
+    const checkIfFormFilled = () => {
+        if (organizerName || templateName || sections ) {
+            setIsFormFilled(true);
+        } else {
+            setIsFormFilled(false);
+        }
+    };
+
+    checkIfFormFilled();
+}, [organizerName, templateName, sections]);
   return (
     <>
       <Box>

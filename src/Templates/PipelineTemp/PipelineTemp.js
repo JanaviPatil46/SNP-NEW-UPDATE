@@ -38,9 +38,16 @@ const PipelineTemp = () => {
     setShowForm(true); // Show the form when button is clicked
   };
   const handleClosePipelineTemp = () => {
-    setShowForm(false);
+  
+    
+      const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+      if (confirmCancel) {
+          // If user confirms, clear the form and hide it
+          setShowForm(false);
+        
+      }
+    
   }
-
 
 
   // sort jobs
@@ -317,6 +324,14 @@ const PipelineTemp = () => {
     {
       accessorKey: 'pipelineName',
       header: 'Name',
+      Cell: ({ row }) => (
+        <Typography
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
+          onClick={() => handleEdit(row.original._id)}
+        >
+          {row.original.pipelineName}
+        </Typography>
+      ),
 
     },
     {

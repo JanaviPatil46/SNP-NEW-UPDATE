@@ -168,6 +168,9 @@
   "@tiptap/starter-kit": "^2.5.1",
  
    
+  "@toolpad/core": "^0.5.2",
+ 
+   
   "axios": "^1.7.2",
  
    

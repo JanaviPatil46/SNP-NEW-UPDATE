@@ -8,10 +8,10 @@ import {
     Button,
     Typography,
     Container,
-    
+
     Autocomplete,
     TextField,
-   
+    Dialog, DialogActions, DialogContent, DialogTitle,
 
     Switch,
     FormControlLabel,
@@ -27,15 +27,15 @@ import Status from '../Status/Status';
 import dayjs from 'dayjs';
 
 const Tasks = () => {
-
     const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
     const USER_API = process.env.REACT_APP_USER_URL;
     const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
 
-      const navigate = useNavigate();
+
+
+    const navigate = useNavigate();
     const { _id } = useParams();
     const [tempNameNew, setTempNameNew] = useState("");
-    
     const [tagsNew, setTagsNew] = useState([]);
     const [AssigneesNew, setAssigneesNew] = useState([]);
     const [absoluteDate, setAbsoluteDates] = useState(false);
@@ -50,7 +50,6 @@ const Tasks = () => {
     const handleStartDateChange = (date) => {
         setStartsDateNew(date);
     };
-
     const handleDueDateChange = (date) => {
         setDueDateNew(date);
     };
@@ -62,11 +61,6 @@ const Tasks = () => {
         { label: "Months", value: "Months" },
         { label: "Years", value: "Years" },
     ];
-
-
-
-
-
     const handlePriorityChange = (priority) => {
         setPriority(priority);
     };
@@ -78,12 +72,9 @@ const Tasks = () => {
     const handleEditorChange = (content) => {
         setTaskDescription(content);
     };
-
     const [taskDiscription, setTaskDescription] = useState();
     const [combinedValues, setCombinedValues] = useState([]);
     const [userData, setUserData] = useState([]);
-
-
     useEffect(() => {
         fetchData();
     }, []);
@@ -110,78 +101,70 @@ const Tasks = () => {
         setCombinedValues(selectedValues);
     };
 
-    
-
     //Tag FetchData ================
-  const [tags, setTags] = useState([]);
- 
+    const [tags, setTags] = useState([]);
+    const [combinedTagsValues, setCombinedTagsValues] = useState([]);
+    useEffect(() => {
+        fetchTagData();
+    }, []);
 
-  const [combinedTagsValues, setCombinedTagsValues] = useState([]);
-  useEffect(() => {
-    fetchTagData();
-  }, []);
+    const fetchTagData = async () => {
+        try {
 
-  const fetchTagData = async () => {
-    try {
+            const url = `${TAGS_API}/tags/`;
 
-      const url = `${TAGS_API}/tags/`;
+            const response = await fetch(url);
+            const data = await response.json();
+            setTags(data.tags);
+            //   console.log(data.tags)
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    };
+    //  for tags
+    const calculateWidth = (tagName) => {
 
-      const response = await fetch(url);
-      const data = await response.json();
-      setTags(data.tags);
-    //   console.log(data.tags)
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
-  //  for tags
-  const calculateWidth = (tagName) => {
+        const baseWidth = 10; // base width for each tag
+        const charWidth = 8; // approximate width of each character
+        const padding = 10; // padding on either side
+        return baseWidth + (charWidth * tagName.length) + padding;
+    };
+    const tagsoptions = tags.map((tag) => ({
+        value: tag._id,
+        label: tag.tagName,
+        colour: tag.tagColour,
 
-    const baseWidth = 10; // base width for each tag
-    const charWidth = 8; // approximate width of each character
-    const padding = 10; // padding on either side
-    return baseWidth + (charWidth * tagName.length) + padding;
-  };
+        customStyle: {
+            backgroundColor: tag.tagColour,
+            color: "#fff",
+            borderRadius: "8px",
+            alignItems: "center",
+            textAlign: "center",
+            marginBottom: "5px",
+            padding: "2px,8px",
+            fontSize: '10px',
+            width: `${calculateWidth(tag.tagName)}px`,
+            margin: '7px', cursor: 'pointer',
+        },
+        customTagStyle: {
+            backgroundColor: tag.tagColour,
+            color: "#fff",
+            alignItems: "center",
+            textAlign: "center",
+            padding: "2px,8px",
+            fontSize: '10px',
+            cursor: 'pointer',
+        },
+    }));
 
-
-  const tagsoptions = tags.map((tag) => ({
-    value: tag._id,
-    label: tag.tagName,
-    colour: tag.tagColour,
-
-    customStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      borderRadius: "8px",
-      alignItems: "center",
-      textAlign: "center",
-      marginBottom: "5px",
-      padding: "2px,8px",
-      fontSize: '10px',
-      width: `${calculateWidth(tag.tagName)}px`,
-      margin: '7px', cursor: 'pointer',
-    },
-    customTagStyle: {
-      backgroundColor: tag.tagColour,
-      color: "#fff",
-      alignItems: "center",
-      textAlign: "center",
-      padding: "2px,8px",
-      fontSize: '10px',
-      cursor: 'pointer',
-    },
-  }));
-
-const handleTagChange = (event, newValue) => {
-    setTagsNew(newValue);
-    // Map selected options to their values and send as an array
-    const selectedTagsValues = newValue.map((option) => option.value);
-    // console.log(selectedTagsValues);
-    setCombinedTagsValues(selectedTagsValues);
-};
-
+    const handleTagChange = (event, newValue) => {
+        setTagsNew(newValue);
+        // Map selected options to their values and send as an array
+        const selectedTagsValues = newValue.map((option) => option.value);
+        // console.log(selectedTagsValues);
+        setCombinedTagsValues(selectedTagsValues);
+    };
     const [tempvalues, setTempValues] = useState();
-
     useEffect(() => {
         fetchidwiseData();
     }, []);
@@ -195,12 +178,6 @@ const handleTagChange = (event, newValue) => {
                 throw new Error("Failed to fetch data");
             }
             const data = await response.json();
-
-            // console.log("Fetched Data:", data); // Log the entire response
-
-           
-           
-
             // Extract and process assigneesData
             if (data.taskTemplate && (data.taskTemplate.taskassignees)) {
                 const innerArray = data.taskTemplate.taskassignees[0]; // Extract the inner array
@@ -223,7 +200,6 @@ const handleTagChange = (event, newValue) => {
                     console.log("taskassignees contains an unexpected structure.");
                 }
             }
-
             // Process tasktags
             if (data.taskTemplate.tasktags && Array.isArray(data.taskTemplate.tasktags)) {
                 const tagsData = data.taskTemplate.tasktags.map((tag) => ({
@@ -241,7 +217,7 @@ const handleTagChange = (event, newValue) => {
                         fontSize: '10px',
                         // width: `${calculateWidth(tag.tagName)}px`,
                         margin: '7px', cursor: 'pointer',
-                      }
+                    }
                 }));
                 // console.log("Tags Data:", tagsData); // Log the processed tagsData
 
@@ -258,20 +234,16 @@ const handleTagChange = (event, newValue) => {
             console.error("Error fetching data:", error);
         }
     };
-
-
     useEffect(() => {
         if (tempvalues) {
             tempallvalue();
         }
     }, [tempvalues]);
-
-
     const tempallvalue = () => {
         if (tempvalues) {
             setTempNameNew(tempvalues.templatename || '');
             setStatus(tempvalues.status || '');
-         
+
             setTaskDescription(tempvalues.description || '');
             setPriority(tempvalues.priority || '');
             setStartsInNew(tempvalues.startsin || '');
@@ -283,67 +255,77 @@ const handleTagChange = (event, newValue) => {
             setAbsoluteDates(tempvalues.absolutedates || false);
         }
     };
-
     const updatetasktemp = () => {
-
-
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
-    
-        const raw = JSON.stringify({
-          templatename: tempNameNew,
-          status: status.value,
-       
-          tasktags: combinedTagsValues,
-          taskassignees: combinedValues,
-       
-          priority: priority.value,
-          description: taskDiscription,
-          absolutedates: absoluteDate,
-          startsin: StartsInNew,
-          startsinduration: StartsInDurationNew,
-          duein: DueInNew,
-          dueinduration: DueInDurationNew,
-          comments: "",
-          startdate: StartsDateNew,
-          enddate: DueDateNew,
 
-        
+        const raw = JSON.stringify({
+            templatename: tempNameNew,
+            status: status.value,
+            tasktags: combinedTagsValues,
+            taskassignees: combinedValues,
+
+            priority: priority.value,
+            description: taskDiscription,
+            absolutedates: absoluteDate,
+            startsin: StartsInNew,
+            startsinduration: StartsInDurationNew,
+            duein: DueInNew,
+            dueinduration: DueInDurationNew,
+            comments: "",
+            startdate: StartsDateNew,
+            enddate: DueDateNew,
         });
-    
+
         const requestOptions = {
-          method: "PATCH",
-          headers: myHeaders,
-          body: raw,
-          redirect: "follow",
+            method: "PATCH",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow",
         };
         const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
         fetch(url + _id, requestOptions)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
-            }
-            return response.text();
-          })
-          .then((result) => {
-            toast.success("Task Template updated successfully");
-            navigate("/firmtemp/templates/tasks")
-            
-          })
-          .catch((error) => {
-            // Handle errors
-            console.error(error);
-            toast.error("Failed to create Job Template");
-          });
-      };
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.text();
+            })
+            .then((result) => {
+                toast.success("Task Template updated successfully");
+                navigate("/firmtemp/templates/tasks")
 
-      const handleTaskTempCancle = () => {
-        navigate("/firmtemp/templates/tasks")
-      }
+            })
+            .catch((error) => {
+                // Handle errors
+                console.error(error);
+                toast.error("Failed to create Job Template");
+            });
+    };
+
+    const handleTaskTempCancle = () => {
+        const hasUnsavedChanges =
+            tempNameNew !== tempvalues.templatename ||
+            status !== tempvalues.status ||
+            taskDiscription !== tempvalues.description ||
+            priority !== tempvalues.priority ||
+            AssigneesNew.length !== tempvalues.taskassignees?.length ||
+            tagsNew.length !== tempvalues.tasktags?.length ||
+            absoluteDate !== tempvalues.absolutedates ||
+            StartsDateNew !== dayjs(tempvalues.startdate) ||
+            DueDateNew !== dayjs(tempvalues.enddate);
+
+        if (hasUnsavedChanges) {
+            if (window.confirm("You have unsaved changes. Are you sure you want to leave without saving?")) {
+                navigate("/firmtemp/templates/tasks");
+            }
+        } else {
+            navigate("/firmtemp/templates/tasks");
+        }
+    };
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Container>
-
                 <Box sx={{ mt: 2 }}>
                     <Box>
                         <form>
@@ -365,8 +347,6 @@ const handleTagChange = (event, newValue) => {
                                                             size="small"
                                                             sx={{ background: '#fff', mt: 1 }}
                                                             onChange={(e) => setTempNameNew(e.target.value)} value={tempNameNew}
-
-
                                                         />
                                                     </Box>
                                                 </Grid>
@@ -377,14 +357,10 @@ const handleTagChange = (event, newValue) => {
                                                 </Grid>
                                             </Grid>
                                         </Box>
-
-
-
                                         <Box sx={{ width: '100%' }}>
                                             <Grid container spacing={2}>
                                                 <Grid item xs={12} sm={6}>
                                                     <Box>
-
                                                         <label className='task-input-label'>Task Assignee</label>
                                                         <Autocomplete
                                                             multiple
@@ -417,17 +393,13 @@ const handleTagChange = (event, newValue) => {
                                                 </Grid>
                                             </Grid>
                                         </Box>
-
                                         <Box sx={{ mt: 3, }}>
                                             <Editor
-
                                                 initialContent={taskDiscription} onChange={handleEditorChange}
                                             />
                                         </Box>
                                         <Box mt={2}>
-
                                             <label className='task-input-label'>Tags</label>
-
                                             <Autocomplete
                                                 multiple
                                                 size='small'
@@ -462,7 +434,6 @@ const handleTagChange = (event, newValue) => {
                                                 )}
                                                 isOptionEqualToValue={(option, value) => option.value === value.value}
                                             />
-
                                         </Box>
                                         <Box mt={2}>
                                             <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
@@ -472,10 +443,8 @@ const handleTagChange = (event, newValue) => {
                                                         control={
                                                             <Switch
                                                                 checked={absoluteDate}
-
                                                                 onChange={(event) => handleAbsolutesDates(event.target.checked)}
                                                                 color="primary"
-
                                                             />
                                                         }
                                                         label={"Absolute Date"}
@@ -576,7 +545,6 @@ const handleTagChange = (event, newValue) => {
                                         ></Box>
                                     </Grid>
                                     <Grid item xs={12} sm={5.8} >
-
                                     </Grid>
                                 </Grid>
                                 <Box mt={2} mb={2}><hr /></Box>

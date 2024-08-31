@@ -415,7 +415,9 @@ export default function Editor({ initialContent, onChange }) {
             Subscript,
             Superscript,
             Color,
-            Highlight,
+            Highlight.configure({
+                multicolor: true,  // Enable multicolor support
+              }),
             TaskList,
             TaskItem.configure({ nested: true }),
             Image,

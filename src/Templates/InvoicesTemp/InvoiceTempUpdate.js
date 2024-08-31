@@ -45,11 +45,12 @@ const InvoiceTempUpdate = () => {
 
   
 
-  const handleCloseInvoiceTemp = () => {
-    // window.location.reload();
-    navigate('/firmtemp/templates/invoices')
-  };
+  // const handleCloseInvoiceTemp = () => {
+  //   // window.location.reload();
+  //   navigate('/firmtemp/templates/invoices')
+  // };
 
+ 
   const paymentsOptions = [
     { value: 'Bank Debits', label: 'Bank Debits' },
     { value: 'Credit Card', label: 'Credit Card' },
@@ -232,10 +233,11 @@ const InvoiceTempUpdate = () => {
           isDiscount: false // Assuming this is default false or you can adjust based on your logic
         }));
         setRows(formattedRows);
-        setSubtotal(result.invoiceTemplate.summary.subtotal)
-        setTaxRate(result.invoiceTemplate.summary.taxRate)
-        setTaxTotal(result.invoiceTemplate.summary.taxTotal)
-        setTotalAmount(result.invoiceTemplate.summary.total)
+        setSubtotal(invoiceResult.invoiceTemplate.summary.subtotal)
+        setTaxRate(invoiceResult.invoiceTemplate.summary.taxRate)
+        console.log(invoiceResult.invoiceTemplate.summary.taxRate)
+        setTaxTotal(invoiceResult.invoiceTemplate.summary.taxTotal)
+        setTotalAmount(invoiceResult.invoiceTemplate.summary.total)
       })
       .catch((error) => console.error(error));
   }
@@ -282,7 +284,7 @@ const InvoiceTempUpdate = () => {
         return response.json();
       })
       .then((result) => {
-        console.log(result)
+        // console.log(result)
         // toast.success("Invoice created successfully");
 
         if (result && result.message === "InvoiceTemplate Updated successfully") {
@@ -440,8 +442,8 @@ const[numOfReminder,setnumOfReminder]=useState();
     setRows(newRows);
   };
 
-  const [subtotal, setSubtotal] = useState(0);
-  const [taxRate, setTaxRate] = useState(0);
+  const [subtotal, setSubtotal] = useState('');
+  const [taxRate, setTaxRate] = useState('');
   const [taxTotal, setTaxTotal] = useState(0);
 
   const handleSubtotalChange = (event) => {
@@ -470,7 +472,7 @@ const[numOfReminder,setnumOfReminder]=useState();
         subtotal += parseFloat(row.amount.replace('$', '')) || 0;
 
       });
-      console.log(subtotal)
+      // console.log(subtotal)
       setSubtotal(subtotal);
       calculateTotal(subtotal, taxRate);
     };
@@ -501,6 +503,32 @@ const[numOfReminder,setnumOfReminder]=useState();
     // Simulate filtered shortcuts based on some logic (e.g., search)
     setSwitchFilteredShortcuts(shortcuts.filter((shortcut) => shortcut.title.toLowerCase().includes('')));
   }, [shortcuts]);
+
+
+  const [isFormFilled, setIsFormFilled] = useState(false);
+  const handleCloseInvoiceTemp = () => {
+      if (isFormFilled) {
+          const confirmCancel = window.confirm("You have unsaved changes. Are you sure you want to cancel?");
+          if (confirmCancel) {
+              navigate("/firmtemp/templates/invoices");
+          }
+      } else {
+          navigate("/firmtemp/templates/invoices");
+      }
+  };
+
+  useEffect(() => {
+      // Check if form is filled
+      const checkIfFormFilled = () => {
+          if (templatename || description || paymentMode || emailToClient || clientmsg || payUsingCredits ||invoiceReminders || lineItems ) {
+              setIsFormFilled(true);
+          } else {
+              setIsFormFilled(false);
+          }
+      };
+
+      checkIfFormFilled();
+  }, [templatename ,description ,paymentMode ,emailToClient,clientmsg,payUsingCredits,invoiceReminders,lineItems]); 
   return (
     <Container>
    

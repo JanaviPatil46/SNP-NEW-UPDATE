@@ -228,7 +228,7 @@ const JobTemplateUpdate = () => {
 
   const [templateData, setTemplateData] = useState(null);
   const [tempvalues, setTempValues] = useState();
-
+  const [initialData, setInitialData] = useState({});
   useEffect(() => {
     fetchidwiseData();
   }, []);
@@ -362,9 +362,36 @@ const JobTemplateUpdate = () => {
       });
   };
 
+  // const handleJobTempCancle = () => {
+  //   navigate("/firmtemp/templates/jobs")
+  // }
+
+  const hasUnsavedChanges = () => {
+    return (
+      tempNameNew !== initialData.templatename ||
+      jobname !== initialData.jobname ||
+      PriorityNew !== initialData.priority ||
+      JobDescriptionNew !== initialData.description ||
+      StartsInNew !== initialData.startsin ||
+      DueInNew !== initialData.duein ||
+      !dayjs(StartsDateNew).isSame(dayjs(initialData.startdate)) ||
+      !dayjs(DueDateNew).isSame(dayjs(initialData.enddate)) ||
+      StartsInDurationNew !== initialData.startsinduration ||
+      DueInDurationNew !== initialData.dueinduration ||
+      AbsoluteDateNew !== initialData.absolutedates
+    );
+  };
+
   const handleJobTempCancle = () => {
-    navigate("/firmtemp/templates/jobs")
-  }
+    if (hasUnsavedChanges()) {
+      if (window.confirm("You have unsaved changes. Are you sure you want to cancel?")) {
+        navigate("/firmtemp/templates/jobs");
+      }
+    } else {
+      navigate("/firmtemp/templates/jobs");
+    }
+  };
+  
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>

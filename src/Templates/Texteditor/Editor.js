@@ -69,7 +69,9 @@ export default function Editor({ initialContent, onChange, }) {
       Subscript,
       Superscript,
       Color,
-      Highlight,
+      Highlight.configure({
+        multicolor: true,  // Enable multicolor support
+      }),
       TaskList,
       TaskItem.configure({
         nested: true,
@@ -104,14 +106,15 @@ export default function Editor({ initialContent, onChange, }) {
 
   return (
     <Box
-    className='editor-box'
+      className='editor-box'
       sx={{
         border: '1px solid grey',
         borderRadius: '4px',
         overflow: 'hidden',
+        height: '500px',
       }}
     >
-      <RichTextEditorProvider editor={editor}>
+      <RichTextEditorProvider editor={editor} >
         <Box sx={{ padding: '10px' }}>
           <MenuControlsContainer>
             <MenuSelectFontFamily
@@ -159,6 +162,7 @@ export default function Editor({ initialContent, onChange, }) {
                 { value: '#8085e9', label: 'Light purple' },
               ]}
             />
+
             <MenuDivider />
             <MenuButtonEditLink />
             <MenuDivider />
@@ -192,7 +196,7 @@ export default function Editor({ initialContent, onChange, }) {
         </Box>
 
         <div className="editor-container">
-          <EditorContent editor={editor} className="editor-content" style={{ borderTop: '1px solid grey', padding: '10px', height:'250px', }} />
+          <EditorContent editor={editor} className="editor-content" style={{ borderTop: '1px solid grey', padding: '10px', height: '100%', lineHeight: '0.8', }} />
         </div>
       </RichTextEditorProvider>
     </Box>

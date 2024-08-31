@@ -88,7 +88,14 @@ const JobTemp = () => {
     setDueDate(date);
   };
   const handleCloseJobTemp = () => {
-    setShowForm(false);
+    
+      const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+      if (confirmCancel) {
+          // If user confirms, clear the form and hide it
+          setShowForm(false);
+        
+      }
+    
   }
   const dayOptions = [
     { label: "Days", value: "Days" },
@@ -406,7 +413,14 @@ const JobTemp = () => {
     {
       accessorKey: 'templatename',
       header: 'Name',
-
+      Cell: ({ row }) => (
+        <Typography
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
+          onClick={() => handleEdit(row.original._id)}
+        >
+          {row.original.templatename}
+        </Typography>
+      ),
     },
     {
       accessorKey: 'Setting', header: 'Setting',

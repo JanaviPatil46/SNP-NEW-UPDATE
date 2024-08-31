@@ -51,10 +51,20 @@ const InvoiceTemp = () => {
   const handleCreateInvoiceTemp = () => {
     setShowForm(true);
   };
+  // const handleCloseInvoiceTemp = () => {
+  //   setShowForm(false);
+  // };
   const handleCloseInvoiceTemp = () => {
-    setShowForm(false);
-  };
-
+  
+    
+    const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+    if (confirmCancel) {
+        // If user confirms, clear the form and hide it
+        setShowForm(false);
+      
+    }
+  
+}
   const paymentsOptions = [
     { value: 'Bank Debits', label: 'Bank Debits' },
     { value: 'Credit Card', label: 'Credit Card' },
@@ -192,19 +202,19 @@ const InvoiceTemp = () => {
 
 
   // Calculate Summary Data
-  const calculateSummary = () => {
-    const subtotal = rows.reduce((acc, row) => acc + (parseFloat(row.amount.replace('$', '')) || 0), 0).toFixed(2);
-    const taxRate = 0;
-    const taxTotal = (subtotal * (taxRate / 100)).toFixed(2);
-    const total = (parseFloat(subtotal) + parseFloat(taxTotal)).toFixed(2);
+  // const calculateSummary = () => {
+  //   const subtotal = rows.reduce((acc, row) => acc + (parseFloat(row.amount.replace('$', '')) || 0), 0).toFixed(2);
+  //   const taxRate = 0;
+  //   const taxTotal = (subtotal * (taxRate / 100)).toFixed(2);
+  //   const total = (parseFloat(subtotal) + parseFloat(taxTotal)).toFixed(2);
 
-    return {
-      subtotal: `$${subtotal}`,
-      taxRate: `${taxRate}%`,
-      taxTotal: `$${taxTotal}`,
-      total: `$${total}`,
-    };
-  };
+  //   return {
+  //     subtotal: `$${subtotal}`,
+  //     taxRate: `${taxRate}%`,
+  //     taxTotal: `$${taxTotal}`,
+  //     total: `$${total}`,
+  //   };
+  // };
 
 
 
@@ -337,8 +347,8 @@ const InvoiceTemp = () => {
   const [totalAmount, setTotalAmount] = useState(0);
 
   const [servicedata, setServiceData] = useState([]);
-  const [daysNextReminder, setDaysNextReminder] = useState();
-  const [numOfReminder, setnumOfReminder] = useState();
+  const [daysNextReminder, setDaysNextReminder] = useState('3');
+  const [numOfReminder, setnumOfReminder] = useState('1');
 
   useEffect(() => {
     const calculateSubtotal = () => {
@@ -467,8 +477,8 @@ const InvoiceTemp = () => {
     setRows(newRows);
   };
 
-  const [subtotal, setSubtotal] = useState(0);
-  const [taxRate, setTaxRate] = useState(0);
+  const [subtotal, setSubtotal] = useState('');
+  const [taxRate, setTaxRate] = useState('');
   const [taxTotal, setTaxTotal] = useState(0);
 
   const handleSubtotalChange = (event) => {
@@ -549,19 +559,20 @@ const InvoiceTemp = () => {
     {
       accessorKey: 'templatename', // Access the template name
       header: 'Name',
+      Cell: ({ row }) => (
+        <Typography
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
+          onClick={() => handleEdit(row.original._id)}
+        >
+          {row.original.templatename}
+        </Typography>
+      ),
     },
     {
       accessorKey: 'settings', // Add settings column
       header: 'Settings',
       Cell: ({ row }) => (
-        // <>
-        //   <IconButton aria-label="edit" onClick={() => handleEdit(row.original._id)}>
-        //     <EditIcon />
-        //   </IconButton>
-        //   <IconButton aria-label="delete" onClick={() => handleDelete(row.original._id)}>
-        //     <DeleteIcon />
-        //   </IconButton>
-        // </>
+        
         <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
           <CiMenuKebab style={{ fontSize: "25px" }} />
           {openMenuId === row.original._id && (

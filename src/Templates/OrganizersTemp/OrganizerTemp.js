@@ -15,7 +15,7 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { CiMenuKebab } from "react-icons/ci";
 const OrganizersTemp = () => {
 
-const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
+  const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
 
   const navigate = useNavigate();
 
@@ -59,11 +59,16 @@ const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
 
 
 
+
   const handleCancel = () => {
-    setShowOrganizerTemplateForm(false);
+    // Show confirmation dialog
+    const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+    if (confirmCancel) {
+      // If user confirms, clear the form and hide it
+      setShowOrganizerTemplateForm(false);
 
+    }
   };
-
   function truncateText(text, maxWords) {
     const words = text.split(' ');
     if (words.length > maxWords) {
@@ -115,7 +120,11 @@ const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
         console.log(result)
         if (result && result.message === "Organizer Template created successfully") {
           toast.success("Organizer Template created successfully");
-          handleCancel();
+          setShowOrganizerTemplateForm(false);
+          setTemplateName('');
+          setOrganizerName('');
+          setSections([]);
+          setSelectedSection(null);
           fetchOrganizerTemplates();
 
         } else {
@@ -128,7 +137,7 @@ const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
   const [organizerTemplatesData, setOrganizerTemplatesData] = useState([]);
   const fetchOrganizerTemplates = async () => {
     try {
-      const url =`${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
+      const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error('Failed to fetch email templates');
@@ -149,8 +158,8 @@ const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
   };
 
 
-   //delete template
-   const handleDelete = (_id) => {
+  //delete template
+  const handleDelete = (_id) => {
     const requestOptions = {
       method: "DELETE",
       redirect: "follow"
@@ -188,6 +197,15 @@ const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
     {
       accessorKey: 'templatename',
       header: 'Name',
+      Cell: ({ row }) => (
+        <Typography
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
+          onClick={() => handleEdit(row.original._id)}
+        >
+          {row.original.templatename}
+        </Typography>
+      ),
+
 
     },
     {
@@ -199,7 +217,7 @@ const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
             <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
               <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
                 handleEdit(row.original._id);
-               
+
               }} >Edit</Typography>
               <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
             </Box>
@@ -235,7 +253,7 @@ const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
     <Box p={3}>
       {!showOrganizerTemplateForm && (
         <Box sx={{ mt: 2 }}>
-        
+
           <Button variant="contained" onClick={handleCreateInvoiceClick} sx={{ mb: 3 }}>Create Template</Button>
           <MaterialReactTable columns={columns} table={table} />
 
@@ -274,8 +292,8 @@ const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
             </Box>
 
           </Box>
-          <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%",gap:3 }}>
-            <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "315px" ,overflowY:'auto',p:2}}>
+          <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%", gap: 3 }}>
+            <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "315px", overflowY: 'auto', p: 2 }}>
               <Box className="smooth-dnd-container vertical" >
                 {sections.map((section) => (
                   <Box key={section.id} sx={{ display: "flex", alignItems: "center" }}>
@@ -314,7 +332,7 @@ const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
               )}
             </Box>
           </Box>
-          <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px",marginTop:'20px' }}>
+          <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px", marginTop: '20px' }}>
             <Button
               type="submit"
               variant="contained"

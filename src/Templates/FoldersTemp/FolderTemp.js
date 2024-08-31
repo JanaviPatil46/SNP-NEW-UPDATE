@@ -1,11 +1,28 @@
-import React from 'react'
+import * as React from 'react';
+import { DialogsProvider, useDialogs } from '@toolpad/core/useDialogs';
+import Button from '@mui/material/Button';
 
-const FolderTemp = () => {
+function DemoContent() {
+  const dialogs = useDialogs();
   return (
     <div>
-      FolderTemp
+      <Button
+        onClick={async () => {
+          // preview-start
+          await dialogs.alert('Hello World');
+          // preview-end
+        }}
+      >
+        Alert
+      </Button>
     </div>
-  )
+  );
 }
 
-export default FolderTemp
+export default function AlertDialog() {
+  return (
+    <DialogsProvider>
+      <DemoContent />
+    </DialogsProvider>
+  );
+}

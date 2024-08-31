@@ -20,9 +20,6 @@ import { LuPlusCircle, LuPenLine } from "react-icons/lu";
 import { RxDragHandleDots2 } from "react-icons/rx";
 import { toast } from 'react-toastify';
 import { useNavigate, useParams } from "react-router-dom";
-
-
-
 const PipelineTempUpdate = () => {
   const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
   const JOBS_API = process.env.REACT_APP_JOBS_TEMP_URL;
@@ -39,7 +36,6 @@ const PipelineTempUpdate = () => {
   const [selectedSortByJob, setSelectedSortByJob] = useState('');
   const handleSortingByJobs = (selectedOptions) => {
     setSelectedSortByJob(selectedOptions);
-    
   }
   useEffect(() => {
     fetchSortByJob();
@@ -96,10 +92,7 @@ const PipelineTempUpdate = () => {
   const handleAssigneesChange = (event) => {
     setAssignees(event.target.checked);
   };
-
-
   const [stages, setStages] = useState([]);
-
   const handleAddStage = () => {
     const newStage = { name: '', conditions: [], automations: [], autoMove: false, showDropdown: false, activeAction: null };
     setStages([...stages, newStage]);
@@ -156,11 +149,8 @@ const PipelineTempUpdate = () => {
   const [selectedtemp, setselectedTemp] = useState(() => {
     return localStorage.getItem('selectedtemp') || null;
   });
-
-  
-  const handletemp = async (event, selectedtemp) => {
-    setselectedTemp(selectedtemp);
- 
+ const handletemp = async (event, selectedtemp) => {
+    setselectedTemp(selectedtemp)
   }
   useEffect(() => {
     fetchtemp();
@@ -306,6 +296,7 @@ const PipelineTempUpdate = () => {
         setDescription(data.pipelineTemplate.description);
         setAssignees(data.pipelineTemplate.assignees);
         setStartDate(data.pipelineTemplate.startdate);
+
       } catch (error) {
         console.error("Error fetching pipeline data:", error);
       }
@@ -319,9 +310,32 @@ const PipelineTempUpdate = () => {
     updatePipe();
     navigate("/firmtemp/templates/pipelines")
   };
-  const hanleCloseupdate = ()=>{
-    navigate("/firmtemp/templates/pipelines")
-  }
+  // const hanleCloseupdate = ()=>{
+  //   navigate("/firmtemp/templates/pipelines")
+  // }
+  const [isFormFilled, setIsFormFilled] = useState(false);
+  const hanleCloseupdate = () => {
+      if (isFormFilled) {
+          const confirmCancel = window.confirm("You have unsaved changes. Are you sure you want to cancel?");
+          if (confirmCancel) {
+            navigate("/firmtemp/templates/pipelines")
+          }
+      } else {
+        navigate("/firmtemp/templates/pipelines")
+      }
+  };
+  useEffect(() => {
+    // Check if form is filled
+    const checkIfFormFilled = () => {
+        if (piplineName ||  selectedUser || selectedSortByJob ||selectedtemp || Account_id || Days_on_stage || Account_tags || startDate || Name || Due_date || Description || Assignees || Priority || stages) {
+            setIsFormFilled(true);
+        } else {
+            setIsFormFilled(false);
+        }
+    };
+
+    checkIfFormFilled();
+}, [piplineName ,selectedUser ,selectedSortByJob,selectedtemp ,Account_id ,Days_on_stage,Account_tags,startDate,Name,Due_date,Description,Assignees,Priority,stages]);
 
   return (
     <Container>
