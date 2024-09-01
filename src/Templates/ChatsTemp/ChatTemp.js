@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, } from "react-router-dom";
 import {
   Box,
   Button,
   Typography,
   Container,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
   Grid,
   TextField,
   InputLabel,
@@ -23,51 +16,72 @@ import {
   ListItem,
   ListItemText,
   Popover,
-  IconButton
+  IconButton,
+  Alert
 } from '@mui/material';
-
 import Editor from '../Texteditor/Editor';
 import { CiMenuKebab } from "react-icons/ci";
 import { toast } from "react-toastify";
-import {MaterialReactTable,useMaterialReactTable} from 'material-react-table';
+import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 const ChatTemp = () => {
-
+  const navigate = useNavigate();
   const CHAT_API = process.env.REACT_APP_CHAT_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
+  const [chatTemplates, setChatTemplates] = useState([]);
+  const [templateName, setTemplateName] = useState('');
+  const [selecteduser, setSelectedUser] = useState('');
+  const [inputText, setInputText] = useState('');
+  const [userData, setUserData] = useState([]);
+
+  // const [emailBody, setEmailBody] = useState('');
+  const [daysuntilNextReminder, setDaysuntilNextReminder] = useState('3');
+  const [noOfReminder, setNoOfReminder] = useState(1);
+  const [description, setDescription] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const [selectedShortcut, setSelectedShortcut] = useState('');
   const handleCreateChat = () => {
     setShowForm(true);
   };
- 
+
+
   const handleCloseChatTemp = () => {
-    const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
-    if (confirmCancel) {
-        // If user confirms, clear the form and hide it
-        setShowForm(false);
-      
+    if (isFormDirty) {
+      const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+      if (!confirmClose) {
+        return;
+      }
     }
-  
-}
-  const navigate = useNavigate();
+    setShowForm(false);
+  };
+
+  // Detect form changes
+  useEffect(() => {
+    if (templateName || selecteduser || description) {
+      setIsFormDirty(true);
+    } else {
+      setIsFormDirty(false);
+    }
+  }, [templateName, selecteduser, description]);
+
   //  for shortcodes
   const [showDropdown, setShowDropdown] = useState(false);
   const [shortcuts, setShortcuts] = useState([]);
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
   const [selectedOption, setSelectedOption] = useState('contacts');
- 
+
   const [anchorEl, setAnchorEl] = useState(null);
   const toggleDropdown = (event) => {
     setAnchorEl(event.currentTarget);
     setShowDropdown(!showDropdown);
   };
 
- 
-  
+
+
   const handleAddShortcut = (shortcut) => {
     setInputText((prevText) => prevText + `[${shortcut}]`);
     setShowDropdown(false);
-};
+  };
 
   useEffect(() => {
     // Simulate filtered shortcuts based on some logic (e.g., search)
@@ -155,25 +169,16 @@ const ChatTemp = () => {
       setShortcuts(accountShortcuts);
     }
   }, [selectedOption]);
-console.log(selectedOption)
+  console.log(selectedOption)
   const handleCloseDropdown = () => {
     setAnchorEl(null);
   };
   //Integration 
-  const [chatTemplates, setChatTemplates] = useState([]);
-  const [templateName, setTemplateName] = useState('');
-  const [selecteduser, setSelectedUser] = useState('');
-  const [inputText, setInputText] = useState('');
-  const [userData, setUserData] = useState([]);
-  
-  // const [emailBody, setEmailBody] = useState('');
-  const [daysuntilNextReminder, setDaysuntilNextReminder] = useState('3');
-  const [noOfReminder, setNoOfReminder] = useState(1);
-  const [description, setDescription] = useState('');
+
   const handlechatsubject = (e) => {
     const { value } = e.target;
     setInputText(value);
-};
+  };
 
   const options = userData.map((user) => ({
     value: user._id,
@@ -201,7 +206,7 @@ console.log(selectedOption)
 
   const fetchData = async () => {
     try {
-      const url =  `${USER_API}/api/auth/users`;
+      const url = `${USER_API}/api/auth/users`;
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
@@ -238,13 +243,15 @@ console.log(selectedOption)
     setSelectedUser('');
     setInputText('');
     setNoOfReminder('');
- 
+
     setDescription('');
     setDaysuntilNextReminder('');
   }
   //**  save chat code */
   const savechat = async () => {
-
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -337,7 +344,7 @@ console.log(selectedOption)
       header: 'Name',
       Cell: ({ row }) => (
         <Typography
-          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
           onClick={() => handleEdit(row.original._id)}
         >
           {row.original.templatename}
@@ -362,7 +369,7 @@ console.log(selectedOption)
             <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
               <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
                 handleEdit(row.original._id);
-               
+
               }} >Edit</Typography>
               <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
             </Box>
@@ -375,7 +382,7 @@ console.log(selectedOption)
 
   const table = useMaterialReactTable({
     columns,
-    data:chatTemplates,
+    data: chatTemplates,
     enableBottomToolbar: true,
     enableStickyHeader: true,
     columnFilterDisplayMode: "custom", // Render own filtering UI
@@ -391,6 +398,43 @@ console.log(selectedOption)
       }),
     },
   });
+
+  const [templateNameError, setTemplateNameError] = useState('');
+  const [selectedUserError, setSelectedUserError] = useState('');
+  const [inputTextError, setInputTextError] = useState('');
+
+
+  const validateForm = () => {
+    let isValid = true;
+
+  
+    if (!templateName) {
+      setTemplateNameError("Template name is required");
+      
+      isValid = false;
+    } else {
+      setTemplateNameError('');
+    }
+
+    if (!selecteduser) {
+      setSelectedUserError('Please select a user');
+      isValid = false;
+    } else {
+      setSelectedUserError('');
+    }
+
+    if (inputText.trim() === '') {
+      setInputTextError('Chat subject is required');
+      isValid = false;
+    } else {
+      setInputTextError('');
+    }
+
+
+
+    return isValid;
+  };
+
   return (
     <Container>
       {!showForm ? (
@@ -398,10 +442,10 @@ console.log(selectedOption)
           <Button variant="contained" color="primary" onClick={handleCreateChat} sx={{ mb: 3 }}>
             Create Chat Template
           </Button>
-          
+
           <MaterialReactTable
             columns={columns}
-            
+
             table={table}
           />
         </Box>
@@ -421,6 +465,7 @@ console.log(selectedOption)
                         <TextField
                           value={templateName}
                           onChange={(e) => setTemplateName(e.target.value)}
+                          error={!!templateNameError}
 
                           fullWidth
                           name="TemplateName"
@@ -428,6 +473,23 @@ console.log(selectedOption)
                           size="small"
                           sx={{ mt: 2 }}
                         />
+                        {(!!templateNameError) && <Alert sx={{
+                          width: '96%',
+                          p: '0', // Adjust padding to control the size
+                          pl: '4%', height: '23px',
+                          borderRadius: '10px',
+                          borderTopLeftRadius: '0',
+                          borderTopRightRadius: '0',
+                          fontSize: '15px',
+                          display: 'flex',
+                          alignItems: 'center', // Center content vertically
+                          '& .MuiAlert-icon': {
+                            fontSize: '16px', // Adjust the size of the icon
+                            mr: '8px', // Add margin to the right of the icon
+                          },
+                        }} variant="filled" severity="error" >
+                          {templateNameError}
+                        </Alert>}
                       </Box>
 
                       <Box mt={2}>
@@ -446,30 +508,69 @@ console.log(selectedOption)
                           isOptionEqualToValue={(option, value) => option.value === value.value}
                           getOptionLabel={(option) => option.label || ""}
                           renderInput={(params) => (
-                            <TextField
-                              {...params}
+                            <>
+                              <TextField
+                                {...params}
+                                error={!!selectedUserError}
 
-                              placeholder="Form"
-                            />
+                                placeholder="Form"
+                              />
+                              {(!!selectedUserError) && <Alert sx={{
+                                width: '96%',
+                                p: '0', // Adjust padding to control the size
+                                pl: '4%', height: '23px',
+                                borderRadius: '10px',
+                                borderTopLeftRadius: '0',
+                                borderTopRightRadius: '0',
+                                fontSize: '15px',
+                                display: 'flex',
+                                alignItems: 'center', // Center content vertically
+                                '& .MuiAlert-icon': {
+                                  fontSize: '16px', // Adjust the size of the icon
+                                  mr: '8px', // Add margin to the right of the icon
+                                },
+                              }} variant="filled" severity="error" >
+                                {selectedUserError}
+                              </Alert>}
+                            </>
                           )}
                           isClearable={true}
 
                         />
 
                       </Box>
-                     
+
                       <Box>
 
                         <InputLabel sx={{ color: 'black' }}>Subject</InputLabel>
 
                         <TextField
-                          margin="normal"
+                          sx={{ mt: 2 }}
                           fullWidth
                           name="subject"
                           value={inputText + selectedShortcut} onChange={handlechatsubject}
                           placeholder="Subject"
                           size="small"
+                          error={!!inputTextError}
+
                         />
+                        {(!!inputTextError) && <Alert sx={{
+                          width: '96%',
+                          p: '0', // Adjust padding to control the size
+                          pl: '4%', height: '23px',
+                          borderRadius: '10px',
+                          borderTopLeftRadius: '0',
+                          borderTopRightRadius: '0',
+                          fontSize: '15px',
+                          display: 'flex',
+                          alignItems: 'center', // Center content vertically
+                          '& .MuiAlert-icon': {
+                            fontSize: '16px', // Adjust the size of the icon
+                            mr: '8px', // Add margin to the right of the icon
+                          },
+                        }} variant="filled" severity="error" >
+                          {inputTextError}
+                        </Alert>}
                       </Box>
                       <Box>
                         <Button
@@ -526,10 +627,10 @@ console.log(selectedOption)
                             <FormControlLabel
                               control={
                                 <Switch
-                                checked={absoluteDate}
-                                onChange={(event) => handleAbsolutesDates(event.target.checked)}
-                                // checked={sendreminderstoclient}
-                                // onChange={(event)=>handleDateSwitchChange(event.target.checked)}
+                                  checked={absoluteDate}
+                                  onChange={(event) => handleAbsolutesDates(event.target.checked)}
+                                  // checked={sendreminderstoclient}
+                                  // onChange={(event)=>handleDateSwitchChange(event.target.checked)}
                                   color="primary"
                                 />
                               }
@@ -541,7 +642,7 @@ console.log(selectedOption)
                         </Box>
                         {absoluteDate && (
                           <Box mb={3}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 ,mt:2}}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mt: 2 }}>
 
                               <Box>
                                 <InputLabel sx={{ color: 'black' }}>Days until next reminder</InputLabel>

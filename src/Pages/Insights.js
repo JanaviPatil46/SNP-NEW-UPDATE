@@ -1,4 +1,6 @@
 // InsightsPage.js
+
+
 import React from 'react';
 import { Box, Grid, Paper, Typography, Container } from '@mui/material';
 

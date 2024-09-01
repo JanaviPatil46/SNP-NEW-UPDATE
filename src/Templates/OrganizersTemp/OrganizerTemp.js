@@ -8,7 +8,8 @@ import {
   Button,
   TextField,
   IconButton,
-  Typography
+  Typography,
+  Alert
 } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
@@ -48,7 +49,17 @@ const OrganizersTemp = () => {
     ));
   };
 
-
+  const handleDuplicateSection = (sectionId) => {
+    const sectionToDuplicate = sections.find(section => section.id === sectionId);
+    if (sectionToDuplicate) {
+      const duplicatedSection = {
+        ...sectionToDuplicate,
+        text: `${sectionToDuplicate.text} (Copy)`,
+        id: Date.now(), // Assign a new ID for the duplicated section
+      };
+      setSections([...sections, duplicatedSection]);
+    }
+  };
 
 
   const [showOrganizerTemplateForm, setShowOrganizerTemplateForm] = useState(false);
@@ -60,15 +71,7 @@ const OrganizersTemp = () => {
 
 
 
-  const handleCancel = () => {
-    // Show confirmation dialog
-    const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
-    if (confirmCancel) {
-      // If user confirms, clear the form and hide it
-      setShowOrganizerTemplateForm(false);
 
-    }
-  };
   function truncateText(text, maxWords) {
     const words = text.split(' ');
     if (words.length > maxWords) {
@@ -80,7 +83,9 @@ const OrganizersTemp = () => {
   const saveOrganizerTemp = () => {
 
     console.log(sections)
-
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -249,6 +254,65 @@ const OrganizersTemp = () => {
     },
   });
 
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const handleCancel = () => {
+    // Show confirmation dialog
+    // const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+    // if (confirmCancel) {
+    //   // If user confirms, clear the form and hide it
+    //   setShowOrganizerTemplateForm(false);
+
+    // }
+    if (isFormDirty) {
+      const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+      if (!confirmClose) {
+        return;
+      }
+    }
+    setShowOrganizerTemplateForm(false);
+  };
+
+  // Detect form changes
+  useEffect(() => {
+    if (templateName || organizerName) {
+      setIsFormDirty(true);
+    } else {
+      setIsFormDirty(false);
+    }
+  }, [templateName, organizerName]);
+
+
+
+  const [templateNameError, setTemplateNameError] = useState('');
+  const [organizerError, setOrganizerError] = useState('');
+
+
+
+  const validateForm = () => {
+    let isValid = true;
+
+
+    if (!templateName) {
+      setTemplateNameError("Template name is required");
+
+      isValid = false;
+    } else {
+      setTemplateNameError('');
+    }
+
+    if (!organizerName) {
+      setOrganizerError('Organizer name is required');
+      isValid = false;
+    } else {
+      setOrganizerError('');
+    }
+
+
+
+
+
+    return isValid;
+  };
   return (
     <Box p={3}>
       {!showOrganizerTemplateForm && (
@@ -270,11 +334,29 @@ const OrganizersTemp = () => {
                 onChange={(e) => setTemplateName(e.target.value)}
                 fullWidth
                 size='small'
-                margin='normal'
+
                 placeholder='Template name'
-                sx={{ backgroundColor: '#fff' }}
+                sx={{ backgroundColor: '#fff',mt:2 }}
                 className='organizer-input-label'
+                error={!!templateNameError}
               />
+              {(!!templateNameError) && <Alert sx={{
+                width: '96%',
+                p: '0', // Adjust padding to control the size
+                pl: '4%', height: '23px',
+                borderRadius: '10px',
+                borderTopLeftRadius: '0',
+                borderTopRightRadius: '0',
+                fontSize: '15px',
+                display: 'flex',
+                alignItems: 'center', // Center content vertically
+                '& .MuiAlert-icon': {
+                  fontSize: '16px', // Adjust the size of the icon
+                  mr: '8px', // Add margin to the right of the icon
+                },
+              }} variant="filled" severity="error" >
+                {templateNameError}
+              </Alert>}
             </Box>
             <Box mt={2}>
               <label className='organizer-input-label'>Organizer name</label>
@@ -284,11 +366,28 @@ const OrganizersTemp = () => {
                 onChange={(e) => setOrganizerName(e.target.value)}
                 fullWidth
                 size='small'
-                margin='normal'
+                error={!!organizerError}
                 placeholder='Organizer name'
                 className='organizer-input-label'
-                sx={{ backgroundColor: '#fff' }}
+                sx={{ backgroundColor: '#fff',mt:2 }}
               />
+              {(!!organizerError) && <Alert sx={{
+                width: '96%',
+                p: '0', // Adjust padding to control the size
+                pl: '4%', height: '23px',
+                borderRadius: '10px',
+                borderTopLeftRadius: '0',
+                borderTopRightRadius: '0',
+                fontSize: '15px',
+                display: 'flex',
+                alignItems: 'center', // Center content vertically
+                '& .MuiAlert-icon': {
+                  fontSize: '16px', // Adjust the size of the icon
+                  mr: '8px', // Add margin to the right of the icon
+                },
+              }} variant="filled" severity="error" >
+                {organizerError}
+              </Alert>}
             </Box>
 
           </Box>
@@ -328,6 +427,7 @@ const OrganizersTemp = () => {
                   section={selectedSection}
                   onDelete={handleDeleteSection}
                   onUpdate={handleUpdateSection}
+                  onDuplicate={handleDuplicateSection}
                 />
               )}
             </Box>

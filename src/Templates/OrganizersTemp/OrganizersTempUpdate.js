@@ -77,7 +77,17 @@ const OrganizersTempUpdate = () => {
     ));
   };
 
-
+  const handleDuplicateSection = (sectionId) => {
+    const sectionToDuplicate = sections.find(section => section.id === sectionId);
+    if (sectionToDuplicate) {
+      const duplicatedSection = {
+        ...sectionToDuplicate,
+        text: `${sectionToDuplicate.text} (Copy)`,
+        id: Date.now(), // Assign a new ID for the duplicated section
+      };
+      setSections([...sections, duplicatedSection]);
+    }
+  };
   const saveOrganizerTemp = () => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
@@ -223,6 +233,7 @@ useEffect(() => {
               section={selectedSection}
               onDelete={handleDeleteSection}
               onUpdate={handleUpdateSection}
+              onDuplicate={handleDuplicateSection}
             />
           )}
         </Box>

@@ -28,7 +28,7 @@ const Tasks = () => {
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
 
   const navigate = useNavigate();
-
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const [templatename, settemplatename] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [startsin, setstartsin] = useState("");
@@ -40,6 +40,11 @@ const Tasks = () => {
   const [status, setStatus] = useState('');
   const [startsInDuration, setStartsInDuration] = useState(null);
   const [dueinduration, setdueinduration] = useState("");
+  const [description, setDescription] = useState('');
+  const [selectedUser, setSelectedUser] = useState([]);
+  const [combinedValues, setCombinedValues] = useState([]);
+  const [userData, setUserData] = useState([]);
+
   const handleAbsolutesDates = (checked) => {
     setAbsoluteDates(checked);
   };
@@ -68,30 +73,20 @@ const Tasks = () => {
   const handleCreateTask = () => {
     setShowForm(true);
   };
-  const handleTaskCancel = () => {
+ 
 
-    
-    const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
-    if (confirmCancel) {
-        // If user confirms, clear the form and hide it
-        setShowForm(false);
-      
-    }
-  };
+  
   const handlePriorityChange = (priority) => {
     setPriority(priority);
   };
   const handleStatusChange = (status) => {
     setStatus(status);
   };
-  const [description, setDescription] = useState('');
+ 
   const handleEditorChange = (content) => {
     setDescription(content);
   };
-  const [selectedUser, setSelectedUser] = useState([]);
-  const [combinedValues, setCombinedValues] = useState([]);
-  const [userData, setUserData] = useState([]);
-
+  
   // console.log(combinedValues)
   useEffect(() => {
     fetchData();
@@ -323,7 +318,7 @@ const Tasks = () => {
         return response.text();
       })
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         toast.success('Item deleted successfully');
         fetchTaskData();
         // setshowOrganizerTemplateForm(false);
@@ -391,25 +386,7 @@ const Tasks = () => {
       }),
     },
   });
-  // Track changes in the form inputs
-  const handleInputChange = (setter) => (e) => {
-    setter(e.target.value);
-    setHasUnsavedChanges(true); // Mark the form as having unsaved changes
-  };
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  // Prevent navigation if there are unsaved changes
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = ''; // This will trigger a browser-specific dialog
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [hasUnsavedChanges]);
+  
   const [templateNameError, setTemplateNameError] = useState('');
   const [startDateError, setStartDateError] = useState('');
   const [dueDateError, setDueDateError] = useState('');
@@ -461,6 +438,25 @@ const Tasks = () => {
     return isValid;
   };
 
+
+  const handleTaskCancel = () => {
+    if (isFormDirty) {
+      const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+      if (!confirmClose) {
+        return;
+      }
+    }
+    setShowForm(false);
+  };
+
+  // Detect form changes
+  useEffect(() => {
+    if (templatename || priority || description || status || absoluteDate ) {
+      setIsFormDirty(true);
+    } else {
+      setIsFormDirty(false);
+    }
+  }, [templatename, priority, description, status, absoluteDate ]);
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
@@ -493,7 +489,7 @@ const Tasks = () => {
                                 sx={{
                                   background: '#fff', mt: 1,
                                 }}
-                                onChange={handleInputChange(settemplatename)}
+                                onChange={(e) => settemplatename(e.target.value)}
                                 error={!!templateNameError}
                               />
                               {(!!templateNameError) && <Alert sx={{

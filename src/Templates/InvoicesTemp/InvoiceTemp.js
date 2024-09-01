@@ -6,7 +6,7 @@ import { BsThreeDotsVertical } from 'react-icons/bs';
 import { RiCloseLine } from 'react-icons/ri';
 
 import { toast } from "react-toastify";
-import Select from 'react-select'
+
 import {
   Box,
   Button,
@@ -32,7 +32,8 @@ import {
   ListItem,
   ListItemText,
   Popover,
-  Checkbox
+  Checkbox,
+  Alert
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
@@ -54,17 +55,7 @@ const InvoiceTemp = () => {
   // const handleCloseInvoiceTemp = () => {
   //   setShowForm(false);
   // };
-  const handleCloseInvoiceTemp = () => {
-  
-    
-    const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
-    if (confirmCancel) {
-        // If user confirms, clear the form and hide it
-        setShowForm(false);
-      
-    }
-  
-}
+
   const paymentsOptions = [
     { value: 'Bank Debits', label: 'Bank Debits' },
     { value: 'Credit Card', label: 'Credit Card' },
@@ -257,6 +248,9 @@ const InvoiceTemp = () => {
 
 
   const createInvoiceTemp = () => {
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -561,7 +555,7 @@ const InvoiceTemp = () => {
       header: 'Name',
       Cell: ({ row }) => (
         <Typography
-          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
           onClick={() => handleEdit(row.original._id)}
         >
           {row.original.templatename}
@@ -572,7 +566,7 @@ const InvoiceTemp = () => {
       accessorKey: 'settings', // Add settings column
       header: 'Settings',
       Cell: ({ row }) => (
-        
+
         <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
           <CiMenuKebab style={{ fontSize: "25px" }} />
           {openMenuId === row.original._id && (
@@ -606,6 +600,54 @@ const InvoiceTemp = () => {
       }),
     },
   });
+  const [templatenameError, setTemplatenameError] = useState('');
+  const [descriptionError, setDescriptionError] = useState('');
+
+
+
+  const validateForm = () => {
+    let isValid = true;
+
+    if (!templatename) {
+      setTemplatenameError("Template name is required");
+      
+      isValid = false;
+    } else {
+      setTemplatenameError('');
+    }
+    if (!description) {
+      setDescriptionError('Please select a user');
+      isValid = false;
+    } else {
+      setDescriptionError('');
+    }
+
+
+
+
+
+    return isValid;
+  };
+
+  const [isFormDirty, setIsFormDirty] = useState(false);
+  const handleCloseInvoiceTemp = () => {
+    if (isFormDirty) {
+      const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+      if (!confirmClose) {
+        return;
+      }
+    }
+    setShowForm(false);
+  };
+
+  // Detect form changes
+  useEffect(() => {
+    if (templatename || description || paymentMode || emailToClient) {
+      setIsFormDirty(true);
+    } else {
+      setIsFormDirty(false);
+    }
+  }, [templatename, description, paymentMode, emailToClient,]);
   return (
     <Container>
       {!showForm ? (
@@ -640,16 +682,34 @@ const InvoiceTemp = () => {
                           placeholder="Template Name"
                           size="small"
                           sx={{ mt: 2 }}
+                          error={!!templatenameError}
                           value={templatename}
                           onChange={(e) => setTemplatename(e.target.value)}
                         />
+                        {(!!templatenameError) && <Alert sx={{
+                          width: '96%',
+                          p: '0', // Adjust padding to control the size
+                          pl: '4%', height: '23px',
+                          borderRadius: '10px',
+                          borderTopLeftRadius: '0',
+                          borderTopRightRadius: '0',
+                          fontSize: '15px',
+                          display: 'flex',
+                          alignItems: 'center', // Center content vertically
+                          '& .MuiAlert-icon': {
+                            fontSize: '16px', // Adjust the size of the icon
+                            mr: '8px', // Add margin to the right of the icon
+                          },
+                        }} variant="filled" severity="error" >
+                          {templatenameError}
+                        </Alert>}
                       </Box>
 
 
                       <Box>
                         <InputLabel sx={{ color: 'black', mt: 2 }}>Description</InputLabel>
                         <TextField
-
+                          error={!!descriptionError}
                           fullWidth
                           name="Description"
                           value={description}
@@ -659,6 +719,23 @@ const InvoiceTemp = () => {
                           inputProps={{ maxLength: 50000 }}
                           sx={{ mt: 2 }}
                         />
+                        {(!!descriptionError) && <Alert sx={{
+                          width: '96%',
+                          p: '0', // Adjust padding to control the size
+                          pl: '4%', height: '23px',
+                          borderRadius: '10px',
+                          borderTopLeftRadius: '0',
+                          borderTopRightRadius: '0',
+                          fontSize: '15px',
+                          display: 'flex',
+                          alignItems: 'center', // Center content vertically
+                          '& .MuiAlert-icon': {
+                            fontSize: '16px', // Adjust the size of the icon
+                            mr: '8px', // Add margin to the right of the icon
+                          },
+                        }} variant="filled" severity="error" >
+                          {descriptionError}
+                        </Alert>}
 
                       </Box>
 
@@ -711,9 +788,9 @@ const InvoiceTemp = () => {
                         <InputLabel sx={{ color: 'black', mt: 2 }}>Choose payment method</InputLabel>
 
                         <Autocomplete
-                        size='small'
-                        fullWidth
-                        sx={{mt:2}}
+                          size='small'
+                          fullWidth
+                          sx={{ mt: 2 }}
                           options={paymentsOptions}
                           getOptionLabel={(option) => option?.label || ''}
                           onChange={handlePaymentOptionChange}
@@ -914,7 +991,7 @@ const InvoiceTemp = () => {
                             <TableBody>
                               {rows.map((row, index) => (
                                 <TableRow key={index}>
-                                  
+
                                   <TableCell>
                                     <CreatableSelect
                                       placeholder="Product or Service"

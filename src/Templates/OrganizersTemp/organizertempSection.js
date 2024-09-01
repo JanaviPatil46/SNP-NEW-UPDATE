@@ -9,10 +9,11 @@ import {
   Menu,
   MenuItem,
   Input,
-  Typography
+  Typography,
+
 } from '@mui/material';
 
-const Section = ({ section, onDelete, onUpdate }) => {
+const Section = ({ section, onDelete, onUpdate,onDuplicate }) => {
   const [text, setText] = useState(section.text);
   const [formElements, setFormElements] = useState(section.formElements || []);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -25,7 +26,9 @@ const Section = ({ section, onDelete, onUpdate }) => {
   const handleDelete = () => {
     onDelete(section.id);
   };
-
+  const handleDuplicate = () => {
+    onDuplicate(section.id);
+  };
   const handleTextChange = (event) => {
     const newText = event.target.value;
     setText(newText);
@@ -137,12 +140,16 @@ const Section = ({ section, onDelete, onUpdate }) => {
       </Box>
     );
   };
+  
 
   const renderFormElement = (element) => {
     switch (element.type) {
       case 'Free Entry':
         return (
+          <>
+          <Typography>Free Entry</Typography>
           <Box key={element.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            
             <TextField
               variant="outlined"
               placeholder="Free Entry"
@@ -158,10 +165,14 @@ const Section = ({ section, onDelete, onUpdate }) => {
               <RiDeleteBinLine />
             </IconButton>
           </Box>
+          </>
         );
       case 'Email':
         return (
+          <>
+          <Typography>Email</Typography>
           <Box key={element.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            
             <TextField
               variant="outlined"
               placeholder="Email"
@@ -176,10 +187,14 @@ const Section = ({ section, onDelete, onUpdate }) => {
               <RiDeleteBinLine />
             </IconButton>
           </Box>
+          </>
         );
       case 'Number':
         return (
+          <>
+           <Typography>Number</Typography>
           <Box key={element.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+           
             <TextField
               variant="outlined"
               placeholder="Number"
@@ -194,10 +209,14 @@ const Section = ({ section, onDelete, onUpdate }) => {
               <RiDeleteBinLine />
             </IconButton>
           </Box>
+          </>
         );
       case 'Date':
         return (
+          <>
+          <Typography>Date</Typography>
           <Box key={element.id} sx={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+            
             <Input
               type="date"
               value={element.text}
@@ -208,6 +227,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
               <RiDeleteBinLine />
             </IconButton>
           </Box>
+          </>
         );
       case 'Radio Buttons':
         return (
@@ -330,7 +350,7 @@ const Section = ({ section, onDelete, onUpdate }) => {
           <IconButton onClick={handleDelete}>
             <RiDeleteBinLine />
           </IconButton>
-          <IconButton >
+          <IconButton onClick={handleDuplicate}>
             <HiOutlineDuplicate />
           </IconButton>
           <Menu

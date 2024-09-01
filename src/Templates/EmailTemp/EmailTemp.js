@@ -16,7 +16,7 @@ import {
     Popover,
     TextField,
     Autocomplete,
-   
+    Alert
 } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
@@ -24,10 +24,10 @@ import { CiMenuKebab } from "react-icons/ci";
 import EditorShortcodes from '../Texteditor/EditorShortcodes';
 
 const EmailTemp = () => {
-   
+
 
     const EMAIL_API = process.env.REACT_APP_EMAIL_TEMP_URL;
-  const USER_API = process.env.REACT_APP_USER_URL;
+    const USER_API = process.env.REACT_APP_USER_URL;
 
 
     const navigate = useNavigate();
@@ -39,23 +39,25 @@ const EmailTemp = () => {
     const [shortcuts, setShortcuts] = useState([]);
     const [filteredShortcuts, setFilteredShortcuts] = useState([]);
     const [selectedOption, setSelectedOption] = useState('contacts');
-
+    const [isFormDirty, setIsFormDirty] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
-   
+
     const handleCreateTemplate = () => {
         setShowForm(true); // Show the form when button is clicked
     };
-  
-    const handleTempCancle = () => {
-        // Show confirmation dialog
-        const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
-        if (confirmCancel) {
-            // If user confirms, clear the form and hide it
-            setShowForm(false);
-            
-        }
-    };
-    
+
+    // const handleTempCancle = () => {
+    //     // Show confirmation dialog
+    //     const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+    //     if (confirmCancel) {
+    //         // If user confirms, clear the form and hide it
+    //         setShowForm(false);
+
+    //     }
+    // };
+
+
+
     const handleChange = (event) => {
         setSelectedOption(event.target.value);
     };
@@ -195,7 +197,9 @@ const EmailTemp = () => {
     }));
     const handleSaveTemplate = (e) => {
         e.preventDefault();
-
+        if (!validateForm()) {
+            return; // Prevent form submission if validation fails
+        }
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
 
@@ -233,7 +237,7 @@ const EmailTemp = () => {
             });
     }
     const [emailBody, setEmailBody] = useState('');
-  
+
     const handleEditorChange = (content) => {
         setEmailBody(content);
     };
@@ -266,13 +270,13 @@ const EmailTemp = () => {
         fetchEmailTemplates();
     }, []);
 
-  
 
-    
+
+
 
     const handleEdit = (_id) => {
         navigate("emailTempUpdate/" + _id);
-     
+
     };
 
     const handleDelete = (_id) => {
@@ -291,7 +295,7 @@ const EmailTemp = () => {
             .then((result) => {
                 toast.success('Data deleted successfully');
                 fetchEmailTemplates();
-              
+
             })
             .catch((error) => {
                 console.error(error);
@@ -301,84 +305,138 @@ const EmailTemp = () => {
     const [tempIdget, setTempIdGet] = useState("");
     const [openMenuId, setOpenMenuId] = useState(null);
     const toggleMenu = (_id) => {
-      setOpenMenuId(openMenuId === _id ? null : _id);
-      setTempIdGet(_id);
+        setOpenMenuId(openMenuId === _id ? null : _id);
+        setTempIdGet(_id);
     };
     // console.log(tempIdget)
     const columns = useMemo(() => [
-      {
-        accessorKey: 'templatename',
-        header: 'Name',
-        Cell: ({ row }) => (
-            <Typography
-              sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
-              onClick={() => handleEdit(row.original._id)}
-            >
-              {row.original.templatename}
-            </Typography>
-          ),
-  
-      },
-      {
-        accessorKey: 'emailsubject',
-        header: 'Subject',
-  
-      },
-      {
-        accessorKey: 'Used in pipeline',
-        header: 'Used in pipeline',
-  
-      },
-      {
-        accessorKey: 'Setting', header: 'Setting',
-        Cell: ({ row }) => (
-          <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
-            <CiMenuKebab style={{ fontSize: "25px" }} />
-            {openMenuId === row.original._id && (
-              <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
-                <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
-                  handleEdit(row.original._id);
-  
-                }} >Edit</Typography>
-                <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
-              </Box>
-            )}
-          </IconButton>
-  
-        ),
-  
-      },
-  
+        {
+            accessorKey: 'templatename',
+            header: 'Name',
+            Cell: ({ row }) => (
+                <Typography
+                    sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
+                    onClick={() => handleEdit(row.original._id)}
+                >
+                    {row.original.templatename}
+                </Typography>
+            ),
+
+        },
+        {
+            accessorKey: 'emailsubject',
+            header: 'Subject',
+
+        },
+        {
+            accessorKey: 'Used in pipeline',
+            header: 'Used in pipeline',
+
+        },
+        {
+            accessorKey: 'Setting', header: 'Setting',
+            Cell: ({ row }) => (
+                <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+                    <CiMenuKebab style={{ fontSize: "25px" }} />
+                    {openMenuId === row.original._id && (
+                        <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+                            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
+                                handleEdit(row.original._id);
+
+                            }} >Edit</Typography>
+                            <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
+                        </Box>
+                    )}
+                </IconButton>
+
+            ),
+
+        },
+
     ], [openMenuId]);
-  
+
     const table = useMaterialReactTable({
-      columns,
-      data: emailTemplates,
-      enableBottomToolbar: true,
-      enableStickyHeader: true,
-      columnFilterDisplayMode: "custom", // Render own filtering UI
-      enableRowSelection: true, // Enable row selection
-      enablePagination: true,
-      muiTableContainerProps: { sx: { maxHeight: "400px" } },
-      initialState: {
-        columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
-      },
-      muiTableBodyCellProps: {
-        sx: (theme) => ({
-          backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
-        }),
-      },
+        columns,
+        data: emailTemplates,
+        enableBottomToolbar: true,
+        enableStickyHeader: true,
+        columnFilterDisplayMode: "custom", // Render own filtering UI
+        enableRowSelection: true, // Enable row selection
+        enablePagination: true,
+        muiTableContainerProps: { sx: { maxHeight: "400px" } },
+        initialState: {
+            columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+        },
+        muiTableBodyCellProps: {
+            sx: (theme) => ({
+                backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+            }),
+        },
     });
+    const handleTempCancle = () => {
+        if (isFormDirty) {
+            const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+            if (!confirmClose) {
+                return;
+            }
+        }
+        setShowForm(false);
+    };
+
+    // Detect form changes
+    useEffect(() => {
+        if (templateName || selecteduser || inputText) {
+            setIsFormDirty(true);
+        } else {
+            setIsFormDirty(false);
+        }
+    }, [templateName, selecteduser, inputText]);
+
+
+    const [templateNameError, setTemplateNameError] = useState('');
+    const [selectedUserError, setSelectedUserError] = useState('');
+    const [inputTextError, setInputTextError] = useState('');
+    
+
+    const validateForm = () => {
+        let isValid = true;
+
+        if (templateName.trim() === '') {
+            setTemplateNameError('Template name is required');
+            isValid = false;
+        } else {
+            setTemplateNameError('');
+        }
+
+        if (!selecteduser) {
+            setSelectedUserError('Please select a user');
+            isValid = false;
+        } else {
+            setSelectedUserError('');
+        }
+
+        if (inputText.trim() === '') {
+            setInputTextError('Email subject is required');
+            isValid = false;
+        } else {
+            setInputTextError('');
+        }
+
+       
+
+        return isValid;
+    };
+
     return (
         <Container>
-      
+
             {!showForm ? (
                 <Box sx={{ mt: 2 }}>
-                    <Button variant="contained" color="primary" onClick={handleCreateTemplate} sx={{mb:3}}>
+                    <Button variant="contained" color="primary" onClick={handleCreateTemplate} sx={{ mb: 3 }}>
                         Create Template
                     </Button>
                     <MaterialReactTable columns={columns} table={table} />
-                    
+
                 </Box>
             ) : (
                 <Box
@@ -396,15 +454,34 @@ const EmailTemp = () => {
                             <label className='email-input-label'>Template Name</label>
 
                             <TextField
-                                sx={{ background: '#fff' }}
-                                margin="normal"
+                                sx={{ background: '#fff', mt: 2 }}
+
                                 fullWidth
                                 name="templateName"
                                 value={templateName}
+                                error={!!templateNameError}
+                                // helperText={templateNameError}
                                 onChange={(e) => setTemplateName(e.target.value)}
                                 placeholder="Template Name"
                                 size="small"
                             />
+                            {(!!templateNameError) && <Alert sx={{
+                                width: '96%',
+                                p: '0', // Adjust padding to control the size
+                                pl: '4%', height: '23px',
+                                borderRadius: '10px',
+                                borderTopLeftRadius: '0',
+                                borderTopRightRadius: '0',
+                                fontSize: '15px',
+                                display: 'flex',
+                                alignItems: 'center', // Center content vertically
+                                '& .MuiAlert-icon': {
+                                    fontSize: '16px', // Adjust the size of the icon
+                                    mr: '8px', // Add margin to the right of the icon
+                                },
+                            }} variant="filled" severity="error" >
+                                {templateNameError}
+                            </Alert>}
                         </Box>
                         <Box>
                             <Typography variant="h6" gutterBottom>
@@ -448,15 +525,36 @@ const EmailTemp = () => {
                                 isOptionEqualToValue={(option, value) => option.value === value.value}
                                 getOptionLabel={(option) => option.label || ""}
                                 renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-
-                                        placeholder="Form"
-                                    />
+                                    <>
+                                        <TextField
+                                            {...params}
+                                            error={!!selectedUserError}
+                                            // helperText={selectedUserError}
+                                            placeholder="Form"
+                                        />
+                                        {(!!selectedUserError) && <Alert sx={{
+                                            width: '96%',
+                                            p: '0', // Adjust padding to control the size
+                                            pl: '4%', height: '23px',
+                                            borderRadius: '10px',
+                                            borderTopLeftRadius: '0',
+                                            borderTopRightRadius: '0',
+                                            fontSize: '15px',
+                                            display: 'flex',
+                                            alignItems: 'center', // Center content vertically
+                                            '& .MuiAlert-icon': {
+                                                fontSize: '16px', // Adjust the size of the icon
+                                                mr: '8px', // Add margin to the right of the icon
+                                            },
+                                        }} variant="filled" severity="error" >
+                                            {selectedUserError}
+                                        </Alert>}
+                                    </>
                                 )}
                                 isClearable={true}
 
                             />
+
 
                         </Box>
                         <Box>
@@ -464,14 +562,33 @@ const EmailTemp = () => {
                             <label className='email-input-label'>Subject</label>
 
                             <TextField
-                                margin="normal"
+                                
                                 fullWidth
                                 name="subject"
                                 value={inputText + selectedShortcut} onChange={handlechatsubject}
                                 placeholder="Subject"
                                 size="small"
-                                sx={{ background: '#fff' }}
+                                error={!!inputTextError}
+                                // helperText={inputTextError}
+                                sx={{ background: '#fff',mt:2 }}
                             />
+                            {(!!inputTextError) && <Alert sx={{
+                                width: '96%',
+                                p: '0', // Adjust padding to control the size
+                                pl: '4%', height: '23px',
+                                borderRadius: '10px',
+                                borderTopLeftRadius: '0',
+                                borderTopRightRadius: '0',
+                                fontSize: '15px',
+                                display: 'flex',
+                                alignItems: 'center', // Center content vertically
+                                '& .MuiAlert-icon': {
+                                    fontSize: '16px', // Adjust the size of the icon
+                                    mr: '8px', // Add margin to the right of the icon
+                                },
+                            }} variant="filled" severity="error" >
+                                {inputTextError}
+                            </Alert>}
                         </Box>
                         <Box>
                             <Button
@@ -521,7 +638,7 @@ const EmailTemp = () => {
 
                             <EditorShortcodes onChange={handleEditorChange} />
                         </Box>
-                        <Box sx={{ mt: 5,display:'flex',gap:2 }}>
+                        <Box sx={{ mt: 5, display: 'flex', gap: 2 }}>
                             <Button variant="contained" color="primary" type="submit">
                                 Save Template
                             </Button>

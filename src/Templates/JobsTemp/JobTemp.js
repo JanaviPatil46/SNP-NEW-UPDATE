@@ -1,14 +1,14 @@
-import React, { useState, useEffect ,useMemo} from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
   Typography,
   Container,
- 
+  Alert,
   Autocomplete,
   TextField,
-  
+
   Switch, FormControlLabel,
   List,
   ListItem,
@@ -87,16 +87,35 @@ const JobTemp = () => {
   const handleDueDateChange = (date) => {
     setDueDate(date);
   };
+  // const handleCloseJobTemp = () => {
+
+  //     const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
+  //     if (confirmCancel) {
+  //         // If user confirms, clear the form and hide it
+  //         setShowForm(false);
+
+  //     }
+
+  // }
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const handleCloseJobTemp = () => {
-    
-      const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
-      if (confirmCancel) {
-          // If user confirms, clear the form and hide it
-          setShowForm(false);
-        
+    if (isFormDirty) {
+      const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+      if (!confirmClose) {
+        return;
       }
-    
-  }
+    }
+    setShowForm(false);
+  };
+
+  // Detect form changes
+  useEffect(() => {
+    if (templatename || jobName || priority || description || absoluteDate) {
+      setIsFormDirty(true);
+    } else {
+      setIsFormDirty(false);
+    }
+  }, [templatename, jobName, priority, description, absoluteDate]);
   const dayOptions = [
     { label: "Days", value: "Days" },
     { label: "Months", value: "Months" },
@@ -273,7 +292,10 @@ const JobTemp = () => {
 
   const createjobtemp = () => {
     if (absoluteDate === true) {
-
+      if (!validateForm()) {
+        // toast.error("Please fix the validation errors.");
+        return;
+      }
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
@@ -317,7 +339,10 @@ const JobTemp = () => {
           toast.error("Failed to create Job Template");
         });
     } else if (absoluteDate === false) {
-
+      if (!validateForm()) {
+        // toast.error("Please fix the validation errors.");
+        return;
+      }
       const myHeaders = new Headers();
       myHeaders.append("Content-Type", "application/json");
 
@@ -399,8 +424,8 @@ const JobTemp = () => {
 
   };
 
-  
- 
+
+
 
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -415,7 +440,7 @@ const JobTemp = () => {
       header: 'Name',
       Cell: ({ row }) => (
         <Typography
-          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
           onClick={() => handleEdit(row.original._id)}
         >
           {row.original.templatename}
@@ -431,7 +456,7 @@ const JobTemp = () => {
             <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
               <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
                 handleEdit(row.original._id);
-               
+
               }} >Edit</Typography>
               <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
             </Box>
@@ -462,16 +487,54 @@ const JobTemp = () => {
       }),
     },
   });
+  const [errors, setErrors] = useState({});
+ 
+  const [startInError, setStartInError] = useState('');
+  const [dueInError, setDueInError] = useState('');
+  const [durationError, setDurationError] = useState('');
+  const validateForm = () => {
+    let tempErrors = {};
+    let isValid = true;
+    if (!templatename) tempErrors.templatename = "Template name is required";
+    if (!jobName) tempErrors.jobName = "Job name is required";
+    if (selectedUser.length === 0) tempErrors.selectedUser = "At least one assignee is required";
+
+
+    if (!absoluteDate) {
+      if (!startsin) {
+        setStartInError('Start in value is required');
+        isValid = false;
+      } else {
+        setStartInError('');
+      }
+      if (!duein) {
+        setDueInError('Due in value is required');
+        isValid = false;
+      } else {
+        setDueInError('');
+      }
+      if (!startsInDuration || !dueinduration) {
+        setDurationError('Duration is required');
+        isValid = false;
+      } else {
+        setDurationError('');
+      }
+    } 
+
+    setErrors(tempErrors);
+
+    return Object.keys(tempErrors).length === 0;
+  };
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
         {!showForm ? (
           <Box sx={{ mt: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleCreateJobTemplate} sx={{mb:3}}>
+            <Button variant="contained" color="primary" onClick={handleCreateJobTemplate} sx={{ mb: 3 }}>
               Job Template
             </Button>
-            
-             <MaterialReactTable columns={columns} table={table} />
+
+            <MaterialReactTable columns={columns} table={table} />
 
           </Box>
         ) : (
@@ -491,23 +554,61 @@ const JobTemp = () => {
                   <label className='jobtemp-input-label'>Template Name</label>
                   <TextField
                     size='small'
-                    margin='normal'
+
                     fullWidth
+                    error={!!errors.templatename}
+                    // helperText={errors.templatename}
                     placeholder='Template Name'
                     value={templatename}
                     onChange={(e) => settemplatename(e.target.value)}
-                    sx={{ backgroundColor: '#fff' }}
+                    sx={{ backgroundColor: '#fff', mt: 2 }}
                   />
+                  {(!!errors.templatename) && <Alert sx={{
+                    width: '96%',
+                    p: '0', // Adjust padding to control the size
+                    pl: '4%', height: '23px',
+                    borderRadius: '10px',
+                    borderTopLeftRadius: '0',
+                    borderTopRightRadius: '0',
+                    fontSize: '15px',
+                    display: 'flex',
+                    alignItems: 'center', // Center content vertically
+                    '& .MuiAlert-icon': {
+                      fontSize: '16px', // Adjust the size of the icon
+                      mr: '8px', // Add margin to the right of the icon
+                    },
+                  }} variant="filled" severity="error" >
+                    {errors.templatename}
+                  </Alert>}
                 </Box>
                 <Box mt={1}>
                   <label className='jobtemp-input-label'>Job Name</label>
                   <TextField
-                    sx={{ backgroundColor: '#fff' }}
+                    sx={{ backgroundColor: '#fff', mt: 2 }}
                     value={jobName + selectedShortcut} onChange={handlejobName}
                     size='small'
-                    margin='normal'
+
                     fullWidth
+                    error={!!errors.jobName}
+                    // helperText={errors.jobName}
                     placeholder='Job Name' />
+                  {(!!errors.jobName) && <Alert sx={{
+                    width: '96%',
+                    p: '0', // Adjust padding to control the size
+                    pl: '4%', height: '23px',
+                    borderRadius: '10px',
+                    borderTopLeftRadius: '0',
+                    borderTopRightRadius: '0',
+                    fontSize: '15px',
+                    display: 'flex',
+                    alignItems: 'center', // Center content vertically
+                    '& .MuiAlert-icon': {
+                      fontSize: '16px', // Adjust the size of the icon
+                      mr: '8px', // Add margin to the right of the icon
+                    },
+                  }} variant="filled" severity="error" >
+                    {errors.jobName}
+                  </Alert>}
                 </Box>
                 <Box>
                   <Button
@@ -573,7 +674,27 @@ const JobTemp = () => {
                       </Box>
                     )}
                     renderInput={(params) => (
-                      <TextField {...params} variant="outlined" placeholder="Assignees" />
+                      <>
+                        <TextField {...params} error={!!errors.selectedUser}
+                          variant="outlined" placeholder="Assignees" />
+                        {(!!errors.selectedUser) && <Alert sx={{
+                          width: '96%',
+                          p: '0', // Adjust padding to control the size
+                          pl: '4%', height: '23px',
+                          borderRadius: '10px',
+                          borderTopLeftRadius: '0',
+                          borderTopRightRadius: '0',
+                          fontSize: '15px',
+                          display: 'flex',
+                          alignItems: 'center', // Center content vertically
+                          '& .MuiAlert-icon': {
+                            fontSize: '16px', // Adjust the size of the icon
+                            mr: '8px', // Add margin to the right of the icon
+                          },
+                        }} variant="filled" severity="error" >
+                          {errors.selectedUser}
+                        </Alert>}
+                      </>
                     )}
                     isOptionEqualToValue={(option, value) => option.value === value.value}
                   />
@@ -602,25 +723,23 @@ const JobTemp = () => {
                     </Box>
                   </Box>
                 </Box>
+
                 {absoluteDate && (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                      <Typography className='jobtemp-input-label'>Start Date</Typography>
+                      <Typography className='task-input-label'>Start Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
                         sx={{ width: '100%', backgroundColor: '#fff' }}
-                       
                         selected={startDate} onChange={handleStartDateChange}
                         renderInput={(params) => <TextField {...params} size="small" />}
                       />
                     </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                      <Typography className='jobtemp-input-label'>Due Date</Typography>
+                      <Typography className='task-input-label'>Due Date</Typography>
                       <DatePicker
                         format="DD/MM/YYYY"
                         sx={{ width: '100%', backgroundColor: '#fff' }}
-                        // value={dueDate}
-                        // onChange={handleDueDateChange}
                         selected={dueDate} onChange={handleDueDateChange}
                         renderInput={(params) => <TextField {...params} size="small" />}
                       />
@@ -629,58 +748,171 @@ const JobTemp = () => {
                 )}
                 {!absoluteDate && (
                   <>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Typography className='jobtemp-input-label'>Start In</Typography>
-                      <TextField
-                        size='small'
-                        margin='normal'
-                        fullWidth
-                        defaultValue={0}
-                        value={startsin}
-                        sx={{ ml: 1, backgroundColor: '#fff' }}
-                        onChange={(e) => setstartsin(e.target.value)}
-                      />
-                      <Autocomplete
-                        options={dayOptions}
-                        size='small'
-                        sx={{ backgroundColor: '#fff', mt: 1 }}
-                        getOptionLabel={(option) => option.label}
-                        onChange={handleStartInDateChange}
-                        renderInput={(params) => (
-                          <TextField {...params} variant="outlined" />
+                    <Grid container spacing={3} alignItems="center">
+                      <Grid item xs={12} sm={2}>
+                        <Typography className="task-input-label">Start In</Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          size="small"
+                          placeholder='0'
+                          defaultValue={0}
+                          value={startsin}
+                          sx={{ background: "#fff", width: '100%' }}
+                          onChange={(e) => setstartsin(e.target.value)}
+                          error={!!startInError}
+                        />
+                        {(!!startInError) && (
+                          <Alert
+                            sx={{
+                              width: '96%',
+                              p: '0',
+                              pl: '4%',
+                              height: '23px',
+                              borderRadius: '10px',
+                              borderTopLeftRadius: '0',
+                              borderTopRightRadius: '0',
+                              fontSize: '15px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              '& .MuiAlert-icon': {
+                                fontSize: '16px',
+                                mr: '8px',
+                              },
+                            }}
+                            variant="filled"
+                            severity="error"
+                          >
+                            {startInError}
+                          </Alert>
                         )}
-                        value={dayOptions.find((option) => option.value === startsInDuration) || null}
-                        className="job-template-select-dropdown"
-                      />
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Typography className='jobtemp-input-label'>Due In</Typography>
-                      <TextField
-                        size='small'
-                        margin='normal'
-                        value={duein}
-                        fullWidth
-                        defaultValue={0}
-                        sx={{ ml: 1.5, backgroundColor: '#fff' }}
-                        onChange={(e) => setduein(e.target.value)}
-                      />
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <Autocomplete
+                          options={dayOptions}
+                          size="small"
+                          getOptionLabel={(option) => option.label}
+                          onChange={handleStartInDateChange}
+                          renderInput={(params) => (
+                            <>
+                              <TextField
+                                {...params}
+                                variant="outlined"
+                                sx={{ backgroundColor: "#fff" }}
 
-                      <Autocomplete
-                        options={dayOptions}
-                        getOptionLabel={(option) => option.label}
-                        onChange={handledueindateChange}
-                        sx={{ backgroundColor: '#fff', mt: 1 }}
-                        size='small'
-                        renderInput={(params) => (
-                          <TextField {...params} variant="outlined" />
+                              />
+                              {!!durationError && (
+                                <Alert
+                                  sx={{
+                                    width: '96%',
+                                    p: '0',
+                                    pl: '4%',
+                                    height: '23px',
+                                    borderRadius: '10px',
+                                    borderTopLeftRadius: '0',
+                                    borderTopRightRadius: '0',
+                                    fontSize: '13px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    '& .MuiAlert-icon': {
+                                      fontSize: '16px',
+                                      mr: '8px',
+                                    },
+                                  }}
+                                  variant="filled"
+                                  severity="error"
+                                >
+                                  {durationError}
+                                </Alert>
+                              )}
+                            </>
+                          )}
+                          value={dayOptions.find((option) => option.value === startsInDuration) || null}
+                          className="job-template-select-dropdown"
+                        />
+                      </Grid>
+                    </Grid>
+                    <Grid container spacing={3} alignItems="center">
+                      <Grid item xs={12} sm={2}>
+                        <Typography className="task-input-label">Due In</Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <TextField
+                          size="small"
+                          placeholder='0'
+                          value={duein}
+                          fullWidth
+                          error={!!dueInError}
+                          sx={{ background: '#fff', }}
+                          onChange={(e) => setduein(e.target.value)}
+                        />
+                        {(!!dueInError) && (
+                          <Alert
+                            sx={{
+                              width: '96%',
+                              p: '0',
+                              pl: '4%',
+                              height: '23px',
+                              borderRadius: '10px',
+                              borderTopLeftRadius: '0',
+                              borderTopRightRadius: '0',
+                              fontSize: '15px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              '& .MuiAlert-icon': {
+                                fontSize: '16px',
+                                mr: '8px',
+                              },
+                            }}
+                            variant="filled"
+                            severity="error"
+                          >
+                            {dueInError}
+                          </Alert>
                         )}
-                        value={dayOptions.find((option) => option.value === dueinduration) || null}
-                        className="job-template-select-dropdown"
-                      />
-                    </Box>
+                      </Grid>
+                      <Grid item xs={12} sm={5}>
+                        <Autocomplete
+                          options={dayOptions}
+                          getOptionLabel={(option) => option.label}
+                          onChange={handledueindateChange}
+                          size='small'
+                          renderInput={(params) => (
+                            <>
+                              <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} />
+                              {!!durationError && (
+                                <Alert
+                                  sx={{
+                                    width: '96%',
+                                    p: '0',
+                                    pl: '4%',
+                                    height: '23px',
+                                    borderRadius: '10px',
+                                    borderTopLeftRadius: '0',
+                                    borderTopRightRadius: '0',
+                                    fontSize: '13px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    '& .MuiAlert-icon': {
+                                      fontSize: '16px',
+                                      mr: '8px',
+                                    },
+                                  }}
+                                  variant="filled"
+                                  severity="error"
+                                >
+                                  {durationError}
+                                </Alert>
+                              )}
+                            </>
+                          )}
+                          value={dayOptions.find((option) => option.value === dueinduration) || null}
+                          className="job-template-select-dropdown"
+                        />
+                      </Grid>
+                    </Grid>
                   </>
                 )}
-
               </Grid>
               <Grid item xs={12} sm={0.4} sx={{ display: { xs: 'none', sm: 'block' } }}>
                 <Box

@@ -10,7 +10,7 @@ import {
   Switch, FormControlLabel,
   Divider, IconButton,
   useMediaQuery,
-  useTheme
+  useTheme, Alert
 } from '@mui/material';
 import Grid from '@mui/material/Unstable_Grid2';
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -33,21 +33,11 @@ const PipelineTemp = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const [showForm, setShowForm] = useState(false);
   const [pipelineName, setPipelineName] = useState('');
-
+  const [isFormDirty, setIsFormDirty] = useState(false);
   const handleCreatePipeline = () => {
     setShowForm(true); // Show the form when button is clicked
   };
-  const handleClosePipelineTemp = () => {
-  
-    
-      const confirmCancel = window.confirm("You have unsaved changes. are you sure you want to leave without saving?");
-      if (confirmCancel) {
-          // If user confirms, clear the form and hide it
-          setShowForm(false);
-        
-      }
-    
-  }
+
 
 
   // sort jobs
@@ -199,6 +189,9 @@ const PipelineTemp = () => {
 
 
   const createPipe = () => {
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
     const data = {
       pipelineName: pipelineName,
       availableto: combinedValues,
@@ -326,7 +319,7 @@ const PipelineTemp = () => {
       header: 'Name',
       Cell: ({ row }) => (
         <Typography
-          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight:'bold' }}
+          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
           onClick={() => handleEdit(row.original._id)}
         >
           {row.original.pipelineName}
@@ -374,6 +367,64 @@ const PipelineTemp = () => {
       }),
     },
   });
+  const handleClosePipelineTemp = () => {
+    if (isFormDirty) {
+      const confirmClose = window.confirm('You have unsaved changes. Are you sure you want to cancel?');
+      if (!confirmClose) {
+        return;
+      }
+    }
+    setShowForm(false);
+  };
+
+  // Detect form changes
+  useEffect(() => {
+    if (pipelineName || Assignees || selectedtemp || selectedSortByJob || selectedtemp) {
+      setIsFormDirty(true);
+
+    } else {
+      setIsFormDirty(false);
+    }
+  }, [pipelineName, Assignees, selectedtemp, selectedSortByJob, selectedtemp]);
+
+  const [pipelineNameError, setPipelineNameError] = useState('');
+  const [sortByJobError, setSortByJobError] = useState('');
+  const [templateError, setTemplateError] = useState('');
+  const [userError, setUserError] = useState('');
+  const validateForm = () => {
+    let isValid = true;
+    if (!pipelineName) {
+      setPipelineNameError("Pipeline name is required");
+
+      isValid = false;
+    } else {
+      setPipelineNameError('');
+    }
+    if (!selectedSortByJob) {
+      setSortByJobError('Sort By Job is required.');
+      isValid = false;
+    } else {
+      setSortByJobError('');
+    }
+
+    if (!selectedtemp) {
+      setTemplateError('Job Template is required.');
+      isValid = false;
+    } else {
+      setTemplateError('');
+    }
+
+    if (selectedUser.length === 0) {
+      setUserError('At least one user must be selected.');
+      isValid = false;
+    } else {
+      setUserError('');
+    }
+
+
+    return isValid;
+  };
+
 
   return (
     <Container>
@@ -409,11 +460,30 @@ const PipelineTemp = () => {
                         fullWidth
                         value={pipelineName}
                         onChange={(e) => setPipelineName(e.target.value)}
-                        // margin="normal"
+
+                        error={!!pipelineNameError}
+                        // helperText={pipelineNameError}
                         sx={{ mt: 1.5, backgroundColor: '#fff' }}
                         size="small"
                         placeholder='Pipeline Name'
                       />
+                      {(!!pipelineNameError) && <Alert sx={{
+                        width: '96%',
+                        p: '0', // Adjust padding to control the size
+                        pl: '4%', height: '23px',
+                        borderRadius: '10px',
+                        borderTopLeftRadius: '0',
+                        borderTopRightRadius: '0',
+                        fontSize: '15px',
+                        display: 'flex',
+                        alignItems: 'center', // Center content vertically
+                        '& .MuiAlert-icon': {
+                          fontSize: '16px', // Adjust the size of the icon
+                          mr: '8px', // Add margin to the right of the icon
+                        },
+                      }} variant="filled" severity="error" >
+                        {pipelineNameError}
+                      </Alert>}
                     </Box>
                     <Box mt={1}>
                       <label className="pipeline-lable">Available To</label>
@@ -435,7 +505,27 @@ const PipelineTemp = () => {
                           </Box>
                         )}
                         renderInput={(params) => (
-                          <TextField {...params} variant="outlined" placeholder="Available To" />
+                          <>
+                            <TextField {...params} variant="outlined" error={!!userError}
+                              placeholder="Available To" />
+                            {(!!userError) && <Alert sx={{
+                              width: '96%',
+                              p: '0', // Adjust padding to control the size
+                              pl: '4%', height: '23px',
+                              borderRadius: '10px',
+                              borderTopLeftRadius: '0',
+                              borderTopRightRadius: '0',
+                              fontSize: '15px',
+                              display: 'flex',
+                              alignItems: 'center', // Center content vertically
+                              '& .MuiAlert-icon': {
+                                fontSize: '16px', // Adjust the size of the icon
+                                mr: '8px', // Add margin to the right of the icon
+                              },
+                            }} variant="filled" severity="error" >
+                              {userError}
+                            </Alert>}
+                          </>
                         )}
                         isOptionEqualToValue={(option, value) => option.value === value.value}
                       />
@@ -459,14 +549,36 @@ const PipelineTemp = () => {
                           </Box>
                         )}
                         renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder="Sort By Job"
-                            size="small"
-                            sx={{ width: '100%', marginTop: '8px', backgroundColor: '#fff' }}
-                            variant="outlined"
-                            InputLabelProps={{ shrink: true }}
-                          />
+                          <>
+                            <TextField
+                              {...params}
+                              placeholder="Sort By Job"
+                              size="small"
+                              error={!!sortByJobError}
+                              // helperText={sortByJobError}
+                              sx={{ width: '100%', marginTop: '8px', backgroundColor: '#fff' }}
+                              variant="outlined"
+                              InputLabelProps={{ shrink: true }}
+
+                            />
+                            {(!!sortByJobError) && <Alert sx={{
+                              width: '96%',
+                              p: '0', // Adjust padding to control the size
+                              pl: '4%', height: '23px',
+                              borderRadius: '10px',
+                              borderTopLeftRadius: '0',
+                              borderTopRightRadius: '0',
+                              fontSize: '15px',
+                              display: 'flex',
+                              alignItems: 'center', // Center content vertically
+                              '& .MuiAlert-icon': {
+                                fontSize: '16px', // Adjust the size of the icon
+                                mr: '8px', // Add margin to the right of the icon
+                              },
+                            }} variant="filled" severity="error" >
+                              {sortByJobError}
+                            </Alert>}
+                          </>
                         )}
                         isOptionEqualToValue={(option, value) => option.value === value.value} // To handle equality
                         disableClearable={false} // Enable clearing selection
@@ -492,13 +604,34 @@ const PipelineTemp = () => {
                           </Box>
                         )}
                         renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            sx={{ backgroundColor: '#fff' }}
-                            placeholder="Default job template"
-                            variant="outlined"
-                            size="small"
-                          />
+                          <>
+                            <TextField
+                              {...params}
+                              error={!!templateError}
+                              // helperText={templateError}
+                              sx={{ backgroundColor: '#fff' }}
+                              placeholder="Default job template"
+                              variant="outlined"
+                              size="small"
+                            />
+                             {(!!templateError) && <Alert sx={{
+                              width: '96%',
+                              p: '0', // Adjust padding to control the size
+                              pl: '4%', height: '23px',
+                              borderRadius: '10px',
+                              borderTopLeftRadius: '0',
+                              borderTopRightRadius: '0',
+                              fontSize: '15px',
+                              display: 'flex',
+                              alignItems: 'center', // Center content vertically
+                              '& .MuiAlert-icon': {
+                                fontSize: '16px', // Adjust the size of the icon
+                                mr: '8px', // Add margin to the right of the icon
+                              },
+                            }} variant="filled" severity="error" >
+                              {templateError}
+                            </Alert>}
+                          </>
                         )}
                         sx={{ width: '100%', marginTop: '8px' }}
                         clearOnEscape // Enable clearable functionality
