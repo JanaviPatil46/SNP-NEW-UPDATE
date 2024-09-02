@@ -101,7 +101,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         handleNewDrawerClose()
         handleDrawerClose()
 
-        const raw = JSON.stringify({
+        const raw = JSON.stringify([{
 
             firstName: firstName,
             middleName: middleName,
@@ -124,7 +124,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
 
 
-        })
+        }])
 
         const requestOptions = {
             method: "POST",
@@ -147,7 +147,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                 // Handle success
                 toast.success('Contact created successfully!');
                 //console.log('Contact ID:', result);  // Log the contactId
-                console.log(result.newContact._id);
+             
                 navigate('/clients/contacts');
 
                 // Additional logic after successful creation if needed

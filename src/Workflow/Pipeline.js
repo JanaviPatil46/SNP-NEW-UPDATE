@@ -304,7 +304,7 @@ const Pipeline = () => {
 
         <br />
 
-        <Typography color={'black'} sx={{ marginBottom: '4px', mt: 2 }}>
+        <Typography color={'black'} sx={{ marginBottom: '4px', mt: 2 }} variant="body2">
           Starts : {startDateFormatted}
         </Typography>
         <Typography color={'black'} variant="body2">
@@ -400,6 +400,15 @@ const Pipeline = () => {
                 options={optionpipeline}
                 getOptionLabel={(option) => option.label}
                 isOptionEqualToValue={(option, value) => option.value === value?.value}
+                renderOption={(props, option) => (
+                  <Box
+                    component="li"
+                    {...props}
+                    sx={{ cursor: 'pointer', margin: '5px 10px' }} // Add cursor pointer style
+                  >
+                    {option.label}
+                  </Box>
+                )}
                 renderInput={(params) => (
                   <TextField
                     {...params}

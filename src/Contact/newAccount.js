@@ -15,11 +15,6 @@ import { toast } from "react-toastify";
 import { AiOutlinePlusCircle, AiOutlineDelete } from 'react-icons/ai';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
-
-  const ACCOUNT_API = process.env.REACT_APP_ACCOUNTS_URL;
-  const USER_API = process.env.REACT_APP_USER_URL;
-  const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
-  const CONTACT_API = process.env.REACT_APP_CONTACTS_URL;
   const theme = useTheme();
   const navigate = useNavigate();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -57,7 +52,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
   const fetchUserData = async () => {
     try {
-      const url = `${USER_API}/api/auth/users`;
+      const url = 'http://127.0.0.1:8080/api/auth/users';
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data);
@@ -116,8 +111,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const fetchData = async () => {
     try {
 
-      const url = `${TAGS_API}/tags/`;
-
+      const url = 'http://127.0.0.1:7500/tags/';
 
       const response = await fetch(url);
       const data = await response.json();
@@ -214,7 +208,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         body: raw,
         redirect: "follow",
       };
-      const url = `${ACCOUNT_API}/accounts/accountdetails`;
+      const url = 'http://127.0.0.1:7000/accounts/accountdetails';
       fetch(url, requestOptions)
         .then((response) => response.json())
 
@@ -246,25 +240,25 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         postalCode: cZipPostalCode,
 
       });
-      console.log(raw)
+
       const requestOptions = {
         method: "POST",
         headers: myHeaders,
         body: raw,
         redirect: "follow",
       };
-      const url = `${ACCOUNT_API}/accounts/accountdetails`;
+      const url = 'http://127.0.0.1:7000/accounts/accountdetails';
       fetch(url, requestOptions)
         .then((response) => response.json())
         .then((result) => {
           console.log(result); // Log the result
-          console.log(result.newAccount._id);
+
           setAccountId(result.newAccount._id)
           updateContactsAccountId(result.newAccount._id);
           toast.success("Form submitted successfully"); // Display success toast
           // window.location.reload();
-          // handleDrawerClose();
-          // handleNewDrawerClose();
+          handleDrawerClose();
+          handleNewDrawerClose();
         })
         .catch((error) => {
           console.error(error); // Log the error
@@ -326,7 +320,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     })));
   };
 
-  const [contacts, setContacts] = useState([{ firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: '' }, accountid: AccountId }]);
+  const [contacts, setContacts] = useState([{ firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: ''} , accountid: AccountId }]);
 
   console.log(contacts)
 
@@ -342,29 +336,12 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     setContacts(updatedContacts);
   };
 
-  // const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue) => {
-  //   const updatedContacts = [...contacts];
-  //   updatedContacts[index].phoneNumbers[phoneIndex] = phoneValue;
-  //   setContacts(updatedContacts);
-  // };
   const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue) => {
-    setContacts(prevContacts => {
-      const updatedContacts = [...prevContacts];
-      const contact = updatedContacts[index];
-      
-      // Ensure the phoneNumbers array has enough elements
-      if (contact.phoneNumbers.length <= phoneIndex) {
-        contact.phoneNumbers = [
-          ...contact.phoneNumbers,
-          ...Array(phoneIndex + 1 - contact.phoneNumbers.length).fill({ phone: '' })
-        ];
-      }
-  
-      // Update the phone number
-      contact.phoneNumbers[phoneIndex] = { ...contact.phoneNumbers[phoneIndex], phone: phoneValue };
-      return updatedContacts;
-    });
-  };
+    const updatedContacts = [...contacts];
+    updatedContacts[index].phoneNumbers[phoneIndex] = phoneValue;
+    setContacts(updatedContacts);
+  };
+
   // const handleContactAddressChange = (index, field, value) => {
   //   const updatedContacts = [...contacts];
   //   updatedContacts[index].address[field] = value;
@@ -386,57 +363,21 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   };
 
 
-  // const handleContactTagChange = (index, event) => {
-  //   const { value } = event.target;
+  const handleContactTagChange = (index, event) => {
+    const { value } = event.target;
 
-  //   setContacts((prevContacts) => {
-  //     const updatedContacts = [...prevContacts];
-  //     updatedContacts[index].selectedTags = Array.isArray(value) ? value : [];
-  //     return updatedContacts;
-  //   });
-
-  //   console.log("Selected Tags for contact", index, ":", value);
-  //   setCombinedValues((prevCombinedValues) => [
-  //     ...prevCombinedValues,
-  //     ...value,
-  //   ]);
-  // };
-
-  // const handleContactTagChange = (index, event, newValue) => {
-  //   setContacts((prevContacts) => {
-  //     const updatedContacts = [...prevContacts];
-  //     updatedContacts[index].selectedTags = newValue;
-  //     return updatedContacts;
-  //   });
-
-  //   console.log("Selected Tags for contact", index, ":", newValue);
-  //   setCombinedValues((prevCombinedValues) => [
-  //     ...prevCombinedValues,
-  //     ...newValue,
-  //   ]);
-  // };
-
-  const handleContactTagChange = (index, event, newValue) => {
-    // Map newValue to get an array of option values
-    const selectedTags = newValue.map((option) => option.value);
-
-    // Update the contacts state
     setContacts((prevContacts) => {
       const updatedContacts = [...prevContacts];
-      updatedContacts[index].tags = selectedTags;
+      updatedContacts[index].selectedTags = Array.isArray(value) ? value : [];
       return updatedContacts;
     });
 
-    // Log the selected tags
-    console.log("Selected Tags for contact", index, ":", selectedTags);
-
-    // Update combined values
+    console.log("Selected Tags for contact", index, ":", value);
     setCombinedValues((prevCombinedValues) => [
       ...prevCombinedValues,
-      ...selectedTags,
+      ...value,
     ]);
   };
-
 
   const handleContactAddPhoneNumber = () => {
     setPhoneNumbers((prevPhoneNumbers) => [
@@ -448,9 +389,8 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
   const handlesubmitContact = () => {
     console.log(contacts)
-    //  const url =`${CONTACT_API}/contacts/`
 
-    fetch(`${CONTACT_API}/contacts/`, {
+    fetch('http://127.0.0.1:7000/contacts/accontcontact', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -460,10 +400,6 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       .then(response => response.json())
       .then(data => {
         console.log('Success:', data);
-        handleDrawerClose();
-        handleNewDrawerClose();
-        toast.success("Contact created successfully!")
-        navigate('/clients/accounts');
         // Handle successful submission (e.g., clear forms, show success message)
       })
       .catch((error) => {
@@ -472,8 +408,8 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       });
   }
 
-
-
+  
+  
 
   return (
     <Box>
@@ -798,9 +734,9 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
           )}
         </Box>
         <Box>
-
+          
           {selectedOption === 'Contact Info' && (
-
+           
             <Box>
 
               <>
@@ -931,7 +867,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
                         <Box key={contact.id}>
                           <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>
-                          {/* <Select
+                          <Select
                             size="small"
                             multiple
                             value={contact.selectedTags || []} // Ensure it's an array
@@ -957,46 +893,14 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                                 {option.label}
                               </MenuItem>
                             ))}
-                          </Select> */}
-                          <Autocomplete
-                            multiple
-                            options={tagsoptions}
-                            getOptionLabel={(option) => option.label}
-                            value={tagsoptions.filter(option => (contact.tags || []).includes(option.value))}
-                            // value={contact.selectedTags || []} // Ensure it's an array
-                            onChange={(event, newValue) => handleContactTagChange(index, event, newValue)}
-                            renderTags={(tagValue, getTagProps) =>
-                              tagValue.map((option, index) => (
-                                <Chip
-                                  key={option.value}
-                                  label={option.label}
-                                  style={option.customStyle}
-                                  {...getTagProps({ index })}
-                                />
-                              ))
-                            }
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                variant="outlined"
-                                size="small"
-                                placeholder="Select tags"
-                                sx={{ width: '100%', marginTop: '8px' }}
-                              />
-                            )}
-                            renderOption={(props, option) => (
-                              <Box component="li" {...props} style={option.customStyle}>
-                                {option.label}
-                              </Box>
-                            )}
-                          />
+                          </Select>
                         </Box>
 
                         <Typography variant="h6" gutterBottom sx={{ ml: 1, fontWeight: 'bold', mt: 3 }}>
                           Phone Numbers
                         </Typography>
 
-                        {/* {phoneNumbers.map((phone) => (
+                        {phoneNumbers.map((phone) => (
                           <Box
                             key={phone.id}
                             sx={{
@@ -1040,52 +944,8 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                               style={{ cursor: 'pointer', color: 'red' }}
                             />
                           </Box>
-                        ))} */}
-{phoneNumbers.map((phone, phoneIndex) => (
-                          <Box
-                            key={phone.id}
-                            sx={{
-                              display: 'flex',
-                              flexDirection: 'row',
-                              alignItems: 'center',
-                              gap: 2,
-                              ml: 1,
-                              mb: 2,
-                            }}
-                          >
-                            {phone.isPrimary && (
-                              <Chip
-                                label="Primary phone"
-                                color="primary"
-                                size="small"
-                                sx={{ position: 'absolute', mt: -3 }}
-                              />
-                            )}
-                            <PhoneInput
-                              country={'us'}
-                              value={phone.phone}
-                              onChange={(phoneValue) =>
-                                handleContactPhoneNumberChange(index, phoneIndex, phoneValue)
-                              }
-                              inputStyle={{
-                                width: '100%',
-                              }}
-                              buttonStyle={{
-                                borderTopLeftRadius: '8px',
-                                borderBottomLeftRadius: '8px',
-                              }}
-                              containerStyle={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                              }}
-                            />
-                            <AiOutlineDelete
-                              onClick={() => handleDeletePhoneNumber(index, phoneIndex)}
-                              style={{ cursor: 'pointer', color: 'red' }}
-                            />
-                          </Box>
-                        ))}
+                        ))}
+
                         <Box
                           sx={{
                             display: 'flex',
