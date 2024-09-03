@@ -32,6 +32,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
   // const [state, setstate] = useState('')
   const [cStreetAddress, SetCStreetAddress] = useState("");
+  const [cCity, setCcity] = useState('');
   const [cStateProvince, SetCStateProvince] = useState("");
   const [cZipPostalCode, SetCZipPostalCode] = useState("");
   const [activeStep, setActiveStep] = useState("Account Info");
@@ -243,6 +244,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         country: cCountry,
         streetAddress: cStreetAddress,
         state: cStateProvince,
+        city: cCity,
         postalCode: cZipPostalCode,
 
       });
@@ -351,7 +353,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     setContacts(prevContacts => {
       const updatedContacts = [...prevContacts];
       const contact = updatedContacts[index];
-      
+
       // Ensure the phoneNumbers array has enough elements
       if (contact.phoneNumbers.length <= phoneIndex) {
         contact.phoneNumbers = [
@@ -359,12 +361,12 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
           ...Array(phoneIndex + 1 - contact.phoneNumbers.length).fill({ phone: '' })
         ];
       }
-  
+
       // Update the phone number
       contact.phoneNumbers[phoneIndex] = { ...contact.phoneNumbers[phoneIndex], phone: phoneValue };
       return updatedContacts;
-    });
-  };
+    });
+  };
   // const handleContactAddressChange = (index, field, value) => {
   //   const updatedContacts = [...contacts];
   //   updatedContacts[index].address[field] = value;
@@ -483,7 +485,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       </Box>
       <Box className='account-form' sx={{ height: '90vh', overflowY: 'auto' }}>
         <Box >
-          <FormControl>
+          <FormControl sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
             <RadioGroup
               row
               aria-labelledby="main-radio-buttons-group-label"
@@ -500,9 +502,9 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                   </>
                 ) : (
                   <>
-                    <FormControlLabel value="Account Info" control={<Radio checked={selectedOption === 'Account Info'} />} label="Account Info" />
+                    <FormControlLabel value="Account Info" control={<Radio checked={selectedOption === 'Account Info'} />} label="Account Info" sx={{ mb: 2 }} />
                     <ArrowForwardIosRoundedIcon />
-                    <FormControlLabel value="Contact Info" control={<Radio checked={selectedOption === 'Contact Info'} />} label="Contact Info" />
+                    <FormControlLabel value="Contact Info" control={<Radio checked={selectedOption === 'Contact Info'} />} label="Contact Info" sx={{ mb: 2, ml: 2 }} />
                   </>
                 )}
               </Box>
@@ -512,6 +514,10 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         <Box sx={{ p: 2 }}>
           {selectedOption === 'Account Info' && (
             <Box>
+              {/* <Typography sx={{fontWeight:'bold'}}>Client Type</Typography> */}
+              <Box>
+                <h3 >Client Type</h3>
+              </Box>
               <FormControl>
                 <RadioGroup
                   row
@@ -527,14 +533,18 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
               {accountType === 'Individual' && (
                 <Box>
                   <Box>
-                    <Box className='account-Type-options'>
+                    <Box className='account-Type-options' sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                       <Box>
-                        <h3 style={{ margin: "5px" }}>Account Type</h3>
+                        <h3 >Account Info</h3>
                       </Box>
-                      <Box className='HelpOutlineRoundedIcon'><HelpOutlineRoundedIcon /></Box>
+
+                      {/* <Box className='HelpOutlineRoundedIcon'></Box> */}
+
                       <Box className='MoreVertRoundedIcon'>
+                        <HelpOutlineRoundedIcon />
                         <MoreVertRoundedIcon />
                       </Box>
+
                     </Box>
 
                     <Box>
@@ -660,7 +670,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                               <Chip
                                 key={option.value}
                                 label={option.label}
-                                style={option.customStyle}
+                                style={option.customTagStyle}
                                 {...getTagProps({ index })}
                               />
                             ))
@@ -671,7 +681,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                             </Box>
                           )}
                           renderInput={(params) => (
-                            <TextField {...params} variant="outlined" size="small" />
+                            <TextField {...params} variant="outlined" size="small" placeholder='select tags' />
                           )}
                           sx={{ width: '100%', marginTop: '8px' }}
                         />
@@ -741,7 +751,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                           mt: 2
                         }}
                       >
-                        {/* <Box>
+                        <Box>
 
                           <InputLabel sx={{ color: 'black' }}>City</InputLabel>
 
@@ -749,12 +759,12 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                             fullWidth
                             margin="normal"
                             name="city"
-                            value={city}
-                            onChange={(e) => setcity(e.target.value)}
+                            // value={city}
+                            onChange={(e) => setCcity(e.target.value)}
                             placeholder="City"
                             size="small"
                           />
-                        </Box> */}
+                        </Box>
                         <Box>
 
                           <InputLabel sx={{ color: 'black' }}>State/Province</InputLabel>
@@ -970,7 +980,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                                 <Chip
                                   key={option.value}
                                   label={option.label}
-                                  style={option.customStyle}
+                                  style={option.customTagStyle}
                                   {...getTagProps({ index })}
                                 />
                               ))
@@ -978,6 +988,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                             renderInput={(params) => (
                               <TextField
                                 {...params}
+
                                 variant="outlined"
                                 size="small"
                                 placeholder="Select tags"
@@ -1041,7 +1052,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                             />
                           </Box>
                         ))} */}
-{phoneNumbers.map((phone, phoneIndex) => (
+                        {phoneNumbers.map((phone, phoneIndex) => (
                           <Box
                             key={phone.id}
                             sx={{
@@ -1085,7 +1096,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                               style={{ cursor: 'pointer', color: 'red' }}
                             />
                           </Box>
-                        ))}
+                        ))}
                         <Box
                           sx={{
                             display: 'flex',

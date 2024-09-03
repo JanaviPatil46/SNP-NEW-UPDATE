@@ -2,13 +2,22 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 import './account.css';
-import { Stack, Select, MenuItem,  Paper, useMediaQuery,Tooltip  } from "@mui/material";
+import {
+  Stack, Select,
+  useMediaQuery,
+  MenuItem, Paper, Tooltip,
+} from "@mui/material";
 import { toast } from 'react-toastify';
 import { useMaterialReactTable, MaterialReactTable } from 'material-react-table';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { Drawer, } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 
 import IconButton from '@mui/material/IconButton';
+import ContactForm from './UpdateContact'
 import { MRT_TableHeadCellFilterContainer } from "material-react-table";
 const ContactTable = () => {
 
@@ -17,6 +26,7 @@ const ContactTable = () => {
   const [contactData, setContactData] = useState([]);
   const [uniqueTags, setUniqueTags] = useState([]);
   const [filterValue, setFilterValue] = useState(null);
+
   useEffect(() => {
     const fetchContacts = async () => {
       try {
@@ -113,12 +123,39 @@ const ContactTable = () => {
       toast.error('Failed to delete contact');
     }
   };
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  const [selectedContact, setSelectedContact] = useState(null);
+
+  const handleClick = async (contactId) => {
+    try {
+      const response = await axios.get(`${CONTACT_API}/contacts/${contactId}`);
+      setSelectedContact(response.data);
+      console.log(response.data);
+      setIsDrawerOpen(true);
+    } catch (error) {
+      console.error('Error fetching contact details:', error);
+      toast.error('Failed to fetch contact details');
+    }
+  };
+
+
+
 
   // Define the columns for MRT
   const columns = useMemo(() => [
     {
       accessorKey: 'name',
       header: 'Name',
+      Cell: ({ cell }) => (
+        <span
+          style={{ cursor: 'pointer', color: 'blue' }}
+          onClick={() => handleClick(cell.row.original.id)}
+        >
+          {cell.getValue()}
+        </span>
+      ),
+
     },
     {
       accessorKey: 'email',
@@ -127,20 +164,17 @@ const ContactTable = () => {
     {
       accessorKey: 'phoneNumbers',
       header: 'Phone Number',
-      // Cell: ({ cell }) => (
-      //   <div>
-      //     {cell.row.original.phoneNumbers.map((phone, index) => (
-      //       <div key={index}>{phone}</div>
-      //     ))}
-      //   </div>
-      // ),
-      Cell: ({ cell }) => (
-        <div>
-          {cell.row.original.phoneNumbers.flat().map((phoneObj, index) => (
-            <div key={index}>{phoneObj.phone}</div>
-          ))}
-        </div>
-      ),
+      Cell: ({ cell }) => {
+        const phoneNumbers = cell.row.original.phoneNumbers.flat();
+        return (
+          <div>
+            {phoneNumbers.map((phoneObj, index) => (
+              <div key={index}>{phoneObj.phone || phoneObj}</div>
+            ))}
+          </div>
+        );
+      },
+
     },
 
     {
@@ -148,13 +182,10 @@ const ContactTable = () => {
       header: 'Tags',
       Cell: ({ cell }) => {
         const tags = cell.row.original.tags.flat();
-    
+
         // Calculate the count for each tag
-        const tagCount = tags.reduce((acc, tag) => {
-          acc[tag.tagName] = (acc[tag.tagName] || 0) + 1;
-          return acc;
-        }, {});
-    
+
+
         if (tags.length > 1) {
           return (
             <Tooltip
@@ -168,10 +199,10 @@ const ContactTable = () => {
                         color: '#fff',
                         padding: '2px 4px',
                         margin: '2px 0',
-                        borderRadius: '4px',
+                        borderRadius: '60px',
                       }}
                     >
-                      {tag.tagName} 
+                      {tag.tagName}
                     </div>
                   ))}
                 </div>
@@ -192,18 +223,23 @@ const ContactTable = () => {
                       color: '#fff',
                       padding: '2px 4px',
                       margin: '0 2px',
-                      borderRadius: '4px',
+                      borderRadius: '60px',
                       cursor: 'pointer',
                     }}
                   >
-                    {tags[0].tagName} 
+                    {tags[0].tagName}
+                  </span>
+                )}
+                {tags.length > 1 && (
+                  <span style={{ marginLeft: '8px', color: 'gray' }}>
+                    +{tags.length - 1} more
                   </span>
                 )}
               </div>
             </Tooltip>
           );
         }
-    
+
         return (
           <div>
             {tags.map((tag) => (
@@ -214,22 +250,27 @@ const ContactTable = () => {
                   color: '#fff',
                   padding: '2px 4px',
                   margin: '0 2px',
-                  borderRadius: '4px',
+                  borderRadius: '60px',
                 }}
               >
-                {tag.tagName} 
+                {tag.tagName}
               </span>
             ))}
+            {tags.length > 1 && (
+              <span style={{ marginLeft: '8px', color: 'gray' }}>
+                +{tags.length - 1} more
+              </span>
+            )}
           </div>
         );
       },
     },
-    
+
     {
       accessorKey: 'companyName',
       header: 'Company Name',
     },
-   
+
     {
       id: 'actions',
       header: 'Actions',
@@ -262,49 +303,117 @@ const ContactTable = () => {
       }),
     },
   });
+  //  edit contact
+
 
   return (
-    // <MaterialReactTable columns={columns} table={table} />
-    <Stack direction={isMobile ? "column-reverse" : "column"} gap="8px">
-      <Paper style={{ border: '2px solid blue', display: 'flex', overflowX: 'auto' }}>
-        <Stack p="8px" gap="8px" display="flex" direction="row">
-          <>
-            <Select
-              value={selectedFilterIndex}
-              onChange={handleFilterChange}
-              sx={{
-                backgroundColor: 'white',
-                minWidth: 200,
-                '& .MuiSelect-select': {
-                  padding: '10px',
-                },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'blue',
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'green',
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'purple',
-                },
-              }}
-            >
-              <MenuItem value={null}>None</MenuItem>
-              {columns.map((column, index) => (
-                <MenuItem key={index} value={index}>
-                  {column.header}
-                </MenuItem>
-              ))}
-            </Select>
-
-            <Stack direction="row" gap="8px">
-              {renderFilterContainers()}
-            </Stack>
-          </>
+    <>
+      <Drawer
+        anchor="right"
+        open={isDrawerOpen}
+        onClose={() => setIsDrawerOpen(false)}
+      >
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          sx={{ padding: '16px', backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}
+        >
+          <h2>Contact Details</h2>
+          <IconButton onClick={() => setIsDrawerOpen(false)}>
+            <CloseIcon />
+          </IconButton>
         </Stack>
-      </Paper>
-      <MaterialReactTable columns={columns} table={table} />
-    </Stack>
+        {/* <div style={{ padding: '16px' }}>
+          {selectedContact && (
+            <>
+              <p><strong>Name:</strong> {selectedContact.contactName}</p>
+              <p><strong>Company:</strong> {selectedContact.companyName}</p>
+              <p><strong>Email:</strong> {selectedContact.email}</p>
+              <p><strong>First Name:</strong> {selectedContact.firstName}</p>
+              <p><strong>Middle Name:</strong> {selectedContact.middleName}</p>
+              <p><strong>last Name:</strong> {selectedContact.lastName}</p>
+              <p><strong>Note:</strong> {selectedContact.note}</p>
+              <p><strong>SSN:</strong> {selectedContact.ssn}</p>
+              <p><strong>email:</strong> {selectedContact.email}</p>
+              <p><strong>country:</strong> {selectedContact.country}</p>
+              <p><strong>street address:</strong> {selectedContact.streetAddress}</p>
+              <p><strong>city:</strong> {selectedContact.city}</p>
+              <p><strong>state:</strong> {selectedContact.state}</p>
+              <p><strong>zip code/postalCode:</strong> {selectedContact.postalCode}</p>
+              <p><strong>Phone Numbers:</strong></p>
+              <ul>
+                {selectedContact.phoneNumbers.flat().map((phoneObj, index) => (
+                  <li key={index}>{phoneObj.phone ? phoneObj.phone : phoneObj}</li>
+                ))}
+              </ul>
+
+            </>
+          )}
+        </div> */}
+        <div style={{ padding: '16px' }}>
+          {selectedContact && (
+            <ContactForm
+              selectedContact={selectedContact}
+              uniqueTags={uniqueTags}
+              // Pass additional props needed by ContactForm
+              handleTagChange={() => {}}
+              handlePhoneNumberChange={() => {}}
+              handleDeletePhoneNumber={() => {}}
+              handleAddPhoneNumber={() => {}}
+              handleCountryChange={() => {}}
+              sendingData={() => {}}
+              handleClose={() => setIsDrawerOpen(false)}
+              isSmallScreen={isMobile}
+            />
+          )}
+        </div>
+      </Drawer>
+
+      {/* // <MaterialReactTable columns={columns} table={table} /> */}
+      <Stack direction={isMobile ? "column-reverse" : "column"} gap="8px">
+        <Paper style={{ border: '2px solid blue', display: 'flex', overflowX: 'auto' }}>
+          <Stack p="8px" gap="8px" display="flex" direction="row">
+            <>
+              <Select
+                value={selectedFilterIndex}
+                onChange={handleFilterChange}
+                sx={{
+                  backgroundColor: 'white',
+                  minWidth: 200,
+                  '& .MuiSelect-select': {
+                    padding: '10px',
+                  },
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'blue',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'green',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: 'purple',
+                  },
+                }}
+              >
+                <MenuItem value={null}>None</MenuItem>
+                {columns.map((column, index) => (
+                  <MenuItem key={index} value={index}>
+                    {column.header}
+                  </MenuItem>
+                ))}
+              </Select>
+
+              <Stack direction="row" gap="8px">
+                {renderFilterContainers()}
+              </Stack>
+            </>
+          </Stack>
+        </Paper>
+        <MaterialReactTable columns={columns} table={table} />
+      </Stack>
+
+
+    </>
   );
 };
 

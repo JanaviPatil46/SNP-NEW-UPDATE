@@ -16,6 +16,9 @@ import { RxCross2 } from "react-icons/rx";
 import ContactForm from '../Contact/ContactForm';
 import AccountForm from '../Contact/AccountForm';
 function Sidebar() {
+
+  const SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
+  const NEW_SIDEBAR_API = process.env.REACT_APP_SIDEBAR_URL;
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [sidebarItems, setSidebarItems] = useState([]);
   const [newSidebarItems, setNewSidebarItems] = useState([]);
@@ -46,7 +49,7 @@ function Sidebar() {
   useEffect(() => {
     const fetchSidebarData = async () => {
       try {
-        const response = await axios.get("http://68.251.138.236:9000/api/");
+        const response = await axios.get(`${SIDEBAR_API}/api/`);
         setSidebarItems(response.data);
       } catch (error) {
         console.error("Error fetching sidebar data:", error);
@@ -60,7 +63,7 @@ function Sidebar() {
     if (isDrawerOpen) {
       const fetchNewSidebarData = async () => {
         try {
-          const response = await axios.get("http://68.251.138.236:9000/newsidebar/");
+          const response = await axios.get(`${NEW_SIDEBAR_API}/newsidebar/`);
           setNewSidebarItems(response.data);
         } catch (error) {
           console.error("Error fetching new sidebar data:", error);

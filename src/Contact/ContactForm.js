@@ -20,6 +20,7 @@ import { useTheme } from '@mui/material/styles';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './contact.css';
+
 import { toast } from 'react-toastify';
 import { RxCross2 } from "react-icons/rx";
 const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
@@ -135,7 +136,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
             body: raw,
             redirect: "follow",
         };
-        const url =`${CONTACT_API}/contacts/`;
+        const url = `${CONTACT_API}/contacts/`;
         fetch(url, requestOptions)
             .then((response) => {
                 if (!response.ok) {
@@ -147,7 +148,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                 // Handle success
                 toast.success('Contact created successfully!');
                 //console.log('Contact ID:', result);  // Log the contactId
-             
+
                 navigate('/clients/contacts');
 
                 // Additional logic after successful creation if needed
@@ -248,9 +249,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     }));
 
     return (
-        <Box
-
-        >
+        <Box>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2, borderBottom: '1px solid grey' }}>
                 <Typography variant='h6'>New Contact</Typography>
                 <RxCross2 onClick={handleNewDrawerClose} style={{ cursor: 'pointer' }} />
