@@ -1,4 +1,4 @@
-import { Box, Typography, FormControl, RadioGroup, FormControlLabel, Radio, Button, Select, Chip, MenuItem, TextField, useMediaQuery, Autocomplete, } from '@mui/material';
+import { Box, Typography, FormControl, RadioGroup, Radio, Button, Select, Chip, MenuItem, TextField, useMediaQuery, Autocomplete, Switch, FormControlLabel, } from '@mui/material';
 import { RxCross2 } from "react-icons/rx";
 import { useTheme } from '@mui/material/styles';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
@@ -37,7 +37,21 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [cZipPostalCode, SetCZipPostalCode] = useState("");
   const [activeStep, setActiveStep] = useState("Account Info");
 
-
+  const [loginSwitch, setLoginSwitch] = useState(false);
+  const [emailSyncSwitch, setEmailSyncSwitch] = useState(false);
+  const [notifySwitch, setNotifySwitch] = useState(false);
+  const handlesetLoginSwitch = (checked) => {
+    setLoginSwitch(checked);
+    updateContactSwitch('login', checked);
+  };
+  const handlesetEamilSyncSwitch = (checked) => {
+    setEmailSyncSwitch(checked);
+    updateContactSwitch('notify', checked);
+  };
+  const handlesetNotifySwitch= (checked) => {
+    setNotifySwitch(checked);
+    updateContactSwitch('emailSync', checked);
+  };
   const handleOptionChange = (event, value) => {
     setSelectedOption(value || event.target.value);
     setActiveStep(value || event.target.value);
@@ -194,7 +208,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   }));
 
   const [AccountId, setAccountId] = useState()
-
+ 
   // create account
   const handleSubmit = () => {
     const myHeaders = new Headers();
@@ -206,7 +220,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         accountName: accountName,
         tags: combinedValues,
         teamMember: combinedTeamMemberValues,
-
+      
       });
 
       const requestOptions = {
@@ -276,13 +290,13 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
     //todo contact
   };
-  const [country, setcountry] = useState('')
-  const [selectedCountry, setSelectedCountry] = useState('');
+  // const [country, setcountry] = useState('')
+  // const [selectedCountry, setSelectedCountry] = useState('');
 
-  const handleCountryChange = (event) => {
-    setSelectedCountry(event.target.value);
-    setcountry(event.target.value);
-  };
+  // const handleCountryChange = (event) => {
+  //   setSelectedCountry(event.target.value);
+  //   setcountry(event.target.value);
+  // };
   const [phoneNumbers, setPhoneNumbers] = useState([]);
 
 
@@ -294,12 +308,12 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   //   );
   // };
 
-  const handleAddPhoneNumber = () => {
-    setPhoneNumbers((prevPhoneNumbers) => [
-      ...prevPhoneNumbers,
-      { id: Date.now(), phone: '', isPrimary: false },
-    ]);
-  };
+  // const handleAddPhoneNumber = () => {
+  //   setPhoneNumbers((prevPhoneNumbers) => [
+  //     ...prevPhoneNumbers,
+  //     { id: Date.now(), phone: '', isPrimary: false },
+  //   ]);
+  // };
 
   const handleDeletePhoneNumber = (id) => {
     setPhoneNumbers((prevPhoneNumbers) =>
@@ -313,11 +327,11 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   // const addNewContact = () => {
   //   setContactCount(contactCount + 1);
   // };
-  const [showContactform, setShowContactForm] = useState(false)
+  // const [showContactform, setShowContactForm] = useState(false)
 
-  const handleCreateContact = () => {
-    setShowContactForm(true)
-  }
+  // const handleCreateContact = () => {
+  //   setShowContactForm(true)
+  // }
 
   //*Dipeeka */
 
@@ -328,12 +342,12 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     })));
   };
 
-  const [contacts, setContacts] = useState([{ firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: '' }, accountid: AccountId }]);
+  const [contacts, setContacts] = useState([{ firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '',login:'false',notify:'false',emailSync:'false', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: '' }, accountid: AccountId }]);
 
   console.log(contacts)
 
   const addNewContact = () => {
-    setContacts([...contacts, { firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: '' }, accountid: AccountId }]);
+    setContacts([...contacts, { firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '',login:'false',notify:'false',emailSync:'false', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: '' }, accountid: AccountId }]);
     setContactCount(contactCount + 1);
   };
 
@@ -341,6 +355,12 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     const { name, value } = event.target;
     const updatedContacts = [...contacts];
     updatedContacts[index] = { ...updatedContacts[index], [name]: value };
+    setContacts(updatedContacts);
+  };
+
+  const updateContactSwitch = (field, checked) => {
+    const updatedContacts = [...contacts];
+    updatedContacts[0][field] = checked ? 'true' : 'false';  // Assuming you want to update the first contact in the array
     setContacts(updatedContacts);
   };
 
@@ -837,7 +857,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                           }}
                         >
                           <Box>
-                            <InputLabel sx={{ color: 'black' }}>First name</InputLabel>
+                            <InputLabel sx={{ color: 'black' }}>First Name</InputLabel>
                             <TextField
                               margin="normal"
                               fullWidth
@@ -939,35 +959,51 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                           />
                         </Box>
 
+                        <Box>
+                          <Box>
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked={loginSwitch}
+                                  // onChange={handleAbsolutesDates}
+                                  onChange={(event) => handlesetLoginSwitch(event.target.checked)}
+                                  color="primary"
+                                />
+                              }
+                              label={"Login"}
+                            />
+                          </Box>
+                          <Box>
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked={notifySwitch}
+                                  // onChange={handleAbsolutesDates}
+                                  onChange={(event) => handlesetNotifySwitch(event.target.checked)}
+                                  color="primary"
+                                />
+                              }
+                              label={"notify"}
+                            />
+                          </Box>
+                          <Box>
+                            <FormControlLabel
+                              control={
+                                <Switch
+                                  checked={emailSyncSwitch}
+                                  // onChange={handleAbsolutesDates}
+                                  onChange={(event) => handlesetEamilSyncSwitch(event.target.checked)}
+                                  color="primary"
+                                />
+                              }
+                              label={"Email Sync"}
+                            />
+                          </Box>
+                        </Box>
+
                         <Box key={contact.id}>
                           <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>
-                          {/* <Select
-                            size="small"
-                            multiple
-                            value={contact.selectedTags || []} // Ensure it's an array
-                            onChange={(event) => handleContactTagChange(index, event)}
-                            sx={{ width: '100%', marginTop: '8px' }}
-                            renderValue={(selected) => (
-                              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                {selected.map((value) => {
-                                  const option = tagsoptions.find(opt => opt.value === value);
-                                  return (
-                                    <Chip
-                                      key={value}
-                                      label={option.label}
-                                      style={option.customStyle}
-                                    />
-                                  );
-                                })}
-                              </Box>
-                            )}
-                          >
-                            {tagsoptions.map((option) => (
-                              <MenuItem key={option.value} value={option.value} style={option.customStyle}>
-                                {option.label}
-                              </MenuItem>
-                            ))}
-                          </Select> */}
+                          
                           <Autocomplete
                             multiple
                             options={tagsoptions}

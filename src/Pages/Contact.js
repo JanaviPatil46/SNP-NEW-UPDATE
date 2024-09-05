@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
+
 import './account.css';
 import {
   Stack, Select,
-  useMediaQuery,
+  useMediaQuery, Box,
   MenuItem, Paper, Tooltip,
+  Typography,
+  Divider,
 } from "@mui/material";
 import { toast } from 'react-toastify';
 import { useMaterialReactTable, MaterialReactTable } from 'material-react-table';
@@ -27,20 +28,24 @@ const ContactTable = () => {
   const [uniqueTags, setUniqueTags] = useState([]);
   const [filterValue, setFilterValue] = useState(null);
 
+  const fetchContacts = async () => {
+    try {
+      const response = await axios.get(`${CONTACT_API}/contacts/contactlist/list/`);
+      setContactData(response.data.contactlist);
+      console.log(response.data.contactlist);
+    } catch (error) {
+      console.error('API Error:', error);
+      // toast.error('Failed to fetch contacts');
+    }
+  };
   useEffect(() => {
-    const fetchContacts = async () => {
-      try {
-        const response = await axios.get(`${CONTACT_API}/contacts/contactlist/list/`);
-        setContactData(response.data.contactlist);
-        console.log(response.data.contactlist);
-      } catch (error) {
-        console.error('API Error:', error);
-        // toast.error('Failed to fetch contacts');
-      }
-    };
+
 
     fetchContacts();
   }, []);
+  const handleContactUpdated = () => {
+    fetchContacts(); // Refetch contacts when updated
+  };
 
   useEffect(() => {
     if (contactData.length > 0) {
@@ -53,7 +58,7 @@ const ContactTable = () => {
         }
       });
       setUniqueTags(Array.from(tagsSet).map(tag => JSON.parse(tag)));
-      console.log(uniqueTags);
+      // console.log(uniqueTags);
     }
   }, [contactData]);
 
@@ -127,18 +132,42 @@ const ContactTable = () => {
 
   const [selectedContact, setSelectedContact] = useState(null);
 
-  const handleClick = async (contactId) => {
+
+
+  const handleClick = async (id) => {
+
     try {
-      const response = await axios.get(`${CONTACT_API}/contacts/${contactId}`);
-      setSelectedContact(response.data);
-      console.log(response.data);
+      const url = `${CONTACT_API}/contacts/${id}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setSelectedContact(data.contact)
+      console.log(data.contact)
+      selectedContacts()
+      console.log(data.contact.tags)
       setIsDrawerOpen(true);
+
+
+
     } catch (error) {
-      console.error('Error fetching contact details:', error);
-      toast.error('Failed to fetch contact details');
+      console.error("Error fetching data:", error);
     }
   };
+  useEffect(() => {
+    if (selectedContact) {
+      selectedContacts()
+    }
+  }, [selectedContact]);
 
+  const selectedContacts = () => {
+    if (selectedContact) {
+
+
+
+    }
+  }
 
 
 
@@ -147,12 +176,12 @@ const ContactTable = () => {
     {
       accessorKey: 'name',
       header: 'Name',
-      Cell: ({ cell }) => (
+      Cell: ({ row }) => (
         <span
           style={{ cursor: 'pointer', color: 'blue' }}
-          onClick={() => handleClick(cell.row.original.id)}
+          onClick={() => handleClick(row.original.id)}
         >
-          {cell.getValue()}
+          {row.original.name}
         </span>
       ),
 
@@ -308,66 +337,45 @@ const ContactTable = () => {
 
   return (
     <>
+
+
       <Drawer
         anchor="right"
         open={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
+        sx={{ width: 600 }}
       >
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{ padding: '16px', backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}
-        >
-          <h2>Contact Details</h2>
-          <IconButton onClick={() => setIsDrawerOpen(false)}>
-            <CloseIcon />
-          </IconButton>
-        </Stack>
-        {/* <div style={{ padding: '16px' }}>
-          {selectedContact && (
-            <>
-              <p><strong>Name:</strong> {selectedContact.contactName}</p>
-              <p><strong>Company:</strong> {selectedContact.companyName}</p>
-              <p><strong>Email:</strong> {selectedContact.email}</p>
-              <p><strong>First Name:</strong> {selectedContact.firstName}</p>
-              <p><strong>Middle Name:</strong> {selectedContact.middleName}</p>
-              <p><strong>last Name:</strong> {selectedContact.lastName}</p>
-              <p><strong>Note:</strong> {selectedContact.note}</p>
-              <p><strong>SSN:</strong> {selectedContact.ssn}</p>
-              <p><strong>email:</strong> {selectedContact.email}</p>
-              <p><strong>country:</strong> {selectedContact.country}</p>
-              <p><strong>street address:</strong> {selectedContact.streetAddress}</p>
-              <p><strong>city:</strong> {selectedContact.city}</p>
-              <p><strong>state:</strong> {selectedContact.state}</p>
-              <p><strong>zip code/postalCode:</strong> {selectedContact.postalCode}</p>
-              <p><strong>Phone Numbers:</strong></p>
-              <ul>
-                {selectedContact.phoneNumbers.flat().map((phoneObj, index) => (
-                  <li key={index}>{phoneObj.phone ? phoneObj.phone : phoneObj}</li>
-                ))}
-              </ul>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', ml: 1 }}>
+            <Typography sx={{ fontWeight: 'bold', }} variant="h6">
+              Edit Contact
+            </Typography>
+            <IconButton onClick={() => setIsDrawerOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
 
-            </>
-          )}
-        </div> */}
-        <div style={{ padding: '16px' }}>
-          {selectedContact && (
-            <ContactForm
-              selectedContact={selectedContact}
-              uniqueTags={uniqueTags}
-              // Pass additional props needed by ContactForm
-              handleTagChange={() => {}}
-              handlePhoneNumberChange={() => {}}
-              handleDeletePhoneNumber={() => {}}
-              handleAddPhoneNumber={() => {}}
-              handleCountryChange={() => {}}
-              sendingData={() => {}}
-              handleClose={() => setIsDrawerOpen(false)}
-              isSmallScreen={isMobile}
-            />
-          )}
-        </div>
+      <Divider/>
+
+
+
+        {selectedContact && (
+          <ContactForm
+            selectedContact={selectedContact}
+            uniqueTags={uniqueTags}
+            // Pass additional props needed by ContactForm
+            handleTagChange={() => { }}
+            handlePhoneNumberChange={() => { }}
+            handleDeletePhoneNumber={() => { }}
+            handleAddPhoneNumber={() => { }}
+            handleCountryChange={() => { }}
+            sendingData={() => { }}
+            handleClose={() => setIsDrawerOpen(false)}
+            isSmallScreen={isMobile}
+            onContactUpdated={handleContactUpdated}
+          />
+        )}
+
+
       </Drawer>
 
       {/* // <MaterialReactTable columns={columns} table={table} /> */}
@@ -418,4 +426,3 @@ const ContactTable = () => {
 };
 
 export default ContactTable;
-

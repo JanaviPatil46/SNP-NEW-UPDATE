@@ -226,6 +226,14 @@ const Service = () => {
         {
           accessorKey: 'serviceName', // Access the template name
           header: 'Name',
+          Cell: ({ row }) => (
+            <Typography
+              sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
+              onClick={() => handleEdit(row.original._id)}
+            >
+              {row.original.serviceName}
+            </Typography>
+          ),
         },
         {
           accessorKey: 'settings', // Add settings column

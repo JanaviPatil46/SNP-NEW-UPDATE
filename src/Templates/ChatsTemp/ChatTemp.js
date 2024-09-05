@@ -290,7 +290,8 @@ const ChatTemp = () => {
           handleClearTemplate();
           fetchChatTemplates();
           toast.success("ChatTemplate created successfully");
-          handleCloseChatTemp()
+          // handleCloseChatTemp()
+          setShowForm(false);
         } else {
           toast.error(result.message || "Failed to create Chat Template");
         }
