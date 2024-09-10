@@ -228,7 +228,7 @@
 
 // export default AccountsTable;
 
-import  { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { MaterialReactTable, useMaterialReactTable } from "material-react-table";
 
 import axios from "axios";
@@ -236,8 +236,8 @@ import Badge from "@mui/material/Badge";
 import Tooltip from "@mui/material/Tooltip";
 import './account.css';
 
-import { Paper, useMediaQuery,  IconButton, } from "@mui/material";
-import {  MRT_TableHeadCellFilterContainer } from "material-react-table";
+import { Paper, useMediaQuery, IconButton, } from "@mui/material";
+import { MRT_TableHeadCellFilterContainer } from "material-react-table";
 import { Stack, Select, MenuItem } from "@mui/material";
 
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -410,7 +410,7 @@ const Example = () => {
 
         const response = await axios.request(config);
         setAccountData(response.data.accountlist);
-        
+
       } catch (error) {
         console.log("Error:", error);
       }
@@ -418,105 +418,105 @@ const Example = () => {
     fetchData();
   }, []);
 
- 
 
- //Tag FetchData ================
-const [tags, setTags] = useState([]);
-useEffect(() => {
-  fetchTagData();
-}, []);
 
-const fetchTagData = async () => {
+  //Tag FetchData ================
+  const [tags, setTags] = useState([]);
+  useEffect(() => {
+    fetchTagData();
+  }, []);
+
+  const fetchTagData = async () => {
     try {
 
-        const url = `${TAGS_API}/tags/`;
+      const url = `${TAGS_API}/tags/`;
 
-        const response = await fetch(url);
-        const data = await response.json();
-        setTags(data.tags);
-        console.log(data.tags);
+      const response = await fetch(url);
+      const data = await response.json();
+      setTags(data.tags);
+      console.log(data.tags);
     } catch (error) {
-        console.error("Error fetching data:", error);
+      console.error("Error fetching data:", error);
     }
-};
-//  for tags
-const calculateWidth = (tagName) => {
+  };
+  //  for tags
+  const calculateWidth = (tagName) => {
 
     const baseWidth = 10; // base width for each tag
     const charWidth = 8; // approximate width of each character
     const padding = 10; // padding on either side
     return baseWidth + (charWidth * tagName.length) + padding;
-};
+  };
 
 
-const tagsOptions = tags.map((tag) => ({
+  const tagsOptions = tags.map((tag) => ({
     value: tag._id,
     label: tag.tagName,
     colour: tag.tagColour,
 
     customStyle: {
-        backgroundColor: tag.tagColour,
-        color: "#fff",
-        borderRadius: "8px",
-        alignItems: "center",
-        textAlign: "center",
-        marginBottom: "5px",
-        padding: "2px,8px",
-        fontSize: '10px',
-        width: `${calculateWidth(tag.tagName)}px`,
-        margin: '7px'
+      backgroundColor: tag.tagColour,
+      color: "#fff",
+      borderRadius: "8px",
+      alignItems: "center",
+      textAlign: "center",
+      marginBottom: "5px",
+      padding: "2px,8px",
+      fontSize: '10px',
+      width: `${calculateWidth(tag.tagName)}px`,
+      margin: '7px'
     },
     customTagStyle: {
-        backgroundColor: tag.tagColour,
-        color: "#fff",
-        alignItems: "center",
-        textAlign: "center",
-        padding: "2px,8px",
-        fontSize: '10px',
-        cursor: 'pointer',
+      backgroundColor: tag.tagColour,
+      color: "#fff",
+      alignItems: "center",
+      textAlign: "center",
+      padding: "2px,8px",
+      fontSize: '10px',
+      cursor: 'pointer',
     },
-}));
+  }));
 
 
 
-const TagFilter = ({ column }) => {
-  const columnFilterValue = column.getFilterValue() || [];
+  const TagFilter = ({ column }) => {
+    const columnFilterValue = column.getFilterValue() || [];
 
-  return (
-    <Box sx={{ marginBottom: 2 }}>
-      <Autocomplete
-        multiple
-        options={tagsOptions}
-        value={columnFilterValue}
-        onChange={(event, newValue) => {
-          column.setFilterValue(newValue);
-        }}
-        getOptionLabel={(option) => option.label}
-        isOptionEqualToValue={(option, value) => option.value === value.value}
-        renderInput={(params) => (
-          <TextField {...params} label="Filter by Tags" variant="outlined" />
-        )}
-        renderOption={(props, option) => (
-          <li {...props} style={option.customTagStyle}>
-            {option.label}
-          </li>
-        )}
-      />
-    </Box>
-  );
-};
-
-
-const tagFilterFn = (row, columnId, filterValue) => {
-  const tags = row.original.Tags || [];
-  // Check if any of the row tags match any of the filter tags
-  return filterValue.length === 0 || filterValue.some(filterTag => 
-    tags.some(tag => tag._id === filterTag.value)
-  );
-};
+    return (
+      <Box sx={{ marginBottom: 2 }}>
+        <Autocomplete
+          multiple
+          options={tagsOptions}
+          value={columnFilterValue}
+          onChange={(event, newValue) => {
+            column.setFilterValue(newValue);
+          }}
+          getOptionLabel={(option) => option.label}
+          isOptionEqualToValue={(option, value) => option.value === value.value}
+          renderInput={(params) => (
+            <TextField {...params} label="Filter by Tags" variant="outlined" />
+          )}
+          renderOption={(props, option) => (
+            <li {...props} style={option.customTagStyle}>
+              {option.label}
+            </li>
+          )}
+        />
+      </Box>
+    );
+  };
 
 
-  
+  const tagFilterFn = (row, columnId, filterValue) => {
+    const tags = row.original.Tags || [];
+    // Check if any of the row tags match any of the filter tags
+    return filterValue.length === 0 || filterValue.some(filterTag =>
+      tags.some(tag => tag._id === filterTag.value)
+    );
+  };
+
+
+
   const columns = useMemo(
     //column definitions...
     () => [
@@ -543,12 +543,12 @@ const tagFilterFn = (row, columnId, filterValue) => {
       {
         accessorKey: "Type",
         header: "Type",
-        size:200,
+        size: 200,
         filterFn: typeFilterFn, // Use the custom filter function
         // Filter: TypeFilter,
         Filter: ({ column, table }) => <TypeFilter column={column} table={table} />,
         Cell: ({ cell }) => (
-          <div style={{ display: "flex", marginLeft:'20px', gap: "0px" }}>
+          <div style={{ display: "flex", marginLeft: '20px', gap: "0px" }}>
             <Badge
               badgeContent={cell.getValue()}
               color="primary"
@@ -596,13 +596,13 @@ const tagFilterFn = (row, columnId, filterValue) => {
         },
       },
 
-      
+
       {
         accessorKey: 'Tags',
         header: 'Tags',
         filterFn: tagFilterFn, // Use the custom tag filter function
-        Filter: ({ column,table }) => <TagFilter column={column} table={table}/>,
-       
+        Filter: ({ column, table }) => <TagFilter column={column} table={table} />,
+
         Cell: ({ cell }) => {
           const tags = cell.getValue()[0];
           if (tags.length > 1) {
@@ -668,7 +668,7 @@ const tagFilterFn = (row, columnId, filterValue) => {
             </span>
           );
         },
-       
+
       },
       {
         accessorKey: "Invoices",
@@ -739,27 +739,17 @@ const tagFilterFn = (row, columnId, filterValue) => {
 
   return (
     <Stack direction={isMobile ? "column-reverse" : "column"} gap="8px">
-      <Paper style={{ border: '2px solid blue', display: 'flex', overflowX: 'auto' }}>
+      <Paper style={{ display: 'flex', overflowX: 'auto' }}>
         <Stack p="8px" gap="8px" display="flex" direction="row" >
           <>
-            <Select
+            {/* <Select
               value={selectedFilterIndex}
               onChange={handleFilterChange}
+              size='small'
               sx={{
                 backgroundColor: 'white',
                 minWidth: 200, // Minimum width for the select box
-                '& .MuiSelect-select': {
-                  padding: '10px', // Padding inside the select
-                },
-                '& .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'blue', // Border color
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'green', // Border color on hover
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: 'purple', // Border color when focused
-                },
+               
               }}
             >
               <MenuItem value={null}>None</MenuItem>
@@ -768,7 +758,28 @@ const tagFilterFn = (row, columnId, filterValue) => {
                   {column.header}
                 </MenuItem>
               ))}
-            </Select>
+            </Select> */}
+            <Autocomplete
+              size="small"
+              value={selectedFilterIndex !== null ? columns[selectedFilterIndex] : null}
+              onChange={(event, newValue) => {
+                handleFilterChange(event, newValue ? columns.indexOf(newValue) : null);
+              }}
+              options={columns}
+              getOptionLabel={(option) => option.header}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Filter"
+                  size="small"
+                  sx={{
+                    backgroundColor: 'white',
+                    minWidth: 200,
+                  }}
+                />
+              )}
+              isOptionEqualToValue={(option, value) => option.header === value?.header}
+            />
 
             <Stack direction="row" gap="8px" >
               {renderFilterContainers()}

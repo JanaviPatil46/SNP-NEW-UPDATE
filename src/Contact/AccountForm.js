@@ -1,4 +1,4 @@
-import { Box, Typography, FormControl, RadioGroup, Radio, Button, Select, Chip, MenuItem, TextField, useMediaQuery, Autocomplete, Switch, FormControlLabel, } from '@mui/material';
+import { ListItem, Box, Typography, FormControl, RadioGroup, Radio, Button, Select, Chip, MenuItem, TextField, useMediaQuery, Autocomplete, Switch, FormControlLabel, } from '@mui/material';
 import { RxCross2 } from "react-icons/rx";
 import { useTheme } from '@mui/material/styles';
 import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
@@ -27,7 +27,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [accountType, setAccountType] = useState("Individual");
   const [accountName, setaccountName] = useState('');
   const [companyname, setcompanyname] = useState('')
-  const [cCountry, SetCCountry] = useState("");
+  const [cCountry, SetCCountry] = useState(null);
   const [countries, setCountries] = useState([]);
 
   // const [state, setstate] = useState('')
@@ -37,21 +37,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   const [cZipPostalCode, SetCZipPostalCode] = useState("");
   const [activeStep, setActiveStep] = useState("Account Info");
 
-  const [loginSwitch, setLoginSwitch] = useState(false);
-  const [emailSyncSwitch, setEmailSyncSwitch] = useState(false);
-  const [notifySwitch, setNotifySwitch] = useState(false);
-  const handlesetLoginSwitch = (checked) => {
-    setLoginSwitch(checked);
-    updateContactSwitch('login', checked);
-  };
-  const handlesetEamilSyncSwitch = (checked) => {
-    setEmailSyncSwitch(checked);
-    updateContactSwitch('notify', checked);
-  };
-  const handlesetNotifySwitch= (checked) => {
-    setNotifySwitch(checked);
-    updateContactSwitch('emailSync', checked);
-  };
+
   const handleOptionChange = (event, value) => {
     setSelectedOption(value || event.target.value);
     setActiveStep(value || event.target.value);
@@ -208,7 +194,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   }));
 
   const [AccountId, setAccountId] = useState()
- 
+
   // create account
   const handleSubmit = () => {
     const myHeaders = new Headers();
@@ -220,7 +206,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
         accountName: accountName,
         tags: combinedValues,
         teamMember: combinedTeamMemberValues,
-      
+
       });
 
       const requestOptions = {
@@ -290,48 +276,26 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
     //todo contact
   };
-  // const [country, setcountry] = useState('')
-  // const [selectedCountry, setSelectedCountry] = useState('');
 
-  // const handleCountryChange = (event) => {
-  //   setSelectedCountry(event.target.value);
-  //   setcountry(event.target.value);
-  // };
   const [phoneNumbers, setPhoneNumbers] = useState([]);
 
-
-  // const handlePhoneNumberChange = (id, phone) => {
+  // const handleDeletePhoneNumber = (id) => {
   //   setPhoneNumbers((prevPhoneNumbers) =>
-  //     prevPhoneNumbers.map((item) =>
-  //       item.id === id ? { ...item, phone } : item
-  //     )
+  //     prevPhoneNumbers.filter((item) => item.id !== id)
   //   );
   // };
-
-  // const handleAddPhoneNumber = () => {
-  //   setPhoneNumbers((prevPhoneNumbers) => [
-  //     ...prevPhoneNumbers,
-  //     { id: Date.now(), phone: '', isPrimary: false },
-  //   ]);
-  // };
-
-  const handleDeletePhoneNumber = (id) => {
-    setPhoneNumbers((prevPhoneNumbers) =>
-      prevPhoneNumbers.filter((item) => item.id !== id)
-    );
+  const handleDeletePhoneNumber = (phoneIndex) => {
+    setPhoneNumbers((prevPhoneNumbers) => {
+      // Create a new array excluding the phone number at the specified index
+      return prevPhoneNumbers.filter((_, index) => index !== phoneIndex);
+    });
   };
+
+
+
 
   //for creating multiple forms when click on Add New Contact
   const [contactCount, setContactCount] = useState(1);
-
-  // const addNewContact = () => {
-  //   setContactCount(contactCount + 1);
-  // };
-  // const [showContactform, setShowContactForm] = useState(false)
-
-  // const handleCreateContact = () => {
-  //   setShowContactForm(true)
-  // }
 
   //*Dipeeka */
 
@@ -342,14 +306,15 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     })));
   };
 
-  const [contacts, setContacts] = useState([{ firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '',login:'false',notify:'false',emailSync:'false', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: '' }, accountid: AccountId }]);
+  const [contacts, setContacts] = useState([{ firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '', login: 'false', notify: 'false', emailSync: 'false', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: '' }, accountid: AccountId }]);
 
   console.log(contacts)
 
   const addNewContact = () => {
-    setContacts([...contacts, { firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '',login:'false',notify:'false',emailSync:'false', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: '' }, accountid: AccountId }]);
+    setContacts([...contacts, { firstName: '', middleName: '', lastName: '', contactName: '', companyName: '', note: '', ssn: '', email: '', login: 'false', notify: 'false', emailSync: 'false', tags: [], phoneNumbers: [], address: { country: '', streetAddress: '', city: '', state: '', postalCode: '' }, accountid: AccountId }]);
     setContactCount(contactCount + 1);
   };
+
 
   const handleContactInputChange = (index, event) => {
     const { name, value } = event.target;
@@ -358,17 +323,15 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     setContacts(updatedContacts);
   };
 
-  const updateContactSwitch = (field, checked) => {
+  const handleContactSwitchChange = (index, fieldName, checked) => {
     const updatedContacts = [...contacts];
-    updatedContacts[0][field] = checked ? 'true' : 'false';  // Assuming you want to update the first contact in the array
+    updatedContacts[index] = { ...updatedContacts[index], [fieldName]: checked ? 'true' : 'false' };
     setContacts(updatedContacts);
   };
 
-  // const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue) => {
-  //   const updatedContacts = [...contacts];
-  //   updatedContacts[index].phoneNumbers[phoneIndex] = phoneValue;
-  //   setContacts(updatedContacts);
-  // };
+
+
+
   const handleContactPhoneNumberChange = (index, phoneIndex, phoneValue) => {
     setContacts(prevContacts => {
       const updatedContacts = [...prevContacts];
@@ -387,11 +350,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
       return updatedContacts;
     });
   };
-  // const handleContactAddressChange = (index, field, value) => {
-  //   const updatedContacts = [...contacts];
-  //   updatedContacts[index].address[field] = value;
-  //   setContacts(updatedContacts);
-  // };
+
 
   const handleContactAddressChange = (index, field, value) => {
     setContacts((prevContacts) => {
@@ -407,36 +366,6 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
     });
   };
 
-
-  // const handleContactTagChange = (index, event) => {
-  //   const { value } = event.target;
-
-  //   setContacts((prevContacts) => {
-  //     const updatedContacts = [...prevContacts];
-  //     updatedContacts[index].selectedTags = Array.isArray(value) ? value : [];
-  //     return updatedContacts;
-  //   });
-
-  //   console.log("Selected Tags for contact", index, ":", value);
-  //   setCombinedValues((prevCombinedValues) => [
-  //     ...prevCombinedValues,
-  //     ...value,
-  //   ]);
-  // };
-
-  // const handleContactTagChange = (index, event, newValue) => {
-  //   setContacts((prevContacts) => {
-  //     const updatedContacts = [...prevContacts];
-  //     updatedContacts[index].selectedTags = newValue;
-  //     return updatedContacts;
-  //   });
-
-  //   console.log("Selected Tags for contact", index, ":", newValue);
-  //   setCombinedValues((prevCombinedValues) => [
-  //     ...prevCombinedValues,
-  //     ...newValue,
-  //   ]);
-  // };
 
   const handleContactTagChange = (index, event, newValue) => {
     // Map newValue to get an array of option values
@@ -516,9 +445,16 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
               <Box className='account-contact-info' >
                 {activeStep === 'Contact Info' ? (
                   <>
-                    <CheckCircleRoundedIcon style={{ color: "green" }} />
-                    <ArrowForwardIosRoundedIcon />
-                    <FormControlLabel value="Contact Info" control={<Radio checked />} label="Contact Info" />
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mr: 2, gap: 2 }}>
+                        <CheckCircleRoundedIcon style={{ color: "green" }} />
+                        <Typography>Account Info</Typography>
+                      </Box>
+
+                      <ArrowForwardIosRoundedIcon />
+                      <FormControlLabel value="Contact Info" control={<Radio checked />} label="Contact Info" sx={{ ml: 2 }} />
+                    </Box>
+
                   </>
                 ) : (
                   <>
@@ -737,8 +673,37 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                       >
 
                         <InputLabel sx={{ color: 'black' }}>Country</InputLabel>
-
-                        <Select
+                        <Autocomplete
+                          size="small"
+                          options={countries}
+                          getOptionLabel={(option) => option.name}
+                          value={cCountry}
+                          onChange={(event, newValue) => SetCCountry(newValue)}
+                          renderOption={(props, option) => (
+                            <ListItem
+                              {...props}
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                padding: '8px',
+                                borderBottom: '1px solid #ddd',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <Typography sx={{ fontWeight: 500 }}>{option.name}</Typography>
+                              <Typography sx={{ fontSize: '0.9rem', color: 'gray' }}>{option.code}</Typography>
+                            </ListItem>
+                          )}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Country"
+                              variant="outlined"
+                              sx={{ marginTop: '8px', width: '100%' }}
+                            />
+                          )}
+                        />
+                        {/* <Select
                           size='small'
                           value={cCountry}
                           onChange={(e) => SetCCountry(e.target.value)}
@@ -753,7 +718,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                               {country.name}
                             </MenuItem>
                           ))}
-                        </Select>
+                        </Select> */}
                       </Box>
                       <Box>
                         <InputLabel sx={{ color: 'black', mt: 2 }}>Street address</InputLabel>
@@ -835,10 +800,11 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
               <>
                 <Box className='create_new_contactform-container'>
-                  <Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <h3 style={{ marginLeft: "20px" }}>Contacts</h3>
+                    <HelpOutlineRoundedIcon />
                   </Box>
-                  <Box className='HelpOutlineRoundedIcon'><HelpOutlineRoundedIcon /></Box>
+
                 </Box>
 
                 {contacts.map((contact, index) => (
@@ -959,51 +925,45 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                           />
                         </Box>
 
-                        <Box>
-                          <Box>
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked={loginSwitch}
-                                  // onChange={handleAbsolutesDates}
-                                  onChange={(event) => handlesetLoginSwitch(event.target.checked)}
-                                  color="primary"
-                                />
-                              }
-                              label={"Login"}
-                            />
-                          </Box>
-                          <Box>
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked={notifySwitch}
-                                  // onChange={handleAbsolutesDates}
-                                  onChange={(event) => handlesetNotifySwitch(event.target.checked)}
-                                  color="primary"
-                                />
-                              }
-                              label={"notify"}
-                            />
-                          </Box>
-                          <Box>
-                            <FormControlLabel
-                              control={
-                                <Switch
-                                  checked={emailSyncSwitch}
-                                  // onChange={handleAbsolutesDates}
-                                  onChange={(event) => handlesetEamilSyncSwitch(event.target.checked)}
-                                  color="primary"
-                                />
-                              }
-                              label={"Email Sync"}
-                            />
-                          </Box>
+
+
+                        {/* Switches for Login, Notify, and Email Sync */}
+                        <Box sx={{ mt: 1 }}>
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={contact.login === 'true'}
+                                onChange={(e) => handleContactSwitchChange(index, 'login', e.target.checked)}
+                                color="primary"
+                              />
+                            }
+                            label="Login"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={contact.notify === 'true'}
+                                onChange={(e) => handleContactSwitchChange(index, 'notify', e.target.checked)}
+                                color="primary"
+                              />
+                            }
+                            label="Notify"
+                          />
+                          <FormControlLabel
+                            control={
+                              <Switch
+                                checked={contact.emailSync === 'true'}
+                                onChange={(e) => handleContactSwitchChange(index, 'emailSync', e.target.checked)}
+                                color="primary"
+                              />
+                            }
+                            label="Email Sync"
+                          />
                         </Box>
 
                         <Box key={contact.id}>
                           <InputLabel sx={{ color: 'black' }}>Tags</InputLabel>
-                          
+
                           <Autocomplete
                             multiple
                             options={tagsoptions}
@@ -1128,7 +1088,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                               }}
                             />
                             <AiOutlineDelete
-                              onClick={() => handleDeletePhoneNumber(index, phoneIndex)}
+                              onClick={() => handleDeletePhoneNumber(phoneIndex)}
                               style={{ cursor: 'pointer', color: 'red' }}
                             />
                           </Box>
@@ -1175,7 +1135,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                           {/* Country Selection */}
                           <Box>
                             <InputLabel sx={{ color: 'black' }}>Country</InputLabel>
-                            <Select
+                            {/* <Select
                               size='small'
                               value={contact.address?.country || ''} // Ensure it's an empty string if undefined
                               onChange={(e) => handleContactAddressChange(index, 'country', e.target.value)}
@@ -1186,7 +1146,37 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                                   {country.name}
                                 </MenuItem>
                               ))}
-                            </Select>
+                            </Select> */}
+                            <Autocomplete
+                              size="small"
+                              value={countries.find((country) => country.code === contact.address?.country) || null} // Ensure it's null if undefined
+                              onChange={(event, newValue) => handleContactAddressChange(index, 'country', newValue?.code || '')} // Handle value change
+                              options={countries}
+                              getOptionLabel={(option) => option.name} // Show country name in options
+                              isOptionEqualToValue={(option, value) => option.code === value.code} // Handle matching options
+                              renderOption={(props, option) => (
+                                <ListItem
+                                  {...props}
+                                  sx={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    padding: '8px',
+                                    borderBottom: '1px solid #ddd',
+                                    cursor:'pointer'
+                                  }}
+                                >
+                                  <Typography sx={{ fontWeight: 500 }}>{option.name}</Typography>
+                                  <Typography sx={{ fontSize: '0.9rem', color: 'gray' }}>{option.code}</Typography>
+                                </ListItem>
+                              )}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder="Country"
+                                  sx={{ width: '100%', marginTop: '8px' }}
+                                />
+                              )}
+                            />
                           </Box>
                         </Box>
                         <Box>
@@ -1277,6 +1267,17 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                     padding: '1px 5px 0 5px',
                   }}
                 >
+                  <Button variant="contained"
+                    color="primary"
+
+                    sx={{
+                      mt: 2,
+                      ml: 3,
+                      borderRadius: '10px',
+                    }} onClick={() => {
+                      handleOptionChange(null, 'Account Info');
+                    }}
+                  >Back</Button>
                   <Button
                     type="submit"
                     variant="contained"
@@ -1284,7 +1285,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
                     sx={{
                       mt: 2,
-                      ml: 3,
+
                       borderRadius: '10px',
                     }}
                     onClick={handlesubmitContact}

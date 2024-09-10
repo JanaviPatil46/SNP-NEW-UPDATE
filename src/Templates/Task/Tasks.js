@@ -38,8 +38,8 @@ const Tasks = () => {
   const [absoluteDate, setAbsoluteDates] = useState(false);
   const [priority, setPriority] = useState('');
   const [status, setStatus] = useState('');
-  const [startsInDuration, setStartsInDuration] = useState(null);
-  const [dueinduration, setdueinduration] = useState("");
+  const [startsInDuration, setStartsInDuration] = useState("Days");
+  const [dueinduration, setdueinduration] = useState("Days");
   const [description, setDescription] = useState('');
   const [selectedUser, setSelectedUser] = useState([]);
   const [combinedValues, setCombinedValues] = useState([]);
@@ -305,6 +305,11 @@ const Tasks = () => {
   };
   //delete template
   const handleDelete = (_id) => {
+      // Show a confirmation prompt
+      const isConfirmed = window.confirm("Are you sure you want to delete this task template?");
+        
+      // Proceed with deletion if confirmed
+      if (isConfirmed) {
     const requestOptions = {
       method: "DELETE",
       redirect: "follow"
@@ -326,7 +331,8 @@ const Tasks = () => {
       .catch((error) => {
         console.error(error);
         toast.error('Failed to delete item');
-      })
+      });
+    }
   };
   const [tempIdget, setTempIdGet] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
@@ -554,7 +560,7 @@ const Tasks = () => {
                           </Grid>
                         </Grid>
                       </Box>
-                      <Box sx={{ mt: 3, }}>
+                      <Box sx={{ mt: 3, mb:3}}>
                         <Editor onChange={handleEditorChange} content={description} />
                       </Box>
                       <Box mt={2}>

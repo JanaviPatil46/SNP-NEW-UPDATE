@@ -52,8 +52,8 @@ const JobTemp = () => {
   const [filteredShortcuts, setFilteredShortcuts] = useState([]);
   const [selectedOption, setSelectedOption] = useState('contacts');
   const [selectedShortcut, setSelectedShortcut] = useState("");
-  const [startsInDuration, setStartsInDuration] = useState(null);
-  const [dueinduration, setdueinduration] = useState("");
+  const [startsInDuration, setStartsInDuration] = useState("Days");
+  const [dueinduration, setdueinduration] = useState("Days");
   // const [startsinduration, setstartsinduration] = useState("");
   const [description, setDescription] = useState('');
 
@@ -399,6 +399,11 @@ const JobTemp = () => {
   };
   //delete template
   const handleDelete = (_id) => {
+    // Show a confirmation prompt
+    const isConfirmed = window.confirm("Are you sure you want to delete this Job template?");
+        
+    // Proceed with deletion if confirmed
+    if (isConfirmed) {
     const requestOptions = {
       method: "DELETE",
       redirect: "follow",
@@ -420,7 +425,8 @@ const JobTemp = () => {
       .catch((error) => {
         console.error(error);
         toast.error("Failed to delete item");
-      })
+      });
+    }
 
   };
 

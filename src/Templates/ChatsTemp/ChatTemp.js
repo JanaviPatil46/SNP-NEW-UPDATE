@@ -306,6 +306,12 @@ const ChatTemp = () => {
 
   //delete template
   const handleDelete = (_id) => {
+
+    // Show a confirmation prompt
+    const isConfirmed = window.confirm("Are you sure you want to delete this chat template?");
+        
+    // Proceed with deletion if confirmed
+    if (isConfirmed) {
     const requestOptions = {
       method: "DELETE",
       redirect: "follow"
@@ -329,7 +335,8 @@ const ChatTemp = () => {
       .catch((error) => {
         console.error(error);
         toast.error('Failed to delete item');
-      })
+      });
+    }
 
   };
   const [tempIdget, setTempIdGet] = useState("");
@@ -618,7 +625,7 @@ const ChatTemp = () => {
                         </Popover>
                       </Box>
 
-                      <Box sx={{ mt: 3, width: '100%' }}>
+                      <Box sx={{ mt: 3, width: '100%',mb:6 }}>
                         <Editor onChange={handleEditorChange} />
                       </Box>
 

@@ -443,7 +443,7 @@ const[numOfReminder,setnumOfReminder]=useState();
   };
 
   const [subtotal, setSubtotal] = useState('');
-  const [taxRate, setTaxRate] = useState('');
+  const [taxRate, setTaxRate] = useState(0);
   const [taxTotal, setTaxTotal] = useState(0);
 
   const handleSubtotalChange = (event) => {
@@ -900,20 +900,24 @@ const[numOfReminder,setnumOfReminder]=useState();
                             <TableBody>
                               <TableRow>
                                 <TableCell>
+                                <Box sx={{display:'flex',alignItems:'center'}}>
                                   <input
                                     type="number"
                                     value={subtotal}
                                     onChange={handleSubtotalChange}
-                                    style={{ border: 'none' }}
-                                  />
+                                    style={{ border: 'none',width:'50%' }}
+                                  />$
+                                  </Box>
                                 </TableCell>
                                 <TableCell>
+                                <Box sx={{display:'flex',alignItems:'center'}}>
                                   <input
-                                    type="number"
+                                    // type="number"
                                     value={taxRate}
                                     onChange={handleTaxRateChange}
-                                    style={{ border: 'none' }}
+                                    style={{ border: 'none',width:'50%' }}
                                   />%
+                                  </Box>
                                 </TableCell>
                                 <TableCell>${taxTotal.toFixed(2)}</TableCell>
                                 <TableCell>${totalAmount}</TableCell>

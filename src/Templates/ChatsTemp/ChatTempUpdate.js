@@ -444,7 +444,7 @@ const ChatTempUpdate = () => {
                                             </Popover>
                                         </Box>
 
-                                        <Box sx={{ mt: 3, width: '100%' }}>
+                                        <Box sx={{ mt: 3, width: '100%',mb:6 }}>
                                             <Editor onChange={handleEditorChange} initialContent={description} 
                                             
                                             

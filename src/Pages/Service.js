@@ -9,8 +9,14 @@ import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import { RxCross2 } from "react-icons/rx";
 import { toast } from 'react-toastify';
 import { useNavigate } from "react-router-dom";
+import Checkbox from '@mui/material/Checkbox';
+
 import {MaterialReactTable,useMaterialReactTable} from 'material-react-table';
 import { CiMenuKebab } from "react-icons/ci";
+
+
+
+
 const Service = () => {
 
     const SERVICE_API = process.env.REACT_APP_SERVICES_URL;
@@ -198,12 +204,41 @@ const Service = () => {
         navigate("/servicesUpdate/" + _id);
       };
       //delete template
-      const handleDelete = (_id) => {
-        const requestOptions = {
+    //   const handleDelete = (_id) => {
+    //     const requestOptions = {
+    //         method: "DELETE",
+    //         redirect: "follow",
+    //       };
+    //       const url = `${SERVICE_API}/workflow/services/servicetemplate/` ;
+    //       fetch(url + _id, requestOptions)
+    //         .then((response) => {
+    //           if (!response.ok) {
+    //             throw new Error("Failed to delete item");
+    //           }
+    //           return response.json();
+    //         })
+    //         .then((result) => {
+    //           console.log(result);
+    //           toast.success("Item deleted successfully");
+    //           fetchServicesData()
+    //         })
+    //         .catch((error) => {
+    //           console.error(error);
+    //           toast.error("Failed to delete item");
+    //         })
+    
+    //   };
+    const handleDelete = (_id) => {
+        // Show a confirmation prompt
+        const isConfirmed = window.confirm("Are you sure you want to delete this service?");
+        
+        // Proceed with deletion if confirmed
+        if (isConfirmed) {
+          const requestOptions = {
             method: "DELETE",
             redirect: "follow",
           };
-          const url = `${SERVICE_API}/workflow/services/servicetemplate/` ;
+          const url = `${SERVICE_API}/workflow/services/servicetemplate/`;
           fetch(url + _id, requestOptions)
             .then((response) => {
               if (!response.ok) {
@@ -214,14 +249,15 @@ const Service = () => {
             .then((result) => {
               console.log(result);
               toast.success("Item deleted successfully");
-              fetchServicesData()
+              fetchServicesData(); // Refresh data
             })
             .catch((error) => {
               console.error(error);
               toast.error("Failed to delete item");
-            })
-    
+            });
+        }
       };
+      
       const columns = [
         {
           accessorKey: 'serviceName', // Access the template name
@@ -234,6 +270,38 @@ const Service = () => {
               {row.original.serviceName}
             </Typography>
           ),
+        },
+        {
+            accessorKey: 'description', // Access the template name
+            header: 'Description',
+        },
+        {
+            accessorKey: 'rate', // Access the template name
+            header: 'Rate',
+        },
+        {
+            accessorKey: 'ratetype', // Access the template name
+            header: 'Rate Type',
+        },
+        // {
+        //     accessorKey: 'tax', // Access the tax
+        //     header: 'Tax',
+        //     Cell: ({ row }) => (
+        //       <Checkbox
+        //         checked={row.original.tax} // Display as checked if tax is true
+        //         // disabled // Make it non-interactive
+        //         color="primary"
+        //       />
+        //     ),
+        //   },
+        {
+            accessorKey: 'category', // Access the template name
+            header: 'Category',
+            Cell: ({ row }) => {
+                // Find the category name based on the category ID
+                const category = categoryData.find((cat) => cat._id === row.original.category);
+                return <Typography>{category ? category.categoryName : "N/A"}</Typography>;
+              },
         },
         {
           accessorKey: 'settings', // Add settings column
@@ -265,8 +333,8 @@ const Service = () => {
         enablePagination: true,
         muiTableContainerProps: { sx: { maxHeight: "400px" } },
         initialState: {
-          columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
-        },
+            columnPinning: { left: ["mrt-row-select", "Name"], },
+          },
         muiTableBodyCellProps: {
           sx: (theme) => ({
             backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
@@ -495,11 +563,3 @@ const Service = () => {
 }
 
 export default Service
-
-
-
-
-
-
-
-

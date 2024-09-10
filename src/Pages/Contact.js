@@ -9,7 +9,7 @@ import {
   useMediaQuery, Box,
   MenuItem, Paper, Tooltip,
   Typography,
-  Divider,
+  Divider, Autocomplete, TextField
 } from "@mui/material";
 import { toast } from 'react-toastify';
 import { useMaterialReactTable, MaterialReactTable } from 'material-react-table';
@@ -312,7 +312,7 @@ const ContactTable = () => {
         </div>
       ),
     },
-  ], [uniqueTags, filterValue]);
+  ], [uniqueTags, filterValue, handleClick]);
 
   const table = useMaterialReactTable({
     columns,
@@ -345,16 +345,16 @@ const ContactTable = () => {
         onClose={() => setIsDrawerOpen(false)}
         sx={{ width: 600 }}
       >
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', ml: 1 }}>
-            <Typography sx={{ fontWeight: 'bold', }} variant="h6">
-              Edit Contact
-            </Typography>
-            <IconButton onClick={() => setIsDrawerOpen(false)}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px', ml: 1 }}>
+          <Typography sx={{ fontWeight: 'bold', }} variant="h6">
+            Edit Contact
+          </Typography>
+          <IconButton onClick={() => setIsDrawerOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
 
-      <Divider/>
+        <Divider />
 
 
 
@@ -380,27 +380,17 @@ const ContactTable = () => {
 
       {/* // <MaterialReactTable columns={columns} table={table} /> */}
       <Stack direction={isMobile ? "column-reverse" : "column"} gap="8px">
-        <Paper style={{ border: '2px solid blue', display: 'flex', overflowX: 'auto' }}>
+        <Paper style={{ display: 'flex', overflowX: 'auto' }}>
           <Stack p="8px" gap="8px" display="flex" direction="row">
             <>
-              <Select
+              {/* <Select
                 value={selectedFilterIndex}
                 onChange={handleFilterChange}
+                size='small'
                 sx={{
                   backgroundColor: 'white',
                   minWidth: 200,
-                  '& .MuiSelect-select': {
-                    padding: '10px',
-                  },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'blue',
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'green',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    borderColor: 'purple',
-                  },
+                 
                 }}
               >
                 <MenuItem value={null}>None</MenuItem>
@@ -409,7 +399,27 @@ const ContactTable = () => {
                     {column.header}
                   </MenuItem>
                 ))}
-              </Select>
+              </Select> */}
+              <Autocomplete
+                value={selectedFilterIndex !== null ? columns[selectedFilterIndex] : null}
+                onChange={(event, newValue) => {
+                  handleFilterChange(event, newValue ? columns.indexOf(newValue) : null);
+                }}
+                options={columns}
+                getOptionLabel={(option) => option.header}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="Filter"
+                    size="small"
+                    sx={{
+                      backgroundColor: 'white',
+                      minWidth: 200,
+                    }}
+                  />
+                )}
+                isOptionEqualToValue={(option, value) => option.header === value?.header}
+              />
 
               <Stack direction="row" gap="8px">
                 {renderFilterContainers()}

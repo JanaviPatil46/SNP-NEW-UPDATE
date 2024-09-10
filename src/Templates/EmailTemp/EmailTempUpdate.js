@@ -164,7 +164,45 @@ const EmailTempUpdate = () => {
                 toast.error("Error updating template."); // Error message
             });
     }
+    const saveTemp = () => {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
 
+        const raw = JSON.stringify({
+            templatename: templateName,
+            // from: selecteduser.value,
+            from: fromtempdata ? fromtempdata.value : '',
+            emailsubject: inputText,
+            emailbody: emailBody
+        });
+
+
+
+        const requestOptions = {
+            method: "PATCH",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+        const url = `${EMAIL_API}/workflow/emailtemplate/`;
+        fetch(url + _id, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.text();
+            })
+            .then((result) => {
+                console.log("Data update result:", result);
+                toast.success("Template updated successfully!"); // Success message
+                // navigate("/firmtemp/templates/emails")
+                // fetchEmailTemplates();
+            })
+            .catch((error) => {
+                console.error("Error sending data:", error);
+                toast.error("Error updating template."); // Error message
+            });
+    }
     useEffect(() => {
         const fetchEmailData = async () => {
             try {
@@ -527,8 +565,9 @@ const EmailTempUpdate = () => {
                     </Box>
                     <Box sx={{ mt: 5 ,display:'flex',gap:2}}>
                         <Button variant="contained" color="primary" onClick={handleButtonClick}>
-                            Save Template
+                            Save & exit
                         </Button>
+                        <Button onClick={saveTemp} variant="contained" color="primary"> Save</Button>
                         <Button variant="outlined" onClick={handleTempCancle}>Cancel</Button>
                     </Box>
                 </form>

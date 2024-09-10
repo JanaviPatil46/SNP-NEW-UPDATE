@@ -29,8 +29,8 @@ const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
   const [startDate, setStartDate] = useState(null);
   const [dueDate, setDueDate] = useState(null);
   const [startsin, setstartsin] = useState('');
-  const [startsInDuration, setStartsInDuration] = useState(null);
-  const [dueinduration, setdueinduration] = useState("");
+  const [startsInDuration, setStartsInDuration] = useState("Days");
+  const [dueinduration, setdueinduration] = useState("Days");
   const [duein, setduein] = useState('');
 
 
@@ -408,11 +408,11 @@ const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
                   <Priority onPriorityChange={handlePriorityChange} selectedPriority={priority} />
 
                 </Box>
-                <Box mt={2}>
+                <Box mt={3} >
 
                   <Editor initialContent={description} onChange={handleEditorChange} />
                 </Box>
-                <Box mt={2}>
+                <Box mt={7}>
                   <Box display={'flex'} alignItems={'center'} justifyContent={'space-between'}>
                     <Typography variant='h6'>Start and Due Date</Typography>
                     <Box className='absolutes-dates'>
@@ -467,6 +467,7 @@ const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
                         margin='normal'
                         fullWidth
                         defaultValue={0}
+                        placeholder='0'
                         sx={{ ml: 1, backgroundColor: '#fff' }}
                         value={startsin}
                         onChange={(e) => setstartsin(e.target.value)}
@@ -500,6 +501,7 @@ const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
                         defaultValue={0}
                         sx={{ ml: 1.5, backgroundColor: '#fff' }}
                         value={duein}
+                        placeholder='0'
                         onChange={(e) => setduein(e.target.value)}
                       // onChange={(e) => setduein(e.target.value)}
                       />

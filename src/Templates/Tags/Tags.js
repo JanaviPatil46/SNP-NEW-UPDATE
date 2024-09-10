@@ -118,6 +118,11 @@ const Tags = () => {
 
   console.log(tagidget);
   const handleDelete = (_id) => {
+       // Show a confirmation prompt
+       const isConfirmed = window.confirm("Are you sure you want to delete this tag?");
+        
+       // Proceed with deletion if confirmed
+       if (isConfirmed) {
     setGetId(_id);
     setOpenMenuId(false);
     const requestOptions = {
@@ -141,6 +146,7 @@ const Tags = () => {
         console.error(error);
         toast.error('Failed to delete tagdata');
       });
+    }
   };
 
   const toggleMenu = (_id) => {

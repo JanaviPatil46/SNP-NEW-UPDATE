@@ -128,7 +128,7 @@ const OrganizersTempUpdate = () => {
             console.log(result)
             if (result && result.message === "OrganizerTemplate Updated successfully") {
                 toast.success("Organizer Template Updated successfully");
-                navigate('/firmtemp/templates/organizers');
+                // navigate('/firmtemp/templates/organizers');
              
             } else {
                 toast.error(result.error || "Failed to Update Organizer Template");
@@ -137,6 +137,54 @@ const OrganizersTempUpdate = () => {
         .catch((error) => console.error(error));
 };
 
+const saveandexitOrganizerTemp = () => {
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const raw = JSON.stringify({
+      templatename: templateName,
+      organizerName: organizerName,
+      sections: sections.map(section => ({
+          name: section.text,
+          text: section.text,
+          id: section.id.toString(),
+          formElements: section.formElements.map(element => ({
+              type: element.type,
+              id: element.id,
+              sectionid: element.sectionid,
+              options: element.options.map(option => ({
+                  id: option.id,
+                  text: option.text
+              })),
+              text: element.text
+          }))
+      })),
+      active: true
+  });
+
+  const requestOptions = {
+      method: "PATCH",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+  };
+
+  console.log(raw)
+  const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${id}`;
+  fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+          console.log(result)
+          if (result && result.message === "OrganizerTemplate Updated successfully") {
+              toast.success("Organizer Template Updated successfully");
+              navigate('/firmtemp/templates/organizers');
+           
+          } else {
+              toast.error(result.error || "Failed to Update Organizer Template");
+          }
+      })
+      .catch((error) => console.error(error));
+};
 // const handleBackButton = ()=>{
 //   navigate('/firmtemp/templates/organizers');
 // }
@@ -197,8 +245,8 @@ useEffect(() => {
         </Box>
 
       </Box>
-      <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%" }}>
-        <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "315px" }}>
+      <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%", gap:3 }}>
+        <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "auto",  p: 2 }}>
           <Box className="smooth-dnd-container vertical">
             {sections.map((section) => (
               <Box key={section.id} sx={{ display: "flex", alignItems: "center" }}>
@@ -238,7 +286,11 @@ useEffect(() => {
           )}
         </Box>
       </Box>
-      <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px" }}>
+      <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px", marginTop: '20px' }}>
+      <Button  type="submit"
+              variant="contained"
+              color="primary"
+              onClick={saveandexitOrganizerTemp}>Save & exit</Button>
         <Button
           type="submit"
           variant="contained"

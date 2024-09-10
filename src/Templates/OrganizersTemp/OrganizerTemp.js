@@ -9,10 +9,17 @@ import {
   TextField,
   IconButton,
   Typography,
-  Alert
+  Alert,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
 } from '@mui/material';
 import { useNavigate } from "react-router-dom";
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
+// import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { CiMenuKebab } from "react-icons/ci";
 const OrganizersTemp = () => {
 
@@ -80,7 +87,7 @@ const OrganizersTemp = () => {
     return text;
   }
 
-  const saveOrganizerTemp = () => {
+  const saveandexitOrganizerTemp = () => {
 
     console.log(sections)
     if (!validateForm()) {
@@ -138,7 +145,60 @@ const OrganizersTemp = () => {
       })
       .catch((error) => console.error(error));
   }
+  const saveOrganizerTemp = () => {
 
+    console.log(sections)
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      templatename: templateName,
+      organizerName: organizerName,
+      sections: sections.map(section => ({
+        name: section.text,
+        text: section.text,
+        id: section.id.toString(),
+        formElements: section.formElements.map(element => ({
+          type: element.type,
+          id: element.id,
+          sectionid: element.sectionid,
+          options: element.options.map(option => ({
+            id: option.id,
+            text: option.text
+          })),
+          text: element.text
+        })),
+        
+      })),
+      active: true
+    });
+
+    console.log(raw)
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+    };
+
+    const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`;
+    fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result)
+        if (result && result.message === "Organizer Template created successfully") {
+          toast.success("Organizer Template created successfully");
+         
+
+        } else {
+          toast.error(result.error || "Failed to create Organizer Template");
+        }
+      })
+      .catch((error) => console.error(error));
+  }
   const [organizerTemplatesData, setOrganizerTemplatesData] = useState([]);
   const fetchOrganizerTemplates = async () => {
     try {
@@ -165,6 +225,11 @@ const OrganizersTemp = () => {
 
   //delete template
   const handleDelete = (_id) => {
+    // Show a confirmation prompt
+    const isConfirmed = window.confirm("Are you sure you want to delete this organizer template?");
+        
+    // Proceed with deletion if confirmed
+    if (isConfirmed) {
     const requestOptions = {
       method: "DELETE",
       redirect: "follow"
@@ -186,7 +251,8 @@ const OrganizersTemp = () => {
       .catch((error) => {
         console.error(error);
         toast.error('Failed to delete item');
-      })
+      });
+    }
   };
   useEffect(() => {
     fetchOrganizerTemplates();
@@ -198,61 +264,63 @@ const OrganizersTemp = () => {
     setTempIdGet(_id);
   };
   // console.log(tempIdget)
-  const columns = useMemo(() => [
-    {
-      accessorKey: 'templatename',
-      header: 'Name',
-      Cell: ({ row }) => (
-        <Typography
-          sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
-          onClick={() => handleEdit(row.original._id)}
-        >
-          {row.original.templatename}
-        </Typography>
-      ),
+  // const columns = useMemo(() => [
+  //   {
+  //     accessorKey: 'templatename',
+  //     header: 'Name',
+  //     Cell: ({ row }) => (
+  //       <Typography
+  //         sx={{ color: "#2c59fa", cursor: "pointer", fontWeight: 'bold' }}
+  //         onClick={() => handleEdit(row.original._id)}
+  //       >
+  //         {row.original.templatename}
+  //       </Typography>
+  //     ),
 
 
-    },
-    {
-      accessorKey: 'Setting', header: 'Setting',
-      Cell: ({ row }) => (
-        <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
-          <CiMenuKebab style={{ fontSize: "25px" }} />
-          {openMenuId === row.original._id && (
-            <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
-              <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
-                handleEdit(row.original._id);
+  //   },
+  //   {
+  //     accessorKey: 'Setting', header: 'Setting',
+  //     Cell: ({ row }) => (
+  //       <IconButton onClick={() => toggleMenu(row.original._id)} style={{ color: "#2c59fa" }}>
+  //         <CiMenuKebab style={{ fontSize: "25px" }} />
+  //         {openMenuId === row.original._id && (
+  //           <Box sx={{ position: 'absolute', zIndex: 1, backgroundColor: '#fff', boxShadow: 1, borderRadius: 1, p: 1, left: '30px', m: 2 }}>
+  //              <Typography>Publice to Marketplace</Typography>
+  //             <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => {
+  //               handleEdit(row.original._id);
 
-              }} >Edit</Typography>
-              <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
-            </Box>
-          )}
-        </IconButton>
+  //             }} >Edit</Typography>
+  //             <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}>Duplicate</Typography>
+  //             <Typography sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }} onClick={() => handleDelete(row.original._id)}>Delete</Typography>
+  //           </Box>
+  //         )}
+  //       </IconButton>
 
-      ),
+  //     ),
 
-    },
+  //   },
 
-  ], [openMenuId]);
+  // ], [openMenuId]);
 
-  const table = useMaterialReactTable({
-    columns,
-    data: organizerTemplatesData,
-    enableBottomToolbar: true,
-    enableStickyHeader: true,
-    columnFilterDisplayMode: "custom", // Render own filtering UI
-    enableRowSelection: true, // Enable row selection
-    enablePagination: true,
-    muiTableContainerProps: { sx: { maxHeight: "400px" } },
-    initialState: {
-      columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
-    },
-    muiTableBodyCellProps: {
-      sx: (theme) => ({
-        backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
-      }),
-    },
-  });
+  // const table = useMaterialReactTable({
+  //   columns,
+  //   data: organizerTemplatesData,
+  //   enableBottomToolbar: true,
+  //   enableStickyHeader: true,
+  //   columnFilterDisplayMode: "custom", // Render own filtering UI
+  //   enableRowSelection: true, // Enable row selection
+  //   enablePagination: true,
+  //   muiTableContainerProps: { sx: { maxHeight: "400px" } },
+  //   initialState: {
+  //     columnPinning: { left: ["mrt-row-select", "tagName"], right: ['settings'], },
+  //   },
+  //   muiTableBodyCellProps: {
+  //     sx: (theme) => ({
+  //       backgroundColor: theme.palette.mode === "dark-theme" ? theme.palette.grey[900] : theme.palette.grey[50],
+  //     }),
+  //   },
+  // });
 
   const [isFormDirty, setIsFormDirty] = useState(false);
   const handleCancel = () => {
@@ -313,13 +381,124 @@ const OrganizersTemp = () => {
 
     return isValid;
   };
+
+  const handleDuplicateTemplate = async (templateId) => {
+    // Find the template by its ID
+    const templateToDuplicate = organizerTemplatesData.find(template => template._id === templateId);
+    if (!templateToDuplicate) {
+      toast.error('Template not found');
+      return;
+    }
+  
+    // Create a new template object (with new ID and modified template name)
+    const duplicatedTemplate = {
+      ...templateToDuplicate,
+      templatename: `${templateToDuplicate.templatename} (Copy)`, // Indicate it's a duplicate
+      // _id: undefined, // Remove the ID since we want to create a new one
+      sections: templateToDuplicate.sections.map(section => ({
+        ...section,
+        id: Date.now().toString() + section.id, // Generate a new unique ID for the section
+      })),
+    };
+  
+    try {
+      // Prepare request options
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+  
+      const raw = JSON.stringify(duplicatedTemplate);
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+      };
+  
+      // Send the duplicated template to the server
+      const response = await fetch(`${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate`, requestOptions);
+      const result = await response.json();
+  
+      if (result.message === "Organizer Template created successfully") {
+        toast.success("Template duplicated successfully");
+        fetchOrganizerTemplates(); // Refresh the list after duplication
+      } else {
+        toast.error(result.error || "Failed to duplicate template");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error duplicating template");
+    }
+  };
+  
   return (
     <Box p={3}>
       {!showOrganizerTemplateForm && (
         <Box sx={{ mt: 2 }}>
 
           <Button variant="contained" onClick={handleCreateInvoiceClick} sx={{ mb: 3 }}>Create Template</Button>
-          <MaterialReactTable columns={columns} table={table} />
+          {/* <MaterialReactTable columns={columns} table={table} /> */}
+          <TableContainer component={Paper} >
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>Template Name</strong></TableCell>
+                  <TableCell><strong>Used in Pipelines</strong></TableCell>
+                  <TableCell><strong></strong></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {organizerTemplatesData.map((row) => (
+                  <TableRow key={row._id}>
+                    <TableCell>
+                      <Typography
+                        sx={{ color: '#2c59fa', cursor: 'pointer', fontWeight: 'bold' }}
+                        onClick={() => handleEdit(row._id)}
+                      >
+                        {row.templatename}
+                      </Typography>
+                    </TableCell>
+                    <TableCell></TableCell>
+                    <TableCell>
+                      <IconButton onClick={() => toggleMenu(row._id)} style={{ color: '#2c59fa' }}>
+                        <CiMenuKebab style={{ fontSize: '25px' }} />
+                        {openMenuId === row._id && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              zIndex: 1,
+                              backgroundColor: '#fff',
+                              boxShadow: 1,
+                              borderRadius: 1,
+                              p: 1,
+                              // left:0,
+                        right:'30px',
+                              m: 2,
+                              top:'10px', width:'150px', textAlign:'start'
+                            }}
+                          >
+                            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }}>Publice to Marketplace</Typography>
+                            <Typography
+                              sx={{ fontSize: '12px', fontWeight: 'bold' }}
+                              onClick={() => handleEdit(row._id)}
+                            >
+                              Edit
+                            </Typography>
+                            <Typography sx={{ fontSize: '12px', fontWeight: 'bold' }} onClick={() => handleDuplicateTemplate(row._id)}>Duplicate</Typography>
+                            <Typography
+                              sx={{ fontSize: '12px', color: 'red', fontWeight: 'bold' }}
+                              onClick={() => handleDelete(row._id)}
+                            >
+                              Delete
+                            </Typography>
+                          </Box>
+                        )}
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
         </Box>
       )}
@@ -392,7 +571,7 @@ const OrganizersTemp = () => {
 
           </Box>
           <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%", gap: 3 }}>
-            <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "315px", overflowY: 'auto', p: 2 }}>
+            <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "auto",  p: 2 }}>
               <Box className="smooth-dnd-container vertical" >
                 {sections.map((section) => (
                   <Box key={section.id} sx={{ display: "flex", alignItems: "center" }}>
@@ -433,6 +612,10 @@ const OrganizersTemp = () => {
             </Box>
           </Box>
           <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px", marginTop: '20px' }}>
+            <Button  type="submit"
+              variant="contained"
+              color="primary"
+              onClick={saveandexitOrganizerTemp}>Save & exit</Button>
             <Button
               type="submit"
               variant="contained"

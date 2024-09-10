@@ -112,6 +112,9 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
             note: note,
             ssn: ssn,
             email: email,
+            login: false,
+            notify: false,
+            emailSync: false,
             tags: combinedValues,
             country: country,
             streetAddress: streetAddress,
@@ -355,6 +358,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                         fullWidth
                         name="note"
                         value={note}
+                        multiline
                         onChange={(e) => setNote(e.target.value)}
                         margin="normal"
                         placeholder="Note"
@@ -497,7 +501,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                 <Box>
 
                     <InputLabel sx={{ color: 'black' }}>Country</InputLabel>
-                    <Select
+                    {/* <Select
                         size='small'
                         value={selectedCountry}
                         onChange={handleCountryChange}
@@ -512,7 +516,25 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                                 {country.name}
                             </MenuItem>
                         ))}
-                    </Select>
+                    </Select> */}
+                    <Autocomplete
+                        size="small"
+                        options={countries}
+                        getOptionLabel={(option) => option.name}
+                        value={countries.find((country) => country.code === selectedCountry) || null}
+                        onChange={(event, newValue) => handleCountryChange(newValue ? newValue.code : '')}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                placeholder="Country"
+                                margin="normal"
+                                sx={{
+                                    width: '100%',
+                                    marginTop: '8px'
+                                }}
+                            />
+                        )}
+                    />
                 </Box>
                 <Box>
 

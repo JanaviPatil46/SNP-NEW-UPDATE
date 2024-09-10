@@ -288,6 +288,12 @@ const PipelineTemp = () => {
 
   //delete template
   const handleDelete = async (_id) => {
+
+    // Show a confirmation prompt
+    const isConfirmed = window.confirm("Are you sure you want to delete this pipeline?");
+        
+    // Proceed with deletion if confirmed
+    if (isConfirmed) {
     const config = {
       method: 'delete',
       maxBodyLength: Infinity,
@@ -304,6 +310,7 @@ const PipelineTemp = () => {
     } catch (error) {
       console.error('Error deleting pipeline:', error);
     }
+  }
   };
 
   const [tempIdget, setTempIdGet] = useState("");

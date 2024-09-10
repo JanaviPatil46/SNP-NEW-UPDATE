@@ -360,6 +360,11 @@ const InvoiceTemp = () => {
 
   //delete template
   const handleDelete = (_id) => {
+    // Show a confirmation prompt
+    const isConfirmed = window.confirm("Are you sure you want to delete this invoice template?");
+        
+    // Proceed with deletion if confirmed
+    if (isConfirmed) {
     const requestOptions = {
       method: "DELETE",
       redirect: "follow",
@@ -385,6 +390,7 @@ const InvoiceTemp = () => {
 
         toast.error('Failed to delete item');
       });
+    }
   };
   // services data
   useEffect(() => {
@@ -472,7 +478,7 @@ const InvoiceTemp = () => {
   };
 
   const [subtotal, setSubtotal] = useState('');
-  const [taxRate, setTaxRate] = useState('');
+  const [taxRate, setTaxRate] = useState(0);
   const [taxTotal, setTaxTotal] = useState(0);
 
   const handleSubtotalChange = (event) => {
@@ -1067,20 +1073,25 @@ const InvoiceTemp = () => {
                             <TableBody>
                               <TableRow>
                                 <TableCell>
-                                  <input
-                                    type="number"
+                                  <Box sx={{display:'flex',alignItems:'center'}}>
+                                  $<input
+                                    // type="number"
                                     value={subtotal}
                                     onChange={handleSubtotalChange}
-                                    style={{ border: 'none' }}
+                                    style={{ border: 'none', width:'50%' }}
                                   />
+                                  </Box>
+                                 
                                 </TableCell>
                                 <TableCell>
+                                <Box sx={{display:'flex',alignItems:'center'}}>
                                   <input
-                                    type="number"
+                                    // type="number"
                                     value={taxRate}
                                     onChange={handleTaxRateChange}
-                                    style={{ border: 'none' }}
+                                    style={{ border: 'none', width:'50%' }}
                                   />%
+                                  </Box>
                                 </TableCell>
                                 <TableCell>${taxTotal.toFixed(2)}</TableCell>
                                 <TableCell>${totalAmount}</TableCell>

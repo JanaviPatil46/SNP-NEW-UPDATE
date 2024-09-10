@@ -195,7 +195,7 @@ const EmailTemp = () => {
         value: user._id,
         label: user.username,
     }));
-    const handleSaveTemplate = (e) => {
+    const handleSaveExitTemplate = (e) => {
         e.preventDefault();
         if (!validateForm()) {
             return; // Prevent form submission if validation fails
@@ -230,6 +230,47 @@ const EmailTemp = () => {
                 handleClearTemplate();
                 setShowForm(false);
                 fetchEmailTemplates();
+            })
+            .catch((error) => {
+                console.error(error);
+                toast.error('Failed to create Email Template');
+            });
+    }
+    const handleSaveTemplate = (e) => {
+        e.preventDefault();
+        if (!validateForm()) {
+            return; // Prevent form submission if validation fails
+        }
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        const raw = JSON.stringify({
+            templatename: templateName,
+            from: selecteduser.value,
+            emailsubject: inputText,
+
+            emailbody: emailBody,
+        });
+
+        const requestOptions = {
+            method: "POST",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+        const url = `${EMAIL_API}/workflow/emailtemplate`;
+        fetch(url, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then((result) => {
+                toast.success('Email Template create successfully');
+                // handleClearTemplate();
+                // setShowForm(false);
+                // fetchEmailTemplates();
             })
             .catch((error) => {
                 console.error(error);
@@ -280,6 +321,11 @@ const EmailTemp = () => {
     };
 
     const handleDelete = (_id) => {
+        // Show a confirmation prompt
+        const isConfirmed = window.confirm("Are you sure you want to delete this email template?");
+        
+        // Proceed with deletion if confirmed
+        if (isConfirmed) {
         const requestOptions = {
             method: 'DELETE',
             redirect: 'follow',
@@ -300,6 +346,7 @@ const EmailTemp = () => {
             .catch((error) => {
                 console.error(error);
             });
+        }
     };
 
     const [tempIdget, setTempIdGet] = useState("");
@@ -448,7 +495,7 @@ const EmailTemp = () => {
                     <Typography variant="h6" gutterBottom>
                         Create Email Template
                     </Typography>
-                    <form onSubmit={handleSaveTemplate}>
+                    <form >
                         <Box>
 
                             <label className='email-input-label'>Template Name</label>
@@ -639,9 +686,10 @@ const EmailTemp = () => {
                             <EditorShortcodes onChange={handleEditorChange} />
                         </Box>
                         <Box sx={{ mt: 5, display: 'flex', gap: 2 }}>
-                            <Button variant="contained" color="primary" type="submit">
-                                Save Template
+                            <Button variant="contained" color="primary" onClick={handleSaveExitTemplate}>
+                               Save & Exit
                             </Button>
+                            <Button variant="contained" color="primary" onClick={handleSaveTemplate}>Save</Button>
                             <Button variant="outlined" onClick={handleTempCancle}>Cancel</Button>
                         </Box>
                     </form>
