@@ -303,7 +303,50 @@ const ChatTempUpdate = () => {
             })
             .catch((error) => console.error(error));
     }
+    const saveSchat= async () => {
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
     
+        const raw = JSON.stringify({
+            templatename:  templateName,
+            from: selecteduser.value,
+            chatsubject: inputText,
+            description: description,
+            sendreminderstoclient: absoluteDate,
+            daysuntilnextreminder: daysuntilNextReminder,
+            numberofreminders: noOfReminder,
+            clienttasks: ["ghghghghj"],
+            active: "true"
+        });
+    
+        const requestOptions = {
+            method: "PATCH",
+            headers: myHeaders,
+            body: raw,
+            redirect: "follow"
+        };
+    
+        const url = `${CHAT_API}/Workflow/chats/chattemplate/` + id;
+        
+        fetch(url, requestOptions)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                return response.json();
+            })
+            .then((result) => {
+                console.log(result.message);
+                if (result && result.message === "ChatTemplate Updated successfully") {
+                    toast.success("ChatTemplate updated successfully");
+                 
+                
+                } else {
+                    toast.error(result.message || "Failed to update Chat Template");
+                }
+            })
+            .catch((error) => console.error(error));
+    }
   
  
     const [isFormFilled, setIsFormFilled] = useState(false);
@@ -524,7 +567,8 @@ const ChatTempUpdate = () => {
                             </Grid>
                             <Divider mt={2} />
                             <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                                <Button onClick={savechat} variant="contained" color="primary">Save</Button>
+                            <Button onClick={savechat} variant="contained" color="primary">Save & exit</Button>
+                                <Button onClick={saveSchat} variant="contained" color="primary">Save</Button>
                                 <Button variant="outlined" onClick={handleCloseChatTemp}>Cancel</Button>
                             </Box>
                         </Box>

@@ -298,7 +298,55 @@ const ChatTemp = () => {
       })
       .catch((error) => console.error(error));
   }
+const saveSchat= async () => {
+  if (!validateForm()) {
+    return; // Prevent form submission if validation fails
+  }
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
 
+  const raw = JSON.stringify({
+    templatename: templateName,
+    from: selecteduser.value,
+    chatsubject: inputText,
+    description: description,
+    sendreminderstoclient: absoluteDate,
+    daysuntilnextreminder: daysuntilNextReminder,
+    numberofreminders: noOfReminder,
+    clienttasks: ["ghghghghj"],
+    active: "true"
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+
+  const url = `${CHAT_API}/Workflow/chats/chattemplate`;
+  fetch(url, requestOptions)
+    .then((response) => {
+      console.log(response)
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then((result) => {
+      console.log(result.message)
+      // toast.success("Invoice created successfully");
+      if (result && result.message === "ChatTemplate created successfully") {
+      
+        fetchChatTemplates();
+        toast.success("ChatTemplate created successfully");
+       
+      } else {
+        toast.error(result.message || "Failed to create Chat Template");
+      }
+    })
+    .catch((error) => console.error(error));
+}
   //Edit
   const handleEdit = (_id) => {
     navigate("chatTemplateUpdate/" + _id);
@@ -702,7 +750,8 @@ const ChatTemp = () => {
                 </Grid>
                 <Divider mt={2} />
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Button variant="contained" color="primary" onClick={savechat}>Save</Button>
+                <Button variant="contained" color="primary" onClick={savechat}>Save & exit</Button>
+                  <Button variant="contained" color="primary" onClick={saveSchat}>Save</Button>
                   <Button variant="outlined" onClick={handleCloseChatTemp}>Cancel</Button>
                 </Box>
               </Box>

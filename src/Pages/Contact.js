@@ -5,9 +5,9 @@ import axios from 'axios';
 
 import './account.css';
 import {
-  Stack, Select,
+  Stack, Paper,
   useMediaQuery, Box,
-  MenuItem, Paper, Tooltip,
+ Tooltip,
   Typography,
   Divider, Autocomplete, TextField
 } from "@mui/material";
@@ -119,6 +119,8 @@ const ContactTable = () => {
   const isMobile = useMediaQuery("(max-width: 1000px)");
 
   const handleDelete = async (id) => {
+    const isConfirmed = window.confirm("Are you sure you want to delete this contact?");
+    if (isConfirmed) {
     try {
       await axios.delete(`${CONTACT_API}/contacts/${id}/`);
       setContactData(prevContacts => prevContacts.filter(contact => contact.id !== id));
@@ -126,6 +128,7 @@ const ContactTable = () => {
     } catch (error) {
       console.error('Delete API Error:', error);
       toast.error('Failed to delete contact');
+    }
     }
   };
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -148,6 +151,8 @@ const ContactTable = () => {
       selectedContacts()
       console.log(data.contact.tags)
       setIsDrawerOpen(true);
+            // console.log(data.contact.tags)
+            console.log(isDrawerOpen)
 
 
 
@@ -203,6 +208,29 @@ const ContactTable = () => {
           </div>
         );
       },
+      // Custom filter function for phoneNumbers
+    filterFn: (row, columnId, filterValue) => {
+      const phoneNumbers = row.original.phoneNumbers.flat();
+      // Check if any phone number contains the filter value
+      return phoneNumbers.some(phoneObj => {
+        const phone = phoneObj.phone || phoneObj;
+        return phone.toString().toLowerCase().includes(filterValue.toLowerCase());
+      });
+    },
+    // Custom filter UI for phoneNumbers
+    Filter: ({ column }) => (
+      <TextField
+        value={column.getFilterValue() || ''}
+        onChange={(e) => column.setFilterValue(e.target.value)}
+        placeholder="Filter Phone Numbers"
+        variant="outlined"
+        size="small"
+        sx={{
+          backgroundColor: 'white',
+          minWidth: 200,
+        }}
+      />
+    ),
 
     },
 
@@ -267,6 +295,8 @@ const ContactTable = () => {
               </div>
             </Tooltip>
           );
+
+          
         }
 
         return (
@@ -302,7 +332,7 @@ const ContactTable = () => {
 
     {
       id: 'actions',
-      header: 'Actions',
+      // header: 'Actions',
       Cell: ({ row }) => (
         <div style={{ display: 'flex', alignItems: 'center' }}>
           <DeleteIcon
@@ -383,43 +413,50 @@ const ContactTable = () => {
         <Paper style={{ display: 'flex', overflowX: 'auto' }}>
           <Stack p="8px" gap="8px" display="flex" direction="row">
             <>
-              {/* <Select
-                value={selectedFilterIndex}
-                onChange={handleFilterChange}
-                size='small'
-                sx={{
-                  backgroundColor: 'white',
-                  minWidth: 200,
-                 
-                }}
-              >
-                <MenuItem value={null}>None</MenuItem>
-                {columns.map((column, index) => (
-                  <MenuItem key={index} value={index}>
-                    {column.header}
-                  </MenuItem>
-                ))}
-              </Select> */}
-              <Autocomplete
-                value={selectedFilterIndex !== null ? columns[selectedFilterIndex] : null}
-                onChange={(event, newValue) => {
-                  handleFilterChange(event, newValue ? columns.indexOf(newValue) : null);
-                }}
-                options={columns}
-                getOptionLabel={(option) => option.header}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    placeholder="Filter"
-                    size="small"
-                    sx={{
-                      backgroundColor: 'white',
-                      minWidth: 200,
-                    }}
-                  />
-                )}
-                isOptionEqualToValue={(option, value) => option.header === value?.header}
-              />
+             
+             <Autocomplete
+              options={columns.map((column, index) => ({
+                label: column.header,  // Display header text
+                value: index           // Store the index as the value
+              }))}
+              value={columns[selectedFilterIndex] ? { label: columns[selectedFilterIndex].header, value: selectedFilterIndex } : null}
+              onChange={(event, newValue) => {
+                if (newValue) {
+                  setSelectedFilterIndex(newValue.value);
+                  handleFilterChange({ target: { value: newValue.value } });
+                } else {
+                  setSelectedFilterIndex(null);
+                  handleFilterChange({ target: { value: null } });
+                }
+              }}
+              getOptionLabel={(option) => option.label || ''}
+              isOptionEqualToValue={(option, value) => option.value === value?.value}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="Select Filter"
+                  variant="outlined"
+                  size="small"
+                  sx={{
+                    backgroundColor: 'white',
+                    minWidth: 200,  // Match the minimum width of the original Select
+                  }}
+                />
+              )}
+              renderOption={(props, option) => (
+                <li
+                  {...props}
+                  style={{
+                    fontSize: '14px',
+                    padding: '5px',             // Padding for each option
+                           // Spacing between options
+                    cursor:'pointer'
+                  }}
+                >
+                  {option.label}
+                </li>
+              )}
+            />
 
               <Stack direction="row" gap="8px">
                 {renderFilterContainers()}
@@ -436,3 +473,25 @@ const ContactTable = () => {
 };
 
 export default ContactTable;
+
+
+
+
+
+ {/* <Select
+                value={selectedFilterIndex}
+                onChange={handleFilterChange}
+                size='small'
+                sx={{
+                  backgroundColor: 'white',
+                  minWidth: 200,
+                 
+                }}
+              >
+                <MenuItem value={null}>None</MenuItem>
+                {columns.map((column, index) => (
+                  <MenuItem key={index} value={index}>
+                    {column.header}
+                  </MenuItem>
+                ))}
+              </Select> */}

@@ -302,7 +302,53 @@ const Tasks = () => {
                 toast.error("Failed to create Job Template");
             });
     };
+const updatesavetasktemp= () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
 
+    const raw = JSON.stringify({
+        templatename: tempNameNew,
+        status: status.value,
+        tasktags: combinedTagsValues,
+        taskassignees: combinedValues,
+
+        priority: priority.value,
+        description: taskDiscription,
+        absolutedates: absoluteDate,
+        startsin: StartsInNew,
+        startsinduration: StartsInDurationNew,
+        duein: DueInNew,
+        dueinduration: DueInDurationNew,
+        comments: "",
+        startdate: StartsDateNew,
+        enddate: DueDateNew,
+    });
+
+    const requestOptions = {
+        method: "PATCH",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+    };
+    const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
+    fetch(url + _id, requestOptions)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.text();
+        })
+        .then((result) => {
+            toast.success("Task Template updated successfully");
+           
+
+        })
+        .catch((error) => {
+            // Handle errors
+            console.error(error);
+            toast.error("Failed to create Job Template");
+        });
+};
     const handleTaskTempCancle = () => {
         const hasUnsavedChanges =
             tempNameNew !== tempvalues.templatename ||
@@ -549,7 +595,8 @@ const Tasks = () => {
                                 </Grid>
                                 <Box mt={2} mb={2}><hr /></Box>
                                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                                    <Button variant="contained" color="primary" onClick={updatetasktemp} >Save</Button>
+                                <Button variant="contained" color="primary" onClick={updatetasktemp} >Save & exit</Button>
+                                    <Button variant="contained" color="primary" onClick={updatesavetasktemp} >Save</Button>
                                     <Button variant="outlined" onClick={handleTaskTempCancle}>Cancel</Button>
                                 </Box>
                             </Box>

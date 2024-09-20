@@ -379,6 +379,7 @@ const Pipeline = () => {
       return job;
     });
     setJobs(updatedJobs);
+    
     setTimeout(() => {
       fetchJobData();
     }, 1000);

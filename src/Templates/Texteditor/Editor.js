@@ -208,16 +208,20 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Import the Quill CSS
-// import './editor.css'; // Your custom CSS
+import 'react-quill/dist/quill.snow.css'; // Quill Snow theme
+import 'quill-emoji/dist/quill-emoji.css'; // Emoji styles
+import Quill from 'quill';
+import 'quill-emoji';
 
+Quill.register('modules/emoji', require('quill-emoji'));
 export default function Editor({ initialContent, onChange }) {
   const [editorContent, setEditorContent] = useState(initialContent);
 
+  
   // Toolbar configuration similar to what you had in mui-tiptap
   const modules = {
     toolbar: [
-      [{ 'font': [] }, { 'size': [] }], // Font family and size
+      [{ 'font': [] }, {  'size': [] }], // Font family and size
       [{ 'header': '1' }, { 'header': '2' }, { 'align': [] }],
       ['bold', 'italic', 'underline', 'strike'], // Formatting options
       [{ 'script': 'sub' }, { 'script': 'super' }], // Subscript/Superscript
@@ -225,10 +229,15 @@ export default function Editor({ initialContent, onChange }) {
       [{ 'color': [] }, { 'background': [] }], // Text color and highlight
       ['blockquote', 'code-block'], // Blockquote and code
       ['link', 'image'], // Links and images
+        [{ 'emoji': true }],
       [{ 'indent': '-1' }, { 'indent': '+1' }], // Indent/unindent
       ['clean'], // Remove formatting
       ['undo', 'redo'], // Undo/Redo
+    
     ],
+    'emoji-toolbar': true,
+    'emoji-textarea': false,
+    'emoji-shortname': true,
     history: {
       delay: 1000,
       maxStack: 50,
@@ -242,7 +251,7 @@ export default function Editor({ initialContent, onChange }) {
     'script', 'list', 'bullet', 'indent',
     'color', 'background', 'align',
     'blockquote', 'code-block', 'link', 'image',
-    'undo', 'redo',
+    'undo', 'redo','emoji'
   ];
 
   useEffect(() => {

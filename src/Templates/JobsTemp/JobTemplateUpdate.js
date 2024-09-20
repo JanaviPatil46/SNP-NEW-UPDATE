@@ -223,6 +223,7 @@ const JobTemplateUpdate = () => {
   };
   const handleCloseDropdown = () => {
     setAnchorEl(null);
+    setShowDropdown(false);
   };
 
 
@@ -354,6 +355,53 @@ const JobTemplateUpdate = () => {
         toast.success("Job Template updated successfully");
         navigate("/firmtemp/templates/jobs")
         // setTimeout(() => navigate("/firmtemplates/jobs"), 1000);
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error(error);
+        toast.error("Failed to create Job Template");
+      });
+  };
+  const updatesavejobtemp= () => {
+
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      templatename: tempNameNew,
+      jobname: jobname,
+      jobassignees: combinedValues,
+      addshortcode: "",
+      priority: PriorityNew.value,
+      description: JobDescriptionNew,
+      absolutedates: AbsoluteDateNew,
+      startsin: StartsInNew,
+      startsinduration: StartsInDurationNew,
+      duein: DueInNew,
+      dueinduration: DueInDurationNew,
+      comments: "",
+      startdate: StartsDateNew,
+      enddate: DueDateNew,
+    });
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate/`;
+    fetch(url + _id, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.text();
+      })
+      .then((result) => {
+        toast.success("Job Template updated successfully");
+       
       })
       .catch((error) => {
         // Handle errors
@@ -662,7 +710,8 @@ const JobTemplateUpdate = () => {
           <Box mt={3}><hr /></Box>
 
           <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-            <Button variant="contained" color="primary" onClick={updatejobtemp}>Save</Button>
+          <Button variant="contained" color="primary" onClick={updatejobtemp}>Save & exit</Button>
+            <Button variant="contained" color="primary" onClick={updatesavejobtemp}>Save</Button>
             <Button variant="outlined" onClick={handleJobTempCancle}>Cancel</Button>
           </Box>
         </Box>

@@ -235,6 +235,50 @@ const PipelineTempUpdate = () => {
       })
       .then((result) => {
         toast.success("Pipeline Updated successfully");
+        
+      })
+      .catch((error) => {
+        toast.error("Failed to Updated pipeline");
+      });
+  };
+  const updateSavePipe = () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      pipelineName: piplineName,
+      availableto: combinedValues,
+      sortjobsby: selectedSortByJob.value,
+      defaultjobtemplate: selectedtemp.value,
+      accountId: Account_id,
+      description: Description,
+      duedate: Due_date,
+      accounttags: Account_tags,
+      priority: Priority,
+      days_on_Stage: Days_on_stage,
+      assignees: Assignees,
+      name: Name,
+      startdate: startDate,
+      stages: stages,
+
+    });
+
+    const requestOptions = {
+      method: "PATCH",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
+    const url = `${PIPELINE_API}/workflow/pipeline/pipeline/${id}`;
+    fetch(url, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((result) => {
+        toast.success("Pipeline Updated successfully");
         // setTimeout(() => navigate("/createpipeline"), 1000);
       })
       .catch((error) => {
@@ -699,7 +743,8 @@ const PipelineTempUpdate = () => {
               </Box>
 
               <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                <Button onClick={handleButtonClick} variant="contained" color="primary">Save</Button>
+              <Button onClick={handleButtonClick} variant="contained" color="primary">Save & exit</Button>
+                <Button onClick={updateSavePipe} variant="contained" color="primary">Save</Button>
                 <Button variant="outlined" onClick={hanleCloseupdate} >Cancel</Button>
               </Box>
             </Box>

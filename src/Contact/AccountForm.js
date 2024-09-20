@@ -316,12 +316,27 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
   };
 
 
+  // const handleContactInputChange = (index, event) => {
+  //   const { name, value } = event.target;
+  //   const updatedContacts = [...contacts];
+  //   updatedContacts[index] = { ...updatedContacts[index], [name]: value };
+  //   setContacts(updatedContacts);
+  // };
+
   const handleContactInputChange = (index, event) => {
     const { name, value } = event.target;
     const updatedContacts = [...contacts];
     updatedContacts[index] = { ...updatedContacts[index], [name]: value };
+
+    // Automatically update the contact name based on first, middle, and last names
+    const firstName = updatedContacts[index].firstName || '';
+    const middleName = updatedContacts[index].middleName || '';
+    const lastName = updatedContacts[index].lastName || '';
+    updatedContacts[index].contactName = `${firstName} ${middleName} ${lastName}`.trim();
+
     setContacts(updatedContacts);
   };
+
 
   const handleContactSwitchChange = (index, fieldName, checked) => {
     const updatedContacts = [...contacts];
@@ -446,7 +461,9 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                 {activeStep === 'Contact Info' ? (
                   <>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mr: 2, gap: 2 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', mr: 2, gap: 2 ,cursor:'pointer'}} onClick={() => {
+                        handleOptionChange(null, 'Account Info');
+                      }}>
                         <CheckCircleRoundedIcon style={{ color: "green" }} />
                         <Typography>Account Info</Typography>
                       </Box>
@@ -869,6 +886,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                             placeholder="Contact Name"
                             margin="normal"
                             size="small"
+                            value={contact.contactName}
                             onChange={(e) => handleContactInputChange(index, e)}
                           />
 
@@ -892,6 +910,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
                           <TextField
                             fullWidth
+                            multiline
                             name="note"
                             margin="normal"
                             placeholder="Note"
@@ -1162,7 +1181,7 @@ const AccountForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                                     justifyContent: 'space-between',
                                     padding: '8px',
                                     borderBottom: '1px solid #ddd',
-                                    cursor:'pointer'
+                                    cursor: 'pointer'
                                   }}
                                 >
                                   <Typography sx={{ fontWeight: 500 }}>{option.name}</Typography>

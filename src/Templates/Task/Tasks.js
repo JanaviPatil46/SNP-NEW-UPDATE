@@ -285,6 +285,100 @@ const Tasks = () => {
         });
     }
   };
+  const createSaveTaskTemp= () => {
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
+    if (absoluteDate === true) {
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      const raw = JSON.stringify({
+        templatename: templatename,
+        status: status.value,
+        taskassignees: combinedValues,
+        tasktags: combinedTagsValues,
+        priority: priority.value,
+        description: description,
+        absolutedates: absoluteDate,
+        comments: "",
+        startdate: startDate,
+        enddate: dueDate,
+      });
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
+      fetch(url, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((result) => {
+          // Handle success
+          toast.success("Task Template created successfully");
+          resetFields();
+          fetchTaskData();
+          
+        })
+        .catch((error) => {
+          // Handle errors
+          console.error(error);
+          toast.error("Failed to create Task Template");
+        });
+    } else if (absoluteDate === false) {
+
+      if (!validateForm()) {
+        return; // Prevent form submission if validation fails
+      }
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+      const raw = JSON.stringify({
+        templatename: templatename,
+        status: status.value,
+        taskassignees: combinedValues,
+        tasktags: combinedTagsValues,
+        priority: priority.value,
+        description: description,
+        absolutedates: absoluteDate,
+        startsin: startsin,
+        startsinduration: startsInDuration,
+        duein: duein,
+        dueinduration: dueinduration,
+
+      });
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
+      fetch(url, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((result) => {
+          // Handle success
+          toast.success("Task Template created successfully");
+          resetFields();
+          fetchTaskData();
+          
+        })
+        .catch((error) => {
+          // Handle errors
+          console.error(error);
+          toast.error("Failed to create Task Template");
+        });
+    }
+  };
   const resetFields = () => {
     setDescription('');
     setSelectedTags([]);
@@ -819,7 +913,8 @@ const Tasks = () => {
                   </Grid>
                   <Box mt={2} mb={2}><hr /></Box>
                   <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <Button variant="contained" color="primary" onClick={createTaskTemp}>Save</Button>
+                  <Button variant="contained" color="primary" onClick={createTaskTemp}>Save & exit</Button>
+                    <Button variant="contained" color="primary" onClick={createSaveTaskTemp}>Save</Button>
                     <Button variant="outlined" onClick={handleTaskCancel}>Cancel</Button>
                   </Box>
                 </Box>

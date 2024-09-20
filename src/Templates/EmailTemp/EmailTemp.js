@@ -164,6 +164,7 @@ const EmailTemp = () => {
     };
     const handleCloseDropdown = () => {
         setAnchorEl(null);
+          setShowDropdown(false);
     };
 
 

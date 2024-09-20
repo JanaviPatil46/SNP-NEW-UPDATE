@@ -220,6 +220,7 @@ const JobTemp = () => {
     }
   }, [selectedOption]);
   const handleCloseDropdown = () => {
+      setShowDropdown(false);
     setAnchorEl(null);
   };
   const handlejobName = (e) => {
@@ -391,6 +392,106 @@ const JobTemp = () => {
     }
   };
 
+  const createsavejobtemp = () => {
+    if (absoluteDate === true) {
+      if (!validateForm()) {
+        // toast.error("Please fix the validation errors.");
+        return;
+      }
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        templatename: templatename,
+        jobname: jobName,
+        jobassignees: combinedValues,
+        addshortcode: "",
+        priority: priority.value,
+        description: description,
+        absolutedates: absoluteDate,
+        comments: "",
+        startdate: startDate,
+        enddate: dueDate,
+      });
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
+      fetch(url, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((result) => {
+          // Handle success
+          toast.success("Job Template created successfully");
+       
+        
+          fetchJobTemplatesData();
+        })
+        .catch((error) => {
+          // Handle errors
+          console.error(error);
+          toast.error("Failed to create Job Template");
+        });
+    } else if (absoluteDate === false) {
+      if (!validateForm()) {
+        // toast.error("Please fix the validation errors.");
+        return;
+      }
+      const myHeaders = new Headers();
+      myHeaders.append("Content-Type", "application/json");
+
+      const raw = JSON.stringify({
+        templatename: templatename,
+        jobname: jobName,
+        jobassignees: combinedValues,
+        addshortcode: "",
+        priority: priority.value,
+        description: description,
+        absolutedates: absoluteDate,
+        startsin: startsin,
+        startsinduration: startsInDuration,
+        duein: duein,
+        dueinduration: dueinduration,
+        comments: "",
+      });
+
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow",
+      };
+      const url = `${JOBS_API}/workflow/jobtemplate/jobtemplate`;
+      fetch(url, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((result) => {
+          // Handle success
+          toast.success("Job Template created successfully");
+         
+         
+          fetchJobTemplatesData();
+          // Additional logic after successful creation if needed
+        })
+        .catch((error) => {
+          // Handle errors
+          console.error(error);
+          toast.error("Failed to create Job Template");
+        });
+    }
+  };
 
   //delete template
   const handleEdit = (_id) => {
@@ -943,7 +1044,8 @@ const JobTemp = () => {
             <Box mt={3}><hr /></Box>
 
             <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-              <Button variant="contained" color="primary" onClick={createjobtemp}>Save</Button>
+            <Button variant="contained" color="primary" onClick={createjobtemp}>Save & exit</Button>
+              <Button variant="contained" color="primary" onClick={createsavejobtemp}>Save</Button>
               <Button variant="outlined" onClick={handleCloseJobTemp}>Cancel</Button>
             </Box>
           </Box>

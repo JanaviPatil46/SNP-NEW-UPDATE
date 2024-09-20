@@ -6,7 +6,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import { toast } from 'react-toastify';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import axios from 'axios';
@@ -559,7 +559,8 @@ const PIPELINE_API = process.env.REACT_APP_PIPELINE_TEMP_URL;
 
             <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
               <Button variant="contained" color="primary" onClick={createjob}>Add</Button>
-              <Button variant="outlined">Cancel</Button>
+              <Link to='/'><Button variant="outlined">Cancel</Button></Link>
+              
             </Box>
           </Box>
         </form>

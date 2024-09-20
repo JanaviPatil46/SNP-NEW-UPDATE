@@ -310,6 +310,69 @@ const InvoiceTemp = () => {
         toast.error(errorMessage);
       });
   }
+  const createSaveInvoiceTemp= () => {
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+      templatename: templatename,
+      description: description,
+      paymentMethod: paymentMode.value,
+      sendEmailWhenInvCreated: emailToClient,
+      messageForClient: clientmsg,
+      payInvoicewithcredits: payUsingCredits,
+      sendReminderstoClients: invoiceReminders,
+      daysuntilnextreminder: daysNextReminder,
+      numberOfreminder: numOfReminder,
+      lineItems: lineItems,
+      summary: {
+        subtotal: subtotal,
+        taxRate: taxRate,
+        taxTotal: taxTotal,
+        total: totalAmount
+      },
+      active: "true",
+    });
+
+    console.log(raw)
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
+    };
+
+    const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate`;
+    fetch(url, requestOptions)
+      .then((response) => {
+        console.log(response)
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+        return response.json();
+      })
+      .then((result) => {
+        console.log(result.message)
+        toast.success("Invoice created successfully");
+
+        if (result && result.message === "InvoiceTemplate created successfully") {
+        
+          fetchInvoiceTemplates();
+       
+        } else {
+          // toast.error(result.message || "Failed to create InvoiceTemplate");
+        }
+      })
+
+      .catch((error) => {
+        console.log(error)
+        const errorMessage = error.response && error.response.message ? error.response.message : "Failed to create InvoiceTemplate";
+        toast.error(errorMessage);
+      });
+  }
   const [templatename, setTemplatename] = useState();
 
   const [paymentMode, setPaymentMode] = useState('');
@@ -1122,7 +1185,8 @@ const InvoiceTemp = () => {
                 </Grid>
                 <Divider mt={2} />
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Button onClick={createInvoiceTemp} variant="contained" color="primary" >Save</Button>
+                <Button onClick={createInvoiceTemp} variant="contained" color="primary" >Save & exit</Button>
+                  <Button onClick={createSaveInvoiceTemp} variant="contained" color="primary" >Save</Button>
                   <Button variant="outlined" onClick={handleCloseInvoiceTemp}>Cancel</Button>
                 </Box>
               </Box>
@@ -1135,12 +1199,3 @@ const InvoiceTemp = () => {
 };
 
 export default InvoiceTemp;
-
-
-
-
-
-
-
-
-

@@ -236,6 +236,53 @@ const PipelineTemp = () => {
         // Additional error handling here
       });
   };
+  const createSavePipe= () => {
+    if (!validateForm()) {
+      return; // Prevent form submission if validation fails
+    }
+    const data = {
+      pipelineName: pipelineName,
+      availableto: combinedValues,
+      sortjobsby: selectedSortByJob.value,
+      defaultjobtemplate: selectedtemp.value,
+      accountId: Account_id,
+      description: Description,
+      duedate: Due_date,
+      accounttags: Account_tags,
+      priority: Priority,
+      days_on_Stage: Days_on_stage,
+      assignees: Assignees,
+      name: Name,
+      startdate: startDate,
+      stages: stages,
+    };
+
+    const config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: `${PIPELINE_API}/workflow/pipeline/createpipeline`,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: data,
+    };
+
+    axios.request(config)
+      .then((response) => {
+        console.log(JSON.stringify(response.data));
+        // Display success toast
+        fetchPipelineData();
+        toast.success("Pipeline created successfully");
+       
+        // Additional success handling here
+      })
+      .catch((error) => {
+        console.log(error);
+        // Display error toast
+        toast.error("Failed to create pipeline");
+        // Additional error handling here
+      });
+  };
   const clearForm = () => {
     setPipelineName('');
     setSelectedUser([]);
@@ -882,7 +929,8 @@ const PipelineTemp = () => {
                 </Box>
 
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Button variant="contained" color="primary" onClick={createPipe}>Save</Button>
+                <Button variant="contained" color="primary" onClick={createPipe}>Save & exit</Button>
+                  <Button variant="contained" color="primary" onClick={createSavePipe}>Save</Button>
                   <Button variant="outlined" onClick={handleClosePipelineTemp}>Cancel</Button>
                 </Box>
               </Box>

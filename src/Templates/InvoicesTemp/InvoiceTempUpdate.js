@@ -302,7 +302,65 @@ const InvoiceTempUpdate = () => {
         toast.error(errorMessage);
       });
   }
+const createSaveInvoiceTemp= () => {
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
 
+  const raw = JSON.stringify({
+    templatename: templatename,
+    description: description,
+    paymentMethod: paymentMode.value,
+    sendEmailWhenInvCreated: emailToClient,
+    messageForClient: clientmsg,
+    payInvoicewithcredits: payUsingCredits,
+    sendReminderstoClients: invoiceReminders,
+    daysuntilnextreminder: daysNextReminder,
+    numberOfreminder: numOfReminder,
+    lineItems: lineItems,
+    summary: {
+      subtotal: subtotal,
+      taxRate: taxRate,
+      taxTotal: taxTotal,
+      total: totalAmount
+    },
+    active: "true",
+  });
+
+  const requestOptions = {
+    method: "PATCH",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+
+  const url = `${INVOICE_API}/workflow/invoicetemp/invoicetemplate/`;
+  fetch(url + id, requestOptions)
+    .then((response) => {
+      console.log(response)
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+      return response.json();
+    })
+    .then((result) => {
+      // console.log(result)
+      // toast.success("Invoice created successfully");
+
+      if (result && result.message === "InvoiceTemplate Updated successfully") {
+        toast.success("InvoiceTemplate Updated successfully");
+       
+
+      } else {
+        toast.error(result.message || "Failed to create InvoiceTemplate");
+      }
+    })
+
+    .catch((error) => {
+      console.log(error)
+      const errorMessage = error.response && error.response.message ? error.response.message : "Failed to create InvoiceTemplate";
+      toast.error(errorMessage);
+    });
+}
 
 
   const [templatename, setTemplatename] = useState();
@@ -760,7 +818,7 @@ const[numOfReminder,setnumOfReminder]=useState();
                       </Box>
 
 
-                      <Box>
+                      <Box mb={2}>
                         <InputLabel sx={{ color: 'black' }}>Number of reminders</InputLabel>
                         <TextField
                           // margin="normal"
@@ -901,13 +959,21 @@ const[numOfReminder,setnumOfReminder]=useState();
                               <TableRow>
                                 <TableCell>
                                 <Box sx={{display:'flex',alignItems:'center'}}>
+                                  $<input
+                                    // type="number"
+                                    value={subtotal}
+                                    onChange={handleSubtotalChange}
+                                    style={{ border: 'none', width:'50%' }}
+                                  />
+                                  </Box>
+                                {/* <Box sx={{display:'flex',alignItems:'center'}}>
                                   <input
                                     type="number"
                                     value={subtotal}
                                     onChange={handleSubtotalChange}
                                     style={{ border: 'none',width:'50%' }}
                                   />$
-                                  </Box>
+                                  </Box> */}
                                 </TableCell>
                                 <TableCell>
                                 <Box sx={{display:'flex',alignItems:'center'}}>
@@ -948,7 +1014,8 @@ const[numOfReminder,setnumOfReminder]=useState();
                 </Grid>
                 <Divider mt={2} />
                 <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Button   onClick={createInvoiceTemp} variant="contained" color="primary" >Save</Button>
+                <Button   onClick={createInvoiceTemp} variant="contained" color="primary" >Save & exit</Button>
+                  <Button   onClick={createSaveInvoiceTemp} variant="contained" color="primary" >Save</Button>
                   <Button variant="outlined" onClick={handleCloseInvoiceTemp}>Cancel</Button>
                 </Box>
               </Box>

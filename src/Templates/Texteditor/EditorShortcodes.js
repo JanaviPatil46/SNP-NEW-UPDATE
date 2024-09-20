@@ -350,10 +350,15 @@ import {
     ListItem,
     ListItemText, Popover
 } from '@mui/material';
-import ReactQuill from 'react-quill'; // Import ReactQuill
-import 'react-quill/dist/quill.snow.css'; // Import Quill styles
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Quill Snow theme
+import 'quill-emoji/dist/quill-emoji.css'; // Emoji styles
+import Quill from 'quill';
+import 'quill-emoji';
 import { useTheme } from '@mui/material';
+Quill.register('modules/emoji', require('quill-emoji'));
+
+
 
 export default function Editor({ initialContent, onChange }) {
     const theme = useTheme();
@@ -373,7 +378,7 @@ export default function Editor({ initialContent, onChange }) {
         'bold', 'italic', 'underline', 'strike', 'blockquote',
         'list', 'bullet', 'indent',
         'link', 'image', 'color', 'background',
-        'align', 'code-block', 'script',
+        'align', 'code-block', 'script','emoji'
     ];
 
     // Define modules for Quill
@@ -386,8 +391,12 @@ export default function Editor({ initialContent, onChange }) {
             [{ 'color': [] }, { 'background': [] }],
             [{ 'align': [] }],
             ['link', 'image'],
+             [{ 'emoji': true }],
             ['clean'] // Remove formatting button
-        ]
+        ],
+         'emoji-toolbar': true,
+    'emoji-textarea': false,
+    'emoji-shortname': true,
     };
     // Handle content change
     const handleEditorChange = (content, delta, source, editor) => {
@@ -526,7 +535,7 @@ export default function Editor({ initialContent, onChange }) {
                     style={{ height: '250px', }}
                 />
             </div>
-            <Box >
+            <Box sx={{mt:3}}>
                 <Button onClick={handleOpenDropdown} variant="contained" sx={{ mt: 7 }}>
                     Shortcode
                 </Button>

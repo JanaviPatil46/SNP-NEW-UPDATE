@@ -11,7 +11,7 @@ import {
     useMediaQuery,
     Chip,
     MenuItem,
-    Select,
+    Select,ListItem,
     TextField,
     InputLabel,
     Autocomplete
@@ -34,7 +34,7 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
 
     const [phoneNumbers, setPhoneNumbers] = useState([]);
     const [countries, setCountries] = useState([]);
-    const [selectedCountry, setSelectedCountry] = useState('');
+    const [selectedCountry, setSelectedCountry] = useState(null);
 
     // Individual state hooks for form fields
     const [firstName, setFirstName] = useState('');
@@ -517,24 +517,36 @@ const ContactForm = ({ handleNewDrawerClose, handleDrawerClose }) => {
                             </MenuItem>
                         ))}
                     </Select> */}
-                    <Autocomplete
-                        size="small"
-                        options={countries}
-                        getOptionLabel={(option) => option.name}
-                        value={countries.find((country) => country.code === selectedCountry) || null}
-                        onChange={(event, newValue) => handleCountryChange(newValue ? newValue.code : '')}
-                        renderInput={(params) => (
+                     <Autocomplete
+                          size="small"
+                          options={countries}
+                          getOptionLabel={(option) => option.name}
+                          value={selectedCountry}
+                          onChange={(event, newValue) => setSelectedCountry(newValue)}
+                          renderOption={(props, option) => (
+                            <ListItem
+                              {...props}
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                padding: '8px',
+                                borderBottom: '1px solid #ddd',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <Typography sx={{ fontWeight: 500 }}>{option.name}</Typography>
+                              <Typography sx={{ fontSize: '0.9rem', color: 'gray' }}>{option.code}</Typography>
+                            </ListItem>
+                          )}
+                          renderInput={(params) => (
                             <TextField
-                                {...params}
-                                placeholder="Country"
-                                margin="normal"
-                                sx={{
-                                    width: '100%',
-                                    marginTop: '8px'
-                                }}
+                              {...params}
+                              placeholder="Country"
+                              variant="outlined"
+                              sx={{ marginTop: '8px', width: '100%' }}
                             />
-                        )}
-                    />
+                          )}
+                        />
                 </Box>
                 <Box>
 
