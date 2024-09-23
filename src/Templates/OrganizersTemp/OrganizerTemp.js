@@ -24,19 +24,42 @@ import { CiMenuKebab } from "react-icons/ci";
 const OrganizersTemp = () => {
 
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
-
+  const [formElements, setFormElements] = useState([]);
   const navigate = useNavigate();
 
   const [templateName, setTemplateName] = useState('');
   const [organizerName, setOrganizerName] = useState('');
   const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
-
+  const [sectionSettings, setSectionSettings] = useState({}); 
+  const handleSectionSaveData = (settings) => {
+    // Update the specific section with the new settings
+    setSections((prevSections) =>
+      prevSections.map((section) =>
+        section.id === selectedSection.id
+          ? { ...section, sectionSettings: settings }
+          : section
+      )
+    );
+  };
   const addSection = () => {
-    const newSection = { id: Date.now(), name: `Section ${sections.length + 1}`, text: '', formElements: [] };
+    const newSection = { id: Date.now(), name: `Section ${sections.length + 1}`, text: '', formElements: [] ,sectionSettings: {
+      sectionRepeatingMode: false,
+      buttonName: '',
+      conditional: false,
+      mode: '',
+      conditions: [
+        {
+          question: '',
+          answer: ''
+        }
+      ]
+    }};
     setSections([...sections, newSection]);
     setSelectedSection(newSection);
   };
+  console.log(sections)
+  console.log(selectedSection)
 
   const handleSectionClick = (section) => {
     setSelectedSection(section);
@@ -86,6 +109,17 @@ const OrganizersTemp = () => {
     }
     return text;
   }
+  const handleFormSave = (elementId, formData) => {
+    setSections(prevSections =>
+      prevSections.map(section => ({
+        ...section,
+        formElements: section.formElements.map(el =>
+          el.id === elementId ? { ...el, questionsectionsettings: formData } : el
+        )
+      }))
+    );
+  };
+
 
   const saveandexitOrganizerTemp = () => {
 
@@ -99,10 +133,12 @@ const OrganizersTemp = () => {
     const raw = JSON.stringify({
       templatename: templateName,
       organizerName: organizerName,
+      
       sections: sections.map(section => ({
         name: section.text,
         text: section.text,
         id: section.id.toString(),
+        sectionsettings: section.sectionSettings || {},
         formElements: section.formElements.map(element => ({
           type: element.type,
           id: element.id,
@@ -111,8 +147,11 @@ const OrganizersTemp = () => {
             id: option.id,
             text: option.text
           })),
-          text: element.text
-        }))
+          text: element.text,
+          
+          questionsectionsettings: element.questionsectionsettings || {}
+        })),
+       
       })),
       active: true
     });
@@ -161,6 +200,7 @@ const OrganizersTemp = () => {
         name: section.text,
         text: section.text,
         id: section.id.toString(),
+        sectionsettings: section.sectionSettings || {},
         formElements: section.formElements.map(element => ({
           type: element.type,
           id: element.id,
@@ -169,7 +209,8 @@ const OrganizersTemp = () => {
             id: option.id,
             text: option.text
           })),
-          text: element.text
+          text: element.text,
+          questionsectionsettings: element.questionsectionsettings || {}
         })),
 
       })),
@@ -589,6 +630,7 @@ const OrganizersTemp = () => {
                       onClick={() => handleSectionClick(section)}
                       fullWidth
                     />
+                    
                   </Box>
                 ))}
               </Box>
@@ -608,6 +650,8 @@ const OrganizersTemp = () => {
                   onDelete={handleDeleteSection}
                   onUpdate={handleUpdateSection}
                   onDuplicate={handleDuplicateSection}
+                  onSaveFormData={handleFormSave} 
+                  onSaveSectionData={handleSectionSaveData}
                 />
               )}
             </Box>
