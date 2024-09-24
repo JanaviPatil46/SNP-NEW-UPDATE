@@ -24,7 +24,6 @@ import { CiMenuKebab } from "react-icons/ci";
 const OrganizersTemp = () => {
 
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
-  const [formElements, setFormElements] = useState([]);
   const navigate = useNavigate();
 
   const [templateName, setTemplateName] = useState('');
@@ -652,6 +651,7 @@ const OrganizersTemp = () => {
                   onDuplicate={handleDuplicateSection}
                   onSaveFormData={handleFormSave} 
                   onSaveSectionData={handleSectionSaveData}
+                  sections={sections}
                 />
               )}
             </Box>

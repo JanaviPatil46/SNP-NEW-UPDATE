@@ -408,6 +408,16 @@ const saveSchat= async () => {
       ),
     },
     {
+      accessorKey: 'chatsubject', // Access the template name
+      header: 'Subject',
+      
+    },
+    {
+      // accessorKey: 'templatename', // Access the template name
+      header: 'Used in Pipeline',
+     
+    },
+    {
       accessorKey: 'settings', // Add settings column
       header: 'Settings',
       Cell: ({ row }) => (

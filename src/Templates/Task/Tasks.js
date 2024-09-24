@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import {
   Box,
   Button,
@@ -12,7 +13,8 @@ import {
   Switch,
   FormControlLabel,
   Chip,
-  Alert
+  Alert,
+  Checkbox,
 } from '@mui/material';
 import { useNavigate, } from "react-router-dom";
 import Editor from '../Texteditor/Editor';
@@ -22,6 +24,9 @@ import Status from '../Status/Status';
 import { toast } from "react-toastify";
 import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
 import { CiMenuKebab } from "react-icons/ci";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { FiPlusCircle } from "react-icons/fi";
+import { PiDotsSixVerticalBold } from "react-icons/pi";
 const Tasks = () => {
   const TASK_API = process.env.REACT_APP_TASK_TEMP_URL;
   const USER_API = process.env.REACT_APP_USER_URL;
@@ -45,6 +50,46 @@ const Tasks = () => {
   const [combinedValues, setCombinedValues] = useState([]);
   const [userData, setUserData] = useState([]);
 
+  const [isChecked, setIsChecked] = useState(false);
+
+  const handleCheckboxChange = (id) => {
+    // Toggle the checked state
+    setIsChecked(!isChecked);
+    // Optionally, you can pass this change to a parent or store it elsewhere
+
+  };
+
+  const [subtasks, setSubtasks] = useState([]);
+
+  const handleAddSubtask = () => {
+    const newId = String(subtasks.length + 1);
+    setSubtasks([...subtasks, { id: newId, text: "" }]);
+  };
+
+  const handleInputChange = (id, value) => {
+    setSubtasks(subtasks.map((subtask) => (subtask.id === id ? { ...subtask, text: value } : subtask)));
+  };
+
+  const handleDeleteSubtask = (id) => {
+    setSubtasks(subtasks.filter((subtask) => subtask.id !== id));
+  };
+
+  const [SubtaskSwitch, setSubtaskSwitch] = useState(false);
+  const handleSubtaskSwitch = (checked) => {
+    setSubtaskSwitch(checked);
+  };
+  const handleDragEnd = (result) => {
+    // Ensure a valid drop location
+    if (!result.destination) return;
+
+    // Reorder subtasks based on the drag-and-drop result
+    const newSubtasks = Array.from(subtasks);
+    const [reorderedItem] = newSubtasks.splice(result.source.index, 1);
+    newSubtasks.splice(result.destination.index, 0, reorderedItem);
+
+    // Update the state with the new order of subtasks
+    setSubtasks(newSubtasks);
+  };
   const handleAbsolutesDates = (checked) => {
     setAbsoluteDates(checked);
   };
@@ -73,20 +118,20 @@ const Tasks = () => {
   const handleCreateTask = () => {
     setShowForm(true);
   };
- 
 
-  
+
+
   const handlePriorityChange = (priority) => {
     setPriority(priority);
   };
   const handleStatusChange = (status) => {
     setStatus(status);
   };
- 
+
   const handleEditorChange = (content) => {
     setDescription(content);
   };
-  
+
   // console.log(combinedValues)
   useEffect(() => {
     fetchData();
@@ -285,7 +330,7 @@ const Tasks = () => {
         });
     }
   };
-  const createSaveTaskTemp= () => {
+  const createSaveTaskTemp = () => {
     if (!validateForm()) {
       return; // Prevent form submission if validation fails
     }
@@ -323,7 +368,7 @@ const Tasks = () => {
           toast.success("Task Template created successfully");
           resetFields();
           fetchTaskData();
-          
+
         })
         .catch((error) => {
           // Handle errors
@@ -370,7 +415,7 @@ const Tasks = () => {
           toast.success("Task Template created successfully");
           resetFields();
           fetchTaskData();
-          
+
         })
         .catch((error) => {
           // Handle errors
@@ -399,33 +444,33 @@ const Tasks = () => {
   };
   //delete template
   const handleDelete = (_id) => {
-      // Show a confirmation prompt
-      const isConfirmed = window.confirm("Are you sure you want to delete this task template?");
-        
-      // Proceed with deletion if confirmed
-      if (isConfirmed) {
-    const requestOptions = {
-      method: "DELETE",
-      redirect: "follow"
-    };
-    const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
-    fetch(url + _id, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to delete item');
-        }
-        return response.text();
-      })
-      .then((result) => {
-        // console.log(result);
-        toast.success('Item deleted successfully');
-        fetchTaskData();
-        // setshowOrganizerTemplateForm(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error('Failed to delete item');
-      });
+    // Show a confirmation prompt
+    const isConfirmed = window.confirm("Are you sure you want to delete this task template?");
+
+    // Proceed with deletion if confirmed
+    if (isConfirmed) {
+      const requestOptions = {
+        method: "DELETE",
+        redirect: "follow"
+      };
+      const url = `${TASK_API}/workflow/tasks/tasktemplate/`;
+      fetch(url + _id, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to delete item');
+          }
+          return response.text();
+        })
+        .then((result) => {
+          // console.log(result);
+          toast.success('Item deleted successfully');
+          fetchTaskData();
+          // setshowOrganizerTemplateForm(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error('Failed to delete item');
+        });
     }
   };
   const [tempIdget, setTempIdGet] = useState("");
@@ -486,7 +531,7 @@ const Tasks = () => {
       }),
     },
   });
-  
+
   const [templateNameError, setTemplateNameError] = useState('');
   const [startDateError, setStartDateError] = useState('');
   const [dueDateError, setDueDateError] = useState('');
@@ -551,12 +596,12 @@ const Tasks = () => {
 
   // Detect form changes
   useEffect(() => {
-    if (templatename || priority || description || status || absoluteDate ) {
+    if (templatename || priority || description || status || absoluteDate) {
       setIsFormDirty(true);
     } else {
       setIsFormDirty(false);
     }
-  }, [templatename, priority, description, status, absoluteDate ]);
+  }, [templatename, priority, description, status, absoluteDate]);
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Container>
@@ -654,7 +699,7 @@ const Tasks = () => {
                           </Grid>
                         </Grid>
                       </Box>
-                      <Box sx={{ mt: 3, mb:3}}>
+                      <Box sx={{ mt: 3, mb: 3 }}>
                         <Editor onChange={handleEditorChange} content={description} />
                       </Box>
                       <Box mt={2}>
@@ -698,6 +743,10 @@ const Tasks = () => {
                           <Box className='absolutes-dates'>
                             <FormControlLabel
                               control={
+
+
+
+
                                 <Switch
                                   checked={absoluteDate}
                                   onChange={(event) => handleAbsolutesDates(event.target.checked)}
@@ -780,36 +829,36 @@ const Tasks = () => {
                                 onChange={handleStartInDateChange}
                                 renderInput={(params) => (
                                   <>
-                                  <TextField
-                                    {...params}
-                                    variant="outlined"
-                                    sx={{ backgroundColor: "#fff" }}
-                                    error={!!durationError}
-                                  />
-                                  {!!durationError && (
-                                    <Alert
-                                      sx={{
-                                        width: '96%',
-                                        p: '0',
-                                        pl: '4%',
-                                        height: '23px',
-                                        borderRadius: '10px',
-                                        borderTopLeftRadius: '0',
-                                        borderTopRightRadius: '0',
-                                        fontSize: '13px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        '& .MuiAlert-icon': {
-                                          fontSize: '16px',
-                                          mr: '8px',
-                                        },
-                                      }}
-                                      variant="filled"
-                                      severity="error"
-                                    >
-                                      {durationError}
-                                    </Alert>
-                                  )}
+                                    <TextField
+                                      {...params}
+                                      variant="outlined"
+                                      sx={{ backgroundColor: "#fff" }}
+                                      error={!!durationError}
+                                    />
+                                    {!!durationError && (
+                                      <Alert
+                                        sx={{
+                                          width: '96%',
+                                          p: '0',
+                                          pl: '4%',
+                                          height: '23px',
+                                          borderRadius: '10px',
+                                          borderTopLeftRadius: '0',
+                                          borderTopRightRadius: '0',
+                                          fontSize: '13px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          '& .MuiAlert-icon': {
+                                            fontSize: '16px',
+                                            mr: '8px',
+                                          },
+                                        }}
+                                        variant="filled"
+                                        severity="error"
+                                      >
+                                        {durationError}
+                                      </Alert>
+                                    )}
                                   </>
                                 )}
                                 value={dayOptions.find((option) => option.value === startsInDuration) || null}
@@ -827,8 +876,8 @@ const Tasks = () => {
                                 placeholder='0'
                                 value={duein}
                                 fullWidth
-                                error={!!dueInError} 
-                                sx={{ background: '#fff',  }}
+                                error={!!dueInError}
+                                sx={{ background: '#fff', }}
                                 onChange={(e) => setduein(e.target.value)}
                               />
                               {(!!startInError) && (
@@ -857,43 +906,43 @@ const Tasks = () => {
                               )}
                             </Grid>
                             <Grid item xs={12} sm={5}>
-                            <Autocomplete
-                              options={dayOptions}
-                              getOptionLabel={(option) => option.label}
-                              onChange={handledueindateChange}
-                              size='small'
-                              renderInput={(params) => (
-                                <>
-                                <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} error={!!durationError}  />
-                                {!!durationError && (
-                                  <Alert
-                                    sx={{
-                                      width: '96%',
-                                      p: '0',
-                                      pl: '4%',
-                                      height: '23px',
-                                      borderRadius: '10px',
-                                      borderTopLeftRadius: '0',
-                                      borderTopRightRadius: '0',
-                                      fontSize: '13px',
-                                      display: 'flex',
-                                      alignItems: 'center',
-                                      '& .MuiAlert-icon': {
-                                        fontSize: '16px',
-                                        mr: '8px',
-                                      },
-                                    }}
-                                    variant="filled"
-                                    severity="error"
-                                  >
-                                    {durationError}
-                                  </Alert>
+                              <Autocomplete
+                                options={dayOptions}
+                                getOptionLabel={(option) => option.label}
+                                onChange={handledueindateChange}
+                                size='small'
+                                renderInput={(params) => (
+                                  <>
+                                    <TextField {...params} variant="outlined" sx={{ backgroundColor: '#fff' }} error={!!durationError} />
+                                    {!!durationError && (
+                                      <Alert
+                                        sx={{
+                                          width: '96%',
+                                          p: '0',
+                                          pl: '4%',
+                                          height: '23px',
+                                          borderRadius: '10px',
+                                          borderTopLeftRadius: '0',
+                                          borderTopRightRadius: '0',
+                                          fontSize: '13px',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          '& .MuiAlert-icon': {
+                                            fontSize: '16px',
+                                            mr: '8px',
+                                          },
+                                        }}
+                                        variant="filled"
+                                        severity="error"
+                                      >
+                                        {durationError}
+                                      </Alert>
+                                    )}
+                                  </>
                                 )}
-                                </>
-                              )}
-                              value={dayOptions.find((option) => option.value === dueinduration) || null}
-                              className="job-template-select-dropdown"
-                            />
+                                value={dayOptions.find((option) => option.value === dueinduration) || null}
+                                className="job-template-select-dropdown"
+                              />
                             </Grid>
                           </Grid>
                         </>
@@ -906,14 +955,78 @@ const Tasks = () => {
                           height: '100%',
                           ml: 1.5
                         }}
-                      ></Box>
+                      >
+
+                      </Box>
                     </Grid>
                     <Grid item xs={12} sm={5.8} >
+                      <div className="B">
+
+                        <DragDropContext onDragEnd={handleDragEnd}>
+
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Typography variant='h6'>Subtasks</Typography>
+                            <FormControlLabel
+                              control={
+                                <Switch onChange={(event) => handleSubtaskSwitch(event.target.checked)} checked={SubtaskSwitch} color="primary" />
+                              }
+
+                            />
+                          </Box>
+                         
+                          {SubtaskSwitch && (
+                            <Droppable droppableId="subtaskList">
+                              {(provided) => (
+                                <div className="subtask-input" {...provided.droppableProps} ref={provided.innerRef}>
+
+                                  {(subtasks.length > 0 ? subtasks : [{ id: 'default', text: '', checked: false }]).map((subtask, index) => (
+                                    <Draggable key={subtask.id} draggableId={subtask.id} index={index}>
+                                      {(provided) => (
+                                        <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+
+                                          <Box display="flex" gap="30px" alignItems="center">
+                                            <Checkbox
+                                              style={{ cursor: 'pointer' }}
+                                              checked={subtask.checked}
+                                              onChange={() => handleCheckboxChange(subtask.id)}
+                                            />
+                                            <TextField
+                                              placeholder="Things To do"
+                                              value={subtask.text}
+                                              size='small'
+                                              margin='normal'
+                                              fullWidth
+                                              onChange={(e) => handleInputChange(subtask.id, e.target.value)}
+                                              variant="outlined"
+                                            />
+                                            <IconButton onClick={() => handleDeleteSubtask(subtask.id)} style={{ cursor: 'pointer' }}>
+                                              <RiDeleteBin6Line />
+                                            </IconButton>
+                                            <IconButton style={{ cursor: 'move' }}>
+                                              <PiDotsSixVerticalBold />
+                                            </IconButton>
+                                          </Box>
+                                        </div>
+                                      )}
+                                    </Draggable>
+                                  ))}
+
+                                  {provided.placeholder}
+                                  <Box sx={{ cursor: 'pointer' }} onClick={handleAddSubtask} style={{ margin: "10px", color: "#1976d3" }}>
+                                    <FiPlusCircle /> Add Subtasks
+                                  </Box>
+                                </div>
+                              )}
+                            </Droppable>
+                          )}
+
+                        </DragDropContext>
+                      </div>
                     </Grid>
                   </Grid>
                   <Box mt={2} mb={2}><hr /></Box>
                   <Box sx={{ pt: 2, display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Button variant="contained" color="primary" onClick={createTaskTemp}>Save & exit</Button>
+                    <Button variant="contained" color="primary" onClick={createTaskTemp}>Save & exit</Button>
                     <Button variant="contained" color="primary" onClick={createSaveTaskTemp}>Save</Button>
                     <Button variant="outlined" onClick={handleTaskCancel}>Cancel</Button>
                   </Box>

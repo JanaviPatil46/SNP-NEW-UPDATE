@@ -25,7 +25,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { IoMdClose } from "react-icons/io";
 Quill.register('modules/emoji', require('quill-emoji'));
 
-const Section = ({ section, onDelete, onUpdate, onDuplicate,onSaveFormData,onSaveSectionData }) => {
+const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFormData, onSaveSectionData }) => {
 
   const [text, setText] = useState(section.text);
   const [formElements, setFormElements] = useState(section.formElements || []);
@@ -38,10 +38,11 @@ const Section = ({ section, onDelete, onUpdate, onDuplicate,onSaveFormData,onSav
   const [descriptionButton, setDescriptionButton] = useState(false);
   const [descriptionText, setDescriptionText] = useState('');
   const [mode, setMode] = useState('Any');
-  const [sectionMode, setSectionMode] =useState('Any');
+  const [sectionMode, setSectionMode] = useState('Any');
   const [queConditionButton, setQueConditionButton] = useState(false);
   const [questionAnswers, setQuestionAnswers] = useState([{ question: '', answer: '' }]);
   const [requiredButton, setRequiredButton] = useState(false);
+
   const handleSectionSave = () => {
     // Construct the sectionSettings object
     const sectionSettings = {
@@ -51,11 +52,17 @@ const Section = ({ section, onDelete, onUpdate, onDuplicate,onSaveFormData,onSav
       sectionMode: sectionMode,
       conditions: conditionButton ? questionAnswers : [], // assuming questionAnswers is an array of {question, answer} objects
     };
-  
+
     console.log('Section Settings:', sectionSettings);
     if (onSaveSectionData) {
       onSaveSectionData(sectionSettings);
     }
+
+    setRepeateButton(false);
+    setConditionButton(false);
+    setSectionMode('Any'); // Or the default value you prefer
+    setQuestionAnswers([]);
+
     setDrawerOpen(false)
   };
   const clearForm = () => {
@@ -66,52 +73,20 @@ const Section = ({ section, onDelete, onUpdate, onDuplicate,onSaveFormData,onSav
     setQuestionAnswers([]); // Assuming this is an array
     setDescriptionButton(false);
     setDescriptionText("");
+   
   };
   const [questionsAnswersMap, setQuestionsAnswersMap] = useState({});
   const handleElementSelect = (element) => {
     setSelectedElement(element);
-    
+
     // Check if we have existing questions and answers for this element
     const existingData = questionsAnswersMap[element.id] || { questionAnswers: [], description: "" };
-    
+
     setQuestionAnswers(existingData.questionAnswers);
     setDescriptionText(existingData.description);
   };
-  
-  // const handleSave = () => {
-  //   // Gather the form data
-  //   const formData = {
-  //     required: requiredButton,
-  //     prefilled: prefilledButton,
-  //     conditional: queConditionButton,
-  //     mode: mode,
-  //     conditions: queConditionButton ? questionAnswers.map((_, index) => ({
-  //       question: selectedQuestions[index],
-  //       answer: selectedAnswers[index],
-  //     })) : [], 
-  //     // conditions: queConditionButton ? questionAnswers : [], // Include conditions if conditional is enabled
-  //     descriptionEnabled: descriptionButton,
-  //     description: descriptionText
-  //   };
-  //   if (selectedElement) {
-  //     console.log(formData);
-  //     // Call any backend API or set the form data in the parent component
-  //     onSaveFormData(selectedElement.id, formData);
-      
-  //     // Clear the form
-  //     clearForm();
-  //     setQueDrawerOpen(false);
-  //   } else {
-  //     console.error("No element selected");
-  //   }
-   
-  //   // console.log(formData);
-  //   // // setQueDrawerOpen(false);
-  //   // clearForm();
-   
-  //   // onSaveFormData(selectedElement.id, formData); 
-  //   // console.log(selectedElement.id, formData) 
-  // };
+
+
   const handleSave = () => {
     if (selectedElement) {
       const formData = {
@@ -126,7 +101,7 @@ const Section = ({ section, onDelete, onUpdate, onDuplicate,onSaveFormData,onSav
         descriptionEnabled: descriptionButton,
         description: descriptionText
       };
-  
+
       // Store the form data in the questionsAnswersMap
       setQuestionsAnswersMap(prev => ({
         ...prev,
@@ -135,10 +110,10 @@ const Section = ({ section, onDelete, onUpdate, onDuplicate,onSaveFormData,onSav
           description: descriptionText,
         }
       }));
-  
+
       // Optionally, log or send data to backend
       onSaveFormData(selectedElement.id, formData);
-      
+
       // Clear the form
       clearForm();
       setQueDrawerOpen(false);
@@ -146,14 +121,7 @@ const Section = ({ section, onDelete, onUpdate, onDuplicate,onSaveFormData,onSav
       console.error("No element selected");
     }
   };
-  
-  // const onSaveFormData = (elementId, formData) => {
-  //   const updatedFormElements = formElements.map(el =>
-  //     el.id === elementId ? { ...el, questionsectionsettings: formData } : el
-  //   );
 
-  //   setFormElements(updatedFormElements);  // Assuming setFormElements is how you store form data in the parent component
-  // };
 
   const handleRequiredButton = (checked) => {
     setRequiredButton(checked);
@@ -187,19 +155,15 @@ const Section = ({ section, onDelete, onUpdate, onDuplicate,onSaveFormData,onSav
 
   const [selectedElement, setSelectedElement] = useState(null);
 
-  // Function to open the drawer and set the selected element
-  // const handleSettingsClick = (element) => {
-  //   setSelectedElement(element);
-  //   setQueDrawerOpen(true);
-  // };
+
 
   const handleSettingsClick = (elementId) => {
-  const updatedElement = formElements.find(element => element.id === elementId);
-  if (updatedElement) {
-    setSelectedElement(updatedElement);
-    setQueDrawerOpen(true);
-  }
-};
+    const updatedElement = formElements.find(element => element.id === elementId);
+    if (updatedElement) {
+      setSelectedElement(updatedElement);
+      setQueDrawerOpen(true);
+    }
+  };
 
 
   useEffect(() => {
@@ -659,30 +623,69 @@ const Section = ({ section, onDelete, onUpdate, onDuplicate,onSaveFormData,onSav
     }
   };
 
-const getRadioButtonOptions = () => {
-  return formElements
-    .filter(element => element.type === 'Radio Buttons')
-    .map(element => element.text); // Extract the text of each radio button element
-};
+  // const getRadioButtonOptions = () => {
+  //   return formElements
+  //     .filter(element => element.type === 'Radio Buttons')
+  //     .map(element => element.text); // Extract the text of each radio button element
+  // };
 
-const [selectedQuestions, setSelectedQuestions] = useState([]);
-const [selectedAnswers, setSelectedAnswers] = useState(Array(questionAnswers.length).fill(null));
+  const getRadioButtonOptions = () => {
+    return sections
+      .flatMap(section =>
+        section.formElements
+          .filter(element => element.type === 'Radio Buttons')
+          .map(element => element.text)
+        //  .map(element => ({ text: element.text, sectionName: section.text })) 
+      );
+  };
 
-const handleQuestionSelect = (value, index) => {
-  
-  const updatedQuestions = [...selectedQuestions];
-  updatedQuestions[index] = value;
-  setSelectedQuestions(updatedQuestions);
-  
-  const updatedAnswers = [...selectedAnswers];
-  updatedAnswers[index] = null; // Reset the answer for the selected question
-  setSelectedAnswers(updatedAnswers);
-};
- const getAnswerOptions = (question) => {
-    // Logic to fetch or derive answer options based on the selected question
-    // For example, if question corresponds to an element in formElements:
-    const element = formElements.find(el => el.text === question);
+
+  const [selectedQuestions, setSelectedQuestions] = useState([]);
+  const [selectedAnswers, setSelectedAnswers] = useState(Array(questionAnswers.length).fill(null));
+
+  // const handleQuestionSelect = (value, index) => {
+
+  //   const updatedQuestions = [...selectedQuestions];
+  //   updatedQuestions[index] = value;
+  //   setSelectedQuestions(updatedQuestions);
+
+  //   const updatedAnswers = [...selectedAnswers];
+  //   updatedAnswers[index] = null; // Reset the answer for the selected question
+  //   setSelectedAnswers(updatedAnswers);
+  // };
+  // const getAnswerOptions = (question) => {
+  //   // Logic to fetch or derive answer options based on the selected question
+  //   // For example, if question corresponds to an element in formElements:
+  //   const element = formElements.find(el => el.text === question);
+  //   return element ? element.options.map(option => option.text) : [];
+  // };
+  // Get answer options for the selected question
+  const getAnswerOptions = (question) => {
+    const section = sections.find(s => s.formElements.some(el => el.text === question));
+    if (!section) return []; // Guard clause for undefined section
+
+    const element = section.formElements.find(el => el.text === question);
     return element ? element.options.map(option => option.text) : [];
+  };
+
+  // Handle question selection
+  const handleQuestionSelect = (value, index) => {
+    const updatedQuestions = [...selectedQuestions];
+    updatedQuestions[index] = value; // Update selected question
+    setSelectedQuestions(updatedQuestions);
+
+    const updatedAnswers = [...selectedAnswers];
+    updatedAnswers[index] = null; // Reset answer for the new selected question
+    setSelectedAnswers(updatedAnswers);
+  };
+  const handleSectionQuestionSelect = (value, index) => {
+    const updatedQuestions = [...selectedQuestions];
+    updatedQuestions[index] = value; // Update selected question
+    setSelectedQuestions(updatedQuestions);
+
+    const updatedAnswers = [...selectedAnswers];
+    updatedAnswers[index] = null; // Reset answer for the new selected question
+    setSelectedAnswers(updatedAnswers);
   };
   return (
     <Box
@@ -837,8 +840,8 @@ const handleQuestionSelect = (value, index) => {
                   <Autocomplete
                     options={['Any', 'All']}
                     defaultValue="Any"
-                     value={sectionMode} // Bind value to state
-                      onChange={(event, newValue) => setSectionMode(newValue)}
+                    value={sectionMode} // Bind value to state
+                    onChange={(event, newValue) => setSectionMode(newValue)}
                     renderInput={(params) => <TextField {...params} variant="outlined" size='small' margin='normal' />}
                     renderOption={(props, option) => (
                       <li {...props} style={{ margin: '5px', cursor: 'pointer' }}>
@@ -850,9 +853,12 @@ const handleQuestionSelect = (value, index) => {
 
                 {questionAnswers.map((qa, index) => (
                   <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 3, mt: 2 }}>
-                    <Box>
+                    <Box sx={{ width: '380px', }}>
                       <Typography>Question</Typography>
                       <Autocomplete
+                        options={getRadioButtonOptions()}
+                        value={selectedQuestions[index] || null}
+                        onChange={(event, newValue) => handleSectionQuestionSelect(newValue, index)}
                         renderInput={(params) => (
                           <TextField
                             {...params}
@@ -872,6 +878,13 @@ const handleQuestionSelect = (value, index) => {
                     <Box>
                       <Typography>Answer</Typography>
                       <Autocomplete
+                        options={getAnswerOptions(selectedQuestions[index])} // Get options based on selected question
+                        value={selectedAnswers[index] || null}
+                        onChange={(event, newValue) => {
+                          const updatedAnswers = [...selectedAnswers];
+                          updatedAnswers[index] = newValue;
+                          setSelectedAnswers(updatedAnswers);
+                        }}
                         renderInput={(params) => (
                           <TextField
                             {...params}
@@ -959,8 +972,8 @@ const handleQuestionSelect = (value, index) => {
               </>
             )} */}
             {selectedElement && (
-            <Typography variant='h6'>{selectedElement.text}</Typography>
-          )}
+              <Typography variant='h6'>{selectedElement.text}</Typography>
+            )}
 
             <IconButton onClick={() => setQueDrawerOpen(false)}>
               <IoMdClose />
@@ -1060,12 +1073,12 @@ const handleQuestionSelect = (value, index) => {
 
                   {questionAnswers.map((qa, index) => (
                     <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 3, mt: 2 }}>
-                      <Box>
+                      <Box sx={{ width: '380px', }}>
                         <Typography>Question</Typography>
                         <Autocomplete
-                         options={getRadioButtonOptions()}
-                         value={selectedQuestions[index] || null}
-                         onChange={(event, newValue) => handleQuestionSelect(newValue, index)}
+                          options={getRadioButtonOptions()}
+                          value={selectedQuestions[index] || null}
+                          onChange={(event, newValue) => handleQuestionSelect(newValue, index)}
                           renderInput={(params) => (
                             <TextField
                               {...params}
@@ -1073,6 +1086,7 @@ const handleQuestionSelect = (value, index) => {
                               size='small'
                               margin='normal'
                               placeholder='Question'
+
                             />
                           )}
                           renderOption={(props, option) => (
@@ -1085,6 +1099,13 @@ const handleQuestionSelect = (value, index) => {
                       <Box>
                         <Typography>Answer</Typography>
                         <Autocomplete
+                          // options={getAnswerOptions(selectedQuestions[index])} // Get options based on selected question
+                          // value={selectedAnswers[index] || null}
+                          // onChange={(event, newValue) => {
+                          //   const updatedAnswers = [...selectedAnswers];
+                          //   updatedAnswers[index] = newValue;
+                          //   setSelectedAnswers(updatedAnswers);
+                          // }}
                           options={getAnswerOptions(selectedQuestions[index])} // Get options based on selected question
                           value={selectedAnswers[index] || null}
                           onChange={(event, newValue) => {

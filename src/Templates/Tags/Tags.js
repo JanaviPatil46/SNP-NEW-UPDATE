@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './tag.css'
-import { Box, Button, Typography, Drawer,  Select, MenuItem, IconButton, TextField } from '@mui/material';
+import { Box, Button, Typography, Drawer, Select, MenuItem, IconButton, TextField } from '@mui/material';
 import { FiSettings } from "react-icons/fi";
 import { CiMenuKebab } from "react-icons/ci";
 import { useTheme } from '@mui/material/styles';
@@ -11,7 +11,7 @@ import { MaterialReactTable, useMaterialReactTable } from 'material-react-table'
 import { toast } from 'react-toastify';
 
 const Tags = () => {
-  
+
   const TAGS_API = process.env.REACT_APP_TAGS_TEMP_URL;
 
   const [tags, setTags] = useState([]);
@@ -25,7 +25,11 @@ const Tags = () => {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [tagid, settagidData] = useState();
 
-  const colors = ["#EE4B2B", "#FFAC1C", "#32CD32", "#008000", "#0000FF", "#BF40BF", "#F72798"];
+  // const colors = ["#EE4B2B", "#FFAC1C", "#32CD32", "#008000", "#0000FF", "#BF40BF", "#F72798"];
+  const colors = ["#fd3241", "#f9b5ac", "#ac6400", "#ff7e39", "#ffea00", "#94ecbe", "#2e8b57", "#76ac1e", "#3cbb50", "#9ed8db", "#0299bb", "#0af4b8", "#466efb", "#0496ff", "#b9c1ff",
+    "#e1b1ff", "#9d33d0", "#d834f5", "#ff54b6", "#1d3354", "#767b91", "#8f8f8f", "#c7c7c7", "#9a657e", "#616468", "#511dff", "#85c7db", "#8cd1ff", "#0aefff", "#d4ff00", "#a1ff0a", "#00f43d", "#ffc100",
+    "#cdc6a5", "#fed6b1", "#e5dfdf", "#ffeaa7"
+  ];
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -53,13 +57,15 @@ const Tags = () => {
 
 
 
-  const handleChange = (event) => {
-    const value = event.target.value;
-    const selectedOption = options.find(option => option.tagColour === value);
-    setSelectedOption(selectedOption);
+  // const handleChange = (event) => {
+  //   const value = event.target.value;
+  //   const selectedOption = options.find(option => option.tagColour === value);
+  //   setSelectedOption(selectedOption);
+  // };
+
+  const handleChange = (event, newValue) => {
+    setSelectedOption(newValue);
   };
-
-
 
   const handleUpdateDrawerOpen = () => {
     setIsUpdateDrawerOpen(true);
@@ -113,39 +119,39 @@ const Tags = () => {
       }
     }
   };
-  
+
 
 
   console.log(tagidget);
   const handleDelete = (_id) => {
-       // Show a confirmation prompt
-       const isConfirmed = window.confirm("Are you sure you want to delete this tag?");
-        
-       // Proceed with deletion if confirmed
-       if (isConfirmed) {
-    setGetId(_id);
-    setOpenMenuId(false);
-    const requestOptions = {
-      method: "DELETE",
-      redirect: "follow"
-    };
-    fetch(`${TAGS_API}/tags/` + _id, requestOptions)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to delete tagdata');
-        }
-        return response.json();
-      })
-      .then((result) => {
-        console.log(result);
-        toast.success('Tagdata deleted successfully');
-        fetchData();
-        setOpenMenuId(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error('Failed to delete tagdata');
-      });
+    // Show a confirmation prompt
+    const isConfirmed = window.confirm("Are you sure you want to delete this tag?");
+
+    // Proceed with deletion if confirmed
+    if (isConfirmed) {
+      setGetId(_id);
+      setOpenMenuId(false);
+      const requestOptions = {
+        method: "DELETE",
+        redirect: "follow"
+      };
+      fetch(`${TAGS_API}/tags/` + _id, requestOptions)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to delete tagdata');
+          }
+          return response.json();
+        })
+        .then((result) => {
+          console.log(result);
+          toast.success('Tagdata deleted successfully');
+          fetchData();
+          setOpenMenuId(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error('Failed to delete tagdata');
+        });
     }
   };
 
@@ -191,7 +197,7 @@ const Tags = () => {
         } else {
           toast.success("Tag data sent successfully!");
           fetchData();
-          
+
           setTags([...tags, { tagName, tagColour }]);
         }
       })
@@ -203,7 +209,7 @@ const Tags = () => {
 
   const handleUpdatesumbit = () => {
     if (selectedOption) {
-      const {  tagColour } = selectedOption;
+      const { tagColour } = selectedOption;
       UpdatedTag(inputValue, tagColour);
     }
   };
@@ -331,7 +337,7 @@ const Tags = () => {
         open={isDrawerOpen}
         onClose={handleDrawerClose}
         PaperProps={{
-          id:'tag-drawer',
+          id: 'tag-drawer',
           sx: {
             borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
             width: isSmallScreen ? '100%' : 500,
@@ -339,7 +345,7 @@ const Tags = () => {
             [theme.breakpoints.down('sm')]: {
               width: '100%',
             },
-            
+
           }
         }}
       >
@@ -353,7 +359,7 @@ const Tags = () => {
             </Box>
             <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
               <Box>
-                <label  className='tag-input-label'>Name</label>
+                <label className='tag-input-label'>Name</label>
 
                 <TextField
                   placeholder="Tag Name"
@@ -362,9 +368,9 @@ const Tags = () => {
                   fullWidth
                   margin="normal"
                   size="small"
-                  sx={{backgroundColor:'#fff'}}
+                  sx={{ backgroundColor: '#fff' }}
                 />
-               
+
               </Box>
               <Box sx={{ mt: 3 }}>
                 <label className='tag-input-label'>Color</label>
@@ -374,7 +380,15 @@ const Tags = () => {
                   labelId="color-select-label"
                   id="color-select"
                   size="small"
-                  sx={{ width: '100%', marginTop: '10px' ,backgroundColor:'#fff'}}
+                  sx={{ width: '100%', marginTop: '10px', backgroundColor: '#fff' }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 200,  // Adjust the dropdown height as per your requirement
+                        overflowY: 'auto',  // Enable scrolling if the content exceeds the height
+                      },
+                    },
+                  }}
                 >
                   {options.map((option) => (
                     <MenuItem key={option.value} value={option.tagColour}>
@@ -407,14 +421,14 @@ const Tags = () => {
         onClose={handleUpdateDrawerClose}
         PaperProps={{
           sx: {
-            
+
             borderRadius: isSmallScreen ? '0' : '10px 0 0 10px',
             width: isSmallScreen ? '100%' : 500,
             maxWidth: '100%',
             [theme.breakpoints.down('sm')]: {
               width: '100%',
             },
-            id:'tag-drawer',
+            id: 'tag-drawer',
           }
         }}
       >
@@ -426,9 +440,9 @@ const Tags = () => {
               </Typography>
               <IoClose onClick={handleUpdateDrawerClose} style={{ cursor: 'pointer' }} />
             </Box>
-            <Box sx={{ pr: 2, pl: 2, pt: 2}}>
+            <Box sx={{ pr: 2, pl: 2, pt: 2 }}>
               <Box>
-               
+
                 <label className='tag-input-label'>Name</label>
 
                 <TextField
@@ -452,6 +466,14 @@ const Tags = () => {
                   id="color-select"
                   size="small"
                   sx={{ width: '100%', marginTop: '10px' }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        maxHeight: 200,  // Adjust the dropdown height as per your requirement
+                        overflowY: 'auto',  // Enable scrolling if the content exceeds the height
+                      },
+                    },
+                  }}
                 >
                   {options.map((option) => (
                     <MenuItem key={option.value} value={option.tagColour}>
