@@ -76,6 +76,7 @@ const OrganizersTempUpdate = () => {
     // const newSection = {
     //     id: section.sectionId, name: section.sectionname, text: section.sectionname, formElements: section.questions
     // };
+    console.log(section);
     setSelectedSection(section);
   };
   const handleDeleteSection = (sectionId) => {
@@ -86,11 +87,20 @@ const OrganizersTempUpdate = () => {
     }
   };
 
-  const handleUpdateSection = (id, newText, newFormElements) => {
+  // const handleUpdateSection = (id, newText, newFormElements) => {
+  //   setSections(prevSections => prevSections.map(section =>
+  //     section.id === id ? { ...section, text: newText, formElements: newFormElements } : section
+  //   ));
+  // };
+  const handleUpdateSection = (id, newText, newFormElements, newSectionSettings) => {
     setSections(prevSections => prevSections.map(section =>
-      section.id === id ? { ...section, text: newText, formElements: newFormElements } : section
+      section.id === id
+        ? { ...section, text: newText, formElements: newFormElements, sectionSettings: newSectionSettings }
+        : section
     ));
   };
+  
+  
 
   const handleDuplicateSection = (sectionId) => {
     const sectionToDuplicate = sections.find(section => section.id === sectionId);

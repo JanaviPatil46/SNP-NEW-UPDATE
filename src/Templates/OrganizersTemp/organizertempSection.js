@@ -53,9 +53,9 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
       conditional: conditionButton,
       sectionMode: sectionMode,
       conditions: conditionButton ? sectionQuestionAnswers.map((qa, index) => ({
-      question: selectedQuestions[index],
-      answer: selectedAnswers[index]
-    })) : [], 
+        question: selectedQuestions[index],
+        answer: selectedAnswers[index]
+      })) : [],
       // conditions: conditionButton ? questionAnswers : [], // assuming questionAnswers is an array of {question, answer} objects
     };
 
@@ -80,8 +80,8 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
     setSelectedQuestions([]); // Clear selected questions
     setSelectedAnswers([]);   // Clear selected answers
     setMode('Any');           // Reset mode to default value
-    setQuestionAnswers([]);   
-   
+    setQuestionAnswers([]);
+
   };
   const [questionsAnswersMap, setQuestionsAnswersMap] = useState({});
   const handleElementSelect = (element) => {
@@ -161,7 +161,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
     setQueConditionButton(checked);
   };
   const toggleDrawer = (open) => {
-    
+
     setDrawerOpen(open);
   };
 
@@ -169,13 +169,29 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
 
 
 
+  // const handleSettingsClick = (elementId) => {
+  //   const updatedElement = formElements.find(element => element.id === elementId);
+  //   if (updatedElement) {
+  //     setSelectedElement(updatedElement);
+  //     setQueDrawerOpen(true);
+  //   }
+  // };
   const handleSettingsClick = (elementId) => {
     const updatedElement = formElements.find(element => element.id === elementId);
     if (updatedElement) {
       setSelectedElement(updatedElement);
       setQueDrawerOpen(true);
+
+      // Get the questionsectionsettings
+      const questionSectionSettings = updatedElement.questionsectionsettings;
+
+      // Log or use the questionsectionsettings
+      console.log("Question Section Settings:", questionSectionSettings);
+
+      // You can now use the questionsectionsettings as needed
     }
   };
+
 
 
   useEffect(() => {
@@ -183,7 +199,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
     setFormElements(section.formElements);
 
   }, [section]);
-
+  console.log(formElements)
   const handleDelete = () => {
     onDelete(section.id);
   };
@@ -681,15 +697,15 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
   };
 
   // Handle question selection
-  const handleQuestionSelect = (value, index) => {
-    const updatedQuestions = [...selectedQuestions];
-    updatedQuestions[index] = value; // Update selected question
-    setSelectedQuestions(updatedQuestions);
+  // const handleQuestionSelect = (value, index) => {
+  //   const updatedQuestions = [...selectedQuestions];
+  //   updatedQuestions[index] = value; // Update selected question
+  //   setSelectedQuestions(updatedQuestions);
 
-    const updatedAnswers = [...selectedAnswers];
-    updatedAnswers[index] = null; // Reset answer for the new selected question
-    setSelectedAnswers(updatedAnswers);
-  };
+  //   const updatedAnswers = [...selectedAnswers];
+  //   updatedAnswers[index] = null; // Reset answer for the new selected question
+  //   setSelectedAnswers(updatedAnswers);
+  // };
   const handleSectionQuestionSelect = (value, index) => {
     const updatedQuestions = [...selectedQuestions];
     updatedQuestions[index] = value; // Update selected question
@@ -699,6 +715,42 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
     updatedAnswers[index] = null; // Reset answer for the new selected question
     setSelectedAnswers(updatedAnswers);
   };
+
+  const handleQuestionSelect = (newValue, index) => {
+    const updatedConditions = [...selectedElement.questionsectionsettings.conditions];
+    updatedConditions[index].question = newValue;
+    setSelectedElement({
+      ...selectedElement,
+      questionsectionsettings: {
+        ...selectedElement.questionsectionsettings,
+        conditions: updatedConditions
+      }
+    });
+  };
+
+  const handleAnswerSelect = (newValue, index) => {
+    const updatedConditions = [...selectedElement.questionsectionsettings.conditions];
+    updatedConditions[index].answer = newValue;
+    setSelectedElement({
+      ...selectedElement,
+      questionsectionsettings: {
+        ...selectedElement.questionsectionsettings,
+        conditions: updatedConditions
+      }
+    });
+  };
+  const handleRemoveCondition = (index) => {
+    const updatedConditions = [...selectedElement.questionsectionsettings.conditions];
+    updatedConditions.splice(index, 1);  // Remove the condition at the specified index
+    setSelectedElement({
+      ...selectedElement,
+      questionsectionsettings: {
+        ...selectedElement.questionsectionsettings,
+        conditions: updatedConditions
+      }
+    });
+  };
+
   return (
     <Box
       sx={{
@@ -816,7 +868,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
                   margin='normal'
                   // defaultValue="Repeat Section"
                   value={repeatButtonName}
-                  onChange={(e) => setRepeatButtonName(e.target.value)} 
+                  onChange={(e) => setRepeatButtonName(e.target.value)}
                 />
 
               </Box>
@@ -1161,6 +1213,10 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
 
         </Box>
       </Drawer>
+    
+
+
+
     </Box>
   );
 };
