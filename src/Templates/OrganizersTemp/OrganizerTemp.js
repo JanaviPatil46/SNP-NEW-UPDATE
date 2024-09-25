@@ -30,7 +30,7 @@ const OrganizersTemp = () => {
   const [organizerName, setOrganizerName] = useState('');
   const [sections, setSections] = useState([]);
   const [selectedSection, setSelectedSection] = useState(null);
-  const [sectionSettings, setSectionSettings] = useState({}); 
+  // const [sectionSettings, setSectionSettings] = useState({}); 
   const handleSectionSaveData = (settings) => {
     // Update the specific section with the new settings
     setSections((prevSections) =>

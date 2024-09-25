@@ -39,18 +39,24 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
   const [descriptionText, setDescriptionText] = useState('');
   const [mode, setMode] = useState('Any');
   const [sectionMode, setSectionMode] = useState('Any');
+  const [repeatButtonName, setRepeatButtonName] = useState('Repeat Section');
+
   const [queConditionButton, setQueConditionButton] = useState(false);
   const [questionAnswers, setQuestionAnswers] = useState([{ question: '', answer: '' }]);
   const [requiredButton, setRequiredButton] = useState(false);
-
+  const [sectionQuestionAnswers, setSectionQuestionAnswers] = useState([{ question: '', answer: '' }]);
   const handleSectionSave = () => {
     // Construct the sectionSettings object
     const sectionSettings = {
       sectionRepeatingMode: repeateButton,
-      buttonName: repeateButton ? 'Repeat Section' : '', // You can store the text input value instead of hardcoding it
+      buttonName: repeateButton ? repeatButtonName : '', // You can store the text input value instead of hardcoding it
       conditional: conditionButton,
       sectionMode: sectionMode,
-      conditions: conditionButton ? questionAnswers : [], // assuming questionAnswers is an array of {question, answer} objects
+      conditions: conditionButton ? sectionQuestionAnswers.map((qa, index) => ({
+      question: selectedQuestions[index],
+      answer: selectedAnswers[index]
+    })) : [], 
+      // conditions: conditionButton ? questionAnswers : [], // assuming questionAnswers is an array of {question, answer} objects
     };
 
     console.log('Section Settings:', sectionSettings);
@@ -69,10 +75,12 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
     setRequiredButton(false);
     setPrefilledButton(false);
     setQueConditionButton(false);
-    setMode("Any");
-    setQuestionAnswers([]); // Assuming this is an array
     setDescriptionButton(false);
-    setDescriptionText("");
+    setDescriptionText('');
+    setSelectedQuestions([]); // Clear selected questions
+    setSelectedAnswers([]);   // Clear selected answers
+    setMode('Any');           // Reset mode to default value
+    setQuestionAnswers([]);   
    
   };
   const [questionsAnswersMap, setQuestionsAnswersMap] = useState({});
@@ -135,6 +143,9 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
   const handleAddQuestionAnswer = () => {
     setQuestionAnswers([...questionAnswers, { question: '', answer: '' }]);
   };
+  const handleAddSectionQuestionAnswer = () => {
+    setSectionQuestionAnswers([...sectionQuestionAnswers, { question: '', answer: '' }]);
+  };
 
   const handleRemoveQuestionAnswer = (index) => {
     const updatedList = questionAnswers.filter((_, i) => i !== index);
@@ -150,6 +161,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
     setQueConditionButton(checked);
   };
   const toggleDrawer = (open) => {
+    
     setDrawerOpen(open);
   };
 
@@ -802,7 +814,9 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
                   fullWidth
                   size='small'
                   margin='normal'
-                  defaultValue="Repeat Section"
+                  // defaultValue="Repeat Section"
+                  value={repeatButtonName}
+                  onChange={(e) => setRepeatButtonName(e.target.value)} 
                 />
 
               </Box>
@@ -830,7 +844,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
               <Box mb={3} mt={2}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <Typography variant='h6' sx={{ fontWeight: 'bold' }}>Conditions</Typography>
-                  <Button variant="text" onClick={handleAddQuestionAnswer}>
+                  <Button variant="text" onClick={handleAddSectionQuestionAnswer}>
                     Add
                   </Button>
                 </Box>
@@ -851,7 +865,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
                   />
                 </Box>
 
-                {questionAnswers.map((qa, index) => (
+                {sectionQuestionAnswers.map((qa, index) => (
                   <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 3, mt: 2 }}>
                     <Box sx={{ width: '380px', }}>
                       <Typography>Question</Typography>
@@ -930,47 +944,7 @@ const Section = ({ sections, section, onDelete, onUpdate, onDuplicate, onSaveFor
           role="presentation"
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-            {/* {selectedElement && (
-              <>
-
-                {selectedElement.type === 'Free Entry' && (
-                  <Typography variant='h6'> {selectedElement.text}</Typography>
-
-                )}
-                {selectedElement.type === 'Email' && (
-                  <Typography variant='h6'> {selectedElement.text}</Typography>
-
-                )}
-                {selectedElement.type === 'Number' && (
-                  <Typography variant='h6'> {selectedElement.text}</Typography>
-
-                )}
-                {selectedElement.type === 'Date' && (
-                  <Typography variant='h6'> {selectedElement.text}</Typography>
-
-                )}
-                {selectedElement.type === 'Radio Buttons' && (
-                  <Typography variant='h6'> {selectedElement.text}</Typography>
-
-                )}
-                {selectedElement.type === 'Checkboxes' && (
-                  <Typography variant='h6'> {selectedElement.text}</Typography>
-
-                )}
-                {selectedElement.type === 'Dropdown' && (
-                  <Typography variant='h6'> {selectedElement.text}</Typography>
-
-                )}
-                {selectedElement.type === 'Yes/No' && (
-                  <Typography variant='h6'> {selectedElement.text}</Typography>
-
-                )}
-                {selectedElement.type === 'Text Editor' && (
-                  <Typography variant='h6'> Text Block</Typography>
-
-                )}
-              </>
-            )} */}
+            
             {selectedElement && (
               <Typography variant='h6'>{selectedElement.text}</Typography>
             )}

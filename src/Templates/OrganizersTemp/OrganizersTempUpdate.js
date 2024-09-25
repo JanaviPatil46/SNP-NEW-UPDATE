@@ -1,11 +1,11 @@
-import React,{useEffect,useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Button,
   TextField,
 
 } from '@mui/material';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { useNavigate, useParams } from "react-router-dom";
 import Section from './organizertempSection';
 const OrganizersTempUpdate = () => {
@@ -13,7 +13,7 @@ const OrganizersTempUpdate = () => {
   const ORGANIZER_TEMP_API = process.env.REACT_APP_ORGANIZER_TEMP_URL;
 
 
-  const { id  } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
 
   const [templateName, setTemplateName] = useState('');
@@ -23,26 +23,27 @@ const OrganizersTempUpdate = () => {
   const [templateData, setTemplateData] = useState(null);
 
   useEffect(() => {
-      fetchidwiseData();
+    fetchidwiseData();
   }, []);
 
   const fetchidwiseData = async () => {
-      try {
-        const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${id}`;
-          const response = await fetch(url);
-          if (!response.ok) {
-              throw new Error("Failed to fetch data");
-          }
-          const data = await response.json();
-          setTemplateData(data.organizerTemplate);
-          setTemplateName(data.organizerTemplate.templatename);
-          console.log(data.organizerTemplate.templatename)
-          setOrganizerName(data.organizerTemplate.organizerName);
-          console.log(data.organizerTemplate.sections)
-          setSections(data.organizerTemplate.sections || []);
-      } catch (error) {
-          console.error("Error fetching data:", error);
+    try {
+      const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${id}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
       }
+      const data = await response.json();
+      console.log(data);
+      setTemplateData(data.organizerTemplate);
+      setTemplateName(data.organizerTemplate.templatename);
+      // console.log(data.organizerTemplate.templatename)
+      setOrganizerName(data.organizerTemplate.organizerName);
+      // console.log(data.organizerTemplate.sections)
+      setSections(data.organizerTemplate.sections || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
   };
   function truncateText(text, maxWords) {
     const words = text.split(' ');
@@ -52,7 +53,21 @@ const OrganizersTempUpdate = () => {
     return text;
   }
   const addSection = () => {
-    const newSection = { id: Date.now(), name: `Section ${sections.length + 1}`, text: '', formElements: [] };
+    // const newSection = { id: Date.now(), name: `Section ${sections.length + 1}`, text: '', formElements: [] };
+    const newSection = {
+      id: Date.now(), name: `Section ${sections.length + 1}`, text: '', formElements: [], sectionSettings: {
+        sectionRepeatingMode: false,
+        buttonName: '',
+        conditional: false,
+        mode: '',
+        conditions: [
+          {
+            question: '',
+            answer: ''
+          }
+        ]
+      }
+    };
     setSections([...sections, newSection]);
     setSelectedSection(newSection); // Select the newly added section
   };
@@ -93,125 +108,149 @@ const OrganizersTempUpdate = () => {
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
-        templatename: templateName,
-        organizerName: organizerName,
-        sections: sections.map(section => ({
-            name: section.text,
-            text: section.text,
-            id: section.id.toString(),
-            formElements: section.formElements.map(element => ({
-                type: element.type,
-                id: element.id,
-                sectionid: element.sectionid,
-                options: element.options.map(option => ({
-                    id: option.id,
-                    text: option.text
-                })),
-                text: element.text
-            }))
-        })),
-        active: true
+      templatename: templateName,
+      organizerName: organizerName,
+      sections: sections.map(section => ({
+        name: section.text,
+        text: section.text,
+        id: section.id.toString(),
+        sectionsettings: section.sectionSettings || {},
+        formElements: section.formElements.map(element => ({
+          type: element.type,
+          id: element.id,
+          sectionid: element.sectionid,
+          options: element.options.map(option => ({
+            id: option.id,
+            text: option.text
+          })),
+          text: element.text,
+          questionsectionsettings: element.questionsectionsettings || {}
+        }))
+      })),
+      active: true
     });
 
     const requestOptions = {
-        method: "PATCH",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow"
+      method: "PATCH",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow"
     };
 
     console.log(raw)
     const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${id}`;
     fetch(url, requestOptions)
-        .then((response) => response.json())
-        .then((result) => {
-            console.log(result)
-            if (result && result.message === "OrganizerTemplate Updated successfully") {
-                toast.success("Organizer Template Updated successfully");
-                // navigate('/firmtemp/templates/organizers');
-             
-            } else {
-                toast.error(result.error || "Failed to Update Organizer Template");
-            }
-        })
-        .catch((error) => console.error(error));
-};
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result)
+        if (result && result.message === "OrganizerTemplate Updated successfully") {
+          toast.success("Organizer Template Updated successfully");
+          // navigate('/firmtemp/templates/organizers');
 
-const saveandexitOrganizerTemp = () => {
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
+        } else {
+          toast.error(result.error || "Failed to Update Organizer Template");
+        }
+      })
+      .catch((error) => console.error(error));
+  };
 
-  const raw = JSON.stringify({
+  const saveandexitOrganizerTemp = () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
       templatename: templateName,
       organizerName: organizerName,
       sections: sections.map(section => ({
-          name: section.text,
-          text: section.text,
-          id: section.id.toString(),
-          formElements: section.formElements.map(element => ({
-              type: element.type,
-              id: element.id,
-              sectionid: element.sectionid,
-              options: element.options.map(option => ({
-                  id: option.id,
-                  text: option.text
-              })),
-              text: element.text
-          }))
+        name: section.text,
+        text: section.text,
+        id: section.id.toString(),
+        sectionsettings: section.sectionSettings || {},
+        formElements: section.formElements.map(element => ({
+          type: element.type,
+          id: element.id,
+          sectionid: element.sectionid,
+          options: element.options.map(option => ({
+            id: option.id,
+            text: option.text
+          })),
+          text: element.text,
+          questionsectionsettings: element.questionsectionsettings || {}
+        }))
       })),
       active: true
-  });
+    });
 
-  const requestOptions = {
+    const requestOptions = {
       method: "PATCH",
       headers: myHeaders,
       body: raw,
       redirect: "follow"
-  };
+    };
 
-  console.log(raw)
-  const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${id}`;
-  fetch(url, requestOptions)
+    console.log(raw)
+    const url = `${ORGANIZER_TEMP_API}/workflow/organizers/organizertemplate/${id}`;
+    fetch(url, requestOptions)
       .then((response) => response.json())
       .then((result) => {
-          console.log(result)
-          if (result && result.message === "OrganizerTemplate Updated successfully") {
-              toast.success("Organizer Template Updated successfully");
-              navigate('/firmtemp/templates/organizers');
-           
-          } else {
-              toast.error(result.error || "Failed to Update Organizer Template");
-          }
+        console.log(result)
+        if (result && result.message === "OrganizerTemplate Updated successfully") {
+          toast.success("Organizer Template Updated successfully");
+          navigate('/firmtemp/templates/organizers');
+
+        } else {
+          toast.error(result.error || "Failed to Update Organizer Template");
+        }
       })
       .catch((error) => console.error(error));
-};
-// const handleBackButton = ()=>{
-//   navigate('/firmtemp/templates/organizers');
-// }
-const [isFormFilled, setIsFormFilled] = useState(false);
-const handleBackButton = () => {
+  };
+  // const handleBackButton = ()=>{
+  //   navigate('/firmtemp/templates/organizers');
+  // }
+  const [isFormFilled, setIsFormFilled] = useState(false);
+  const handleBackButton = () => {
     if (isFormFilled) {
-        const confirmCancel = window.confirm("You have unsaved changes. Are you sure you want to cancel?");
-        if (confirmCancel) {
-          navigate('/firmtemp/templates/organizers');
-        }
+      const confirmCancel = window.confirm("You have unsaved changes. Are you sure you want to cancel?");
+      if (confirmCancel) {
+        navigate('/firmtemp/templates/organizers');
+      }
     } else {
       navigate('/firmtemp/templates/organizers');
     }
-};
+  };
 
-useEffect(() => {
+  useEffect(() => {
     // Check if form is filled
     const checkIfFormFilled = () => {
-        if (organizerName || templateName || sections ) {
-            setIsFormFilled(true);
-        } else {
-            setIsFormFilled(false);
-        }
+      if (organizerName || templateName || sections) {
+        setIsFormFilled(true);
+      } else {
+        setIsFormFilled(false);
+      }
     };
 
     checkIfFormFilled();
-}, [organizerName, templateName, sections]);
+  }, [organizerName, templateName, sections]);
+  const handleFormSave = (elementId, formData) => {
+    setSections(prevSections =>
+      prevSections.map(section => ({
+        ...section,
+        formElements: section.formElements.map(el =>
+          el.id === elementId ? { ...el, questionsectionsettings: formData } : el
+        )
+      }))
+    );
+  };
+  const handleSectionSaveData = (settings) => {
+    // Update the specific section with the new settings
+    setSections((prevSections) =>
+      prevSections.map((section) =>
+        section.id === selectedSection.id
+          ? { ...section, sectionSettings: settings }
+          : section
+      )
+    );
+  };
   return (
     <>
       <Box>
@@ -245,8 +284,8 @@ useEffect(() => {
         </Box>
 
       </Box>
-      <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%", gap:3 }}>
-        <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "auto",  p: 2 }}>
+      <Box className="organizer-container" sx={{ display: "flex", marginTop: "40px", height: "auto", width: "100%", gap: 3 }}>
+        <Box className="left-org-container" sx={{ padding: '10px', width: "30%", height: "auto", p: 2 }}>
           <Box className="smooth-dnd-container vertical">
             {sections.map((section) => (
               <Box key={section.id} sx={{ display: "flex", alignItems: "center" }}>
@@ -282,15 +321,19 @@ useEffect(() => {
               onDelete={handleDeleteSection}
               onUpdate={handleUpdateSection}
               onDuplicate={handleDuplicateSection}
+              onSaveFormData={handleFormSave}
+              onSaveSectionData={handleSectionSaveData}
+              sections={sections}
+              
             />
           )}
         </Box>
       </Box>
       <Box sx={{ display: "flex", gap: "10px", marginLeft: "10px", marginBottom: "20px", marginTop: '20px' }}>
-      <Button  type="submit"
-              variant="contained"
-              color="primary"
-              onClick={saveandexitOrganizerTemp}>Save & exit</Button>
+        <Button type="submit"
+          variant="contained"
+          color="primary"
+          onClick={saveandexitOrganizerTemp}>Save & exit</Button>
         <Button
           type="submit"
           variant="contained"
@@ -303,7 +346,7 @@ useEffect(() => {
           type="button"
           variant="outlined"
           color="primary"
-onClick={handleBackButton}
+          onClick={handleBackButton}
         >
           Cancel
         </Button>
